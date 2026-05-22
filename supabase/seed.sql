@@ -1,0 +1,2 @@
+-- QSB Ask foundation seed intentionally creates no rows.
+-- Application records depend on Supabase Auth users and are created through server-side flows.
