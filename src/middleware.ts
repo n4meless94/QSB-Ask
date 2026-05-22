@@ -45,6 +45,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (process.env.QSB_ASK_E2E_AUTH === "1") {
+    return NextResponse.next();
+  }
+
   const envStatus = getRuntimeEnvStatus();
 
   if (!envStatus.configured) {

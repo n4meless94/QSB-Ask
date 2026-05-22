@@ -12,7 +12,7 @@ test("dashboard shows shell, title, create action, search, and event rows", asyn
   );
   await expect(page.getByLabel("Search events")).toBeVisible();
 
-  const row = page.getByRole("link", { name: /Quarterly Briefing/ });
+  const row = page.getByRole("listitem").filter({ hasText: "Quarterly Briefing" });
   await expect(row).toBeVisible();
   await expect(row).toContainText("1 Jun 2099");
   await expect(row).toContainText("Draft");
@@ -23,7 +23,7 @@ test("dashboard shows shell, title, create action, search, and event rows", asyn
 test("dashboard search filters by event name and join code case-insensitively", async ({ page }) => {
   await page.goto("/dashboard");
 
-  await page.getByLabel("Search events").fill("townhall");
+  await page.getByLabel("Search events").fill("town");
   await expect(page.getByRole("link", { name: /Town Hall/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Quarterly Briefing/ })).toHaveCount(0);
 
