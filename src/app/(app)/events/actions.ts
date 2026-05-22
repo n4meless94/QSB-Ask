@@ -1,7 +1,9 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import { createEventForOrganiser } from "@/lib/events/events";
 import type { CreateEventFieldErrors } from "@/lib/events/validation";
 import { createEventSchema } from "@/lib/events/validation";
@@ -40,7 +42,9 @@ export async function createEventAction(
     };
   }
 
-  if (process.env.QSB_ASK_E2E_AUTH === "1") {
+  const cookieStore = await cookies();
+
+  if (isE2EAuthEnabled(cookieStore.get(E2E_AUTH_COOKIE)?.value)) {
     redirect(
       `/dashboard?createdName=${encodeURIComponent(parsed.data.name)}&createdCode=E2E9SAVE`,
     );

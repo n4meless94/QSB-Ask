@@ -28,6 +28,7 @@ vi.mock("next/headers", () => ({
     get: vi.fn(() => null),
   })),
   cookies: vi.fn(async () => ({
+    get: vi.fn(() => undefined),
     getAll: vi.fn(() => []),
     set: vi.fn(),
   })),

@@ -1,7 +1,9 @@
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 
 import { EventDashboard } from "@/components/events/EventDashboard";
 import type { DashboardEvent } from "@/components/events/EventDashboard";
+import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import { buildJoinLink, listAccessibleEvents } from "@/lib/events/events";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -80,7 +82,9 @@ function getE2ECreatedEvent(
 }
 
 async function loadDashboardEvents(params: Record<string, string | string[] | undefined>) {
-  if (process.env.QSB_ASK_E2E_AUTH === "1") {
+  const cookieStore = await cookies();
+
+  if (isE2EAuthEnabled(cookieStore.get(E2E_AUTH_COOKIE)?.value)) {
     const createdEvent = getE2ECreatedEvent(params);
     return { events: createdEvent ? [createdEvent, ...E2E_EVENTS] : E2E_EVENTS };
   }

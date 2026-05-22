@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+test.beforeEach(async ({ context }) => {
+  await context.addCookies([
+    {
+      name: "qsb_ask_e2e_auth",
+      value: "1",
+      domain: "127.0.0.1",
+      path: "/",
+      sameSite: "Lax",
+    },
+  ]);
+});
+
 test("dashboard shows shell, title, create action, search, and event rows", async ({ page }) => {
   await page.goto("/dashboard");
 

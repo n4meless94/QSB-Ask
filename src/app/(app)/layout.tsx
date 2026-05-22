@@ -1,15 +1,17 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import type { ReactNode } from "react";
 
 import { signOutAction } from "@/app/(auth)/actions";
 import { AppShell } from "@/components/shell/AppShell";
+import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function ProtectedAppLayout({ children }: { children: ReactNode }) {
-  const user =
-    process.env.QSB_ASK_E2E_AUTH === "1"
-      ? { email: "organiser@qsb.com" }
-      : await getAuthenticatedUser();
+  const cookieStore = await cookies();
+  const user = isE2EAuthEnabled(cookieStore.get(E2E_AUTH_COOKIE)?.value)
+    ? { email: "organiser@qsb.com" }
+    : await getAuthenticatedUser();
 
   if (!user) {
     redirect("/login");

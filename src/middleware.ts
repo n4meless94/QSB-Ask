@@ -9,6 +9,7 @@ import {
   getSessionIdleTimeoutSeconds,
   touchSessionActivity,
 } from "@/lib/auth/session";
+import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import type { Database } from "@/lib/supabase/database.types";
 
 export const APP_SESSION_IDLE_TIMEOUT_SECONDS = getSessionIdleTimeoutSeconds();
@@ -45,7 +46,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (process.env.QSB_ASK_E2E_AUTH === "1") {
+  if (isE2EAuthEnabled(request.cookies.get(E2E_AUTH_COOKIE)?.value)) {
     return NextResponse.next();
   }
 
