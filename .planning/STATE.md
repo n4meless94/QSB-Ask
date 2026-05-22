@@ -3,21 +3,27 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: Phase 1 - Foundation, Auth, And Data
-status: in_progress
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-05-22T08:05:53.119Z"
+current_plan: 4
+status: verifying
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-05-22T08:52:38.461Z"
+last_activity: 2026-05-22
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 25
 ---
 
 # Project State: QSB Ask
 
 **Last updated:** 2026-05-22  
 **Current phase:** Phase 1 - Foundation, Auth, And Data  
+**Current Plan:** 4
+**Total Plans in Phase:** 4
+**Status:** Phase complete - ready for verification
+**Last Activity:** 2026-05-22
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
 
@@ -42,7 +48,7 @@ Phase 1 prepares the technical and product foundation:
 
 | Phase | Status | Requirements | Notes |
 |-------|--------|--------------|-------|
-| 1 | In Progress | 9 | Foundation, auth, event dashboard, data security. Plans 01-03 complete. |
+| 1 | Complete | 9 | Foundation, auth, event dashboard, data security. Plans 01-04 complete. |
 | 2 | Pending | 27 | Live Q&A, moderation, audience, presenter. |
 | 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
 | 4 | Pending | 4 | Deployment, reconnect handling, UAT readiness. |
@@ -62,6 +68,7 @@ Phase 1 prepares the technical and product foundation:
 - 2026-05-22: Completed Phase 1 Plan 01 foundation scaffold, health route, env contract, UI primitives, README, and smoke tests.
 - 2026-05-22: Completed Phase 1 Plan 02 Supabase schema, RLS policies, generated database types, and typed client helpers.
 - 2026-05-22: Completed Phase 1 Plan 03 login, password reset, lockout, protected shell, sign out, and inactivity timeout.
+- 2026-05-22: Completed Phase 1 Plan 04 Event Dashboard, Create Event flow, scoped event listing, and join-detail copy.
 
 ## Decisions
 
@@ -74,6 +81,8 @@ Phase 1 prepares the technical and product foundation:
 - [Phase 01]: Auth copy constants live in src/lib/auth/messages.ts because Next.js server-action modules can only export async functions.
 - [Phase 01]: Lockout state is derived from login_attempts rather than a separate lockout table, using five failures in a 15-minute window and a 30-minute lockout from the latest triggering failure.
 - [Phase 01]: The app inactivity marker is a secure same-site HTTP-only cookie refreshed by middleware on protected route access.
+- [Phase 01]: Event creation upserts the organiser profile before inserting the event because events.created_by references public.users and no auth-user profile trigger exists yet.
+- [Phase 01]: Playwright uses QSB_ASK_E2E_AUTH=1 as an env-gated fixture for protected-route UI tests without weakening production auth.
 
 ## Performance Metrics
 
@@ -82,13 +91,14 @@ Phase 1 prepares the technical and product foundation:
 | Phase 01 P01 | 12min | 3 tasks | 24 files |
 | Phase 01 P02 | 19min | 3 tasks | 14 files |
 | Phase 01 P03 | 15min | 3 tasks | 16 files |
+| Phase 01 P04 | 36min | 3 tasks | 15 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-22T08:05:53.089Z
-- **Stopped At:** Completed 01-03-PLAN.md
+- **Last session:** 2026-05-22T09:00:00.000Z
+- **Stopped At:** Completed 01-04-PLAN.md
 - **Resume File:** None
 
 ## Next Recommended Command
 
-`$gsd-execute-phase 1 --wave 4`
+`$gsd-verify-work Phase 1` or continue autonomous execution with Phase 2 planning.

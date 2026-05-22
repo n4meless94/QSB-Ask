@@ -10,7 +10,7 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 
 | Phase | Name | Goal | Requirements |
 |-------|------|------|--------------|
-| 1 | Foundation, Auth, And Data | Create the working Next.js/Supabase foundation that supports authenticated organiser workflows and the initial event dashboard. | AUTH-01, AUTH-02, AUTH-03, AUTH-04, EVNT-01, EVNT-02, EVNT-03, DEPL-01, DEPL-05 |
+| 1 | Foundation, Auth, And Data | Establish the app shell, local development, authentication baseline, event dashboard, and Supabase data/security foundation. Complete 2026-05-22. | AUTH-01 to AUTH-04, EVNT-01 to EVNT-03, DEPL-01, DEPL-05 |
 | 2 | Live Event Q&A And Moderation | Deliver the core moderated Q&A experience across organiser, moderator, audience, and presenter views. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-07, QNA-01 to QNA-15, LIVE-01 to LIVE-04 |
 | 3 | Surveys, Results, Presentation, And CSV | Deliver survey creation, participant responses, chart/data analytics UI, presentation view, and CSV exports. | LIVE-05, SURV-01 to SURV-13, EXPT-01 to EXPT-05 |
 | 4 | Hardening, Deployment, And UAT | Prepare production deployment through Coolify, verify live behaviour, handle reconnect states, and complete UAT readiness. | LIVE-06, DEPL-02 to DEPL-04 |
@@ -33,13 +33,13 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 
 **UI hint:** yes
 
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 01-01-PLAN.md - Scaffold Next.js/Tailwind foundation, local docs, health route, and UI primitives.
 - [x] 01-02-PLAN.md - Create Supabase schema, RLS foundations, generated types, and client helpers.
 - [x] 01-03-PLAN.md - Implement login, password reset, lockout, inactivity timeout, and protected shell.
-- [ ] 01-04-PLAN.md - Implement Event Dashboard, Create Event flow, accessible event listing, and join detail copy.
+- [x] 01-04-PLAN.md - Implement Event Dashboard, Create Event flow, accessible event listing, and join detail copy.
 
 ### Phase 2: Live Event Q&A And Moderation
 
@@ -100,7 +100,7 @@ Plans:
 
 ## Next Step
 
-Run `$gsd-discuss-phase 1 --auto` or `$gsd-plan-phase 1` to begin implementation planning.
+Phase 1 is implemented. Continue with `$gsd-discuss-phase 2 --auto` and `$gsd-plan-phase 2`.
 
 ---
 *Roadmap created: 2026-05-22*
