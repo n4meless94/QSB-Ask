@@ -7,9 +7,9 @@
 
 ### Authentication And Access
 
-- [ ] **AUTH-01**: Signed-in user can log in with email and password.
-- [ ] **AUTH-02**: Signed-in user can request and complete password reset by email link.
-- [ ] **AUTH-03**: Signed-in user session expires after 8 hours of inactivity.
+- [x] **AUTH-01**: Signed-in user can log in with email and password.
+- [x] **AUTH-02**: Signed-in user can request and complete password reset by email link.
+- [x] **AUTH-03**: Signed-in user session expires after 8 hours of inactivity.
 - [x] **AUTH-04**: System locks an account for 30 minutes after five failed sign-in attempts within 15 minutes.
 - [ ] **AUTH-05**: Organiser can invite and remove Moderator and Speaker access for an event.
 - [ ] **AUTH-06**: Speaker can access Presenter View for assigned events only.
@@ -122,9 +122,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 2 | Pending |
 | AUTH-06 | Phase 2 | Pending |
