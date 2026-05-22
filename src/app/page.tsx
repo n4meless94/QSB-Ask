@@ -46,13 +46,13 @@ export default function Home() {
             label="Auth route"
             name="next-destination"
             readOnly
-            value="/auth/sign-in"
+            value="/login"
           />
 
           <div className="flex flex-wrap gap-3">
             <a
               className="inline-flex min-h-11 items-center justify-center rounded-[6px] bg-teal-700 px-4 text-base font-semibold text-white outline-none hover:bg-teal-800 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
-              href="/auth/sign-in"
+              href="/login"
             >
               Go to sign in
             </a>

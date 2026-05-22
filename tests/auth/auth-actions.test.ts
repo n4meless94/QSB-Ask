@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  LOCKED_ACCOUNT_MESSAGE,
-  PASSWORD_RESET_CONFIRMATION_MESSAGE,
+  confirmPasswordResetAction,
+  signOutAction,
   signInAction,
   requestPasswordResetAction,
 } from "@/app/(auth)/actions";
+import { LOCKED_ACCOUNT_MESSAGE, PASSWORD_RESET_CONFIRMATION_MESSAGE } from "@/lib/auth/messages";
+import { assertActiveSession, DEFAULT_SESSION_IDLE_TIMEOUT_SECONDS } from "@/lib/auth/session";
 
 const redirectMock = vi.hoisted(() => vi.fn((url: string) => {
   throw new Error(`REDIRECT:${url}`);
@@ -15,7 +17,10 @@ const getUserMock = vi.hoisted(() => vi.fn());
 const signInWithPasswordMock = vi.hoisted(() => vi.fn());
 const resetPasswordForEmailMock = vi.hoisted(() => vi.fn());
 const updateUserMock = vi.hoisted(() => vi.fn());
+const signOutMock = vi.hoisted(() => vi.fn());
 const adminFromMock = vi.hoisted(() => vi.fn());
+
+vi.mock("server-only", () => ({}));
 
 vi.mock("next/navigation", () => ({
   redirect: redirectMock,
@@ -38,6 +43,7 @@ vi.mock("@/lib/supabase/server", () => ({
       signInWithPassword: signInWithPasswordMock,
       resetPasswordForEmail: resetPasswordForEmailMock,
       updateUser: updateUserMock,
+      signOut: signOutMock,
     },
   })),
 }));
@@ -59,15 +65,22 @@ function form(values: Record<string, string>) {
 }
 
 function mockFailedAttempts(attempts: string[] = []) {
+  const storedAttempts = [...attempts];
   const order = vi.fn(async () => ({
-    data: attempts.map((attempted_at) => ({ attempted_at, success: false })),
+    data: storedAttempts.map((attempted_at) => ({ attempted_at, success: false })),
     error: null,
   }));
   const gte = vi.fn(() => ({ order }));
   const successEq = vi.fn(() => ({ gte }));
   const emailEq = vi.fn(() => ({ eq: successEq }));
   const select = vi.fn(() => ({ eq: emailEq }));
-  const insert = vi.fn(async () => ({ error: null }));
+  const insert = vi.fn(async (attempt: { attempted_at: string; success: boolean }) => {
+    if (!attempt.success) {
+      storedAttempts.unshift(attempt.attempted_at);
+    }
+
+    return { error: null };
+  });
 
   adminFromMock.mockReturnValue({
     select,
@@ -77,7 +90,12 @@ function mockFailedAttempts(attempts: string[] = []) {
 
 describe("auth server actions", () => {
   beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "http://127.0.0.1:54321";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "anon";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role";
     process.env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
+    process.env.APP_JOIN_URL_BASE = "http://localhost:3000/join";
+    process.env.APP_SESSION_IDLE_TIMEOUT_SECONDS = "28800";
     vi.clearAllMocks();
     mockFailedAttempts();
     getUserMock.mockResolvedValue({ data: { user: { email: "organiser@qsb.com" } }, error: null });
@@ -140,5 +158,40 @@ describe("auth server actions", () => {
     expect(PASSWORD_RESET_CONFIRMATION_MESSAGE).toBe(
       "If an account exists for that email, a reset link has been sent.",
     );
+  });
+
+  it("rejects mismatched password reset confirmation before Supabase update", async () => {
+    await expect(
+      confirmPasswordResetAction(
+        form({ password: "ValidPass123!", confirmPassword: "DifferentPass123!" }),
+      ),
+    ).rejects.toThrow("REDIRECT:/password-reset/confirm?error=mismatch");
+
+    expect(updateUserMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects weak password reset confirmation before Supabase update", async () => {
+    await expect(
+      confirmPasswordResetAction(form({ password: "short", confirmPassword: "short" })),
+    ).rejects.toThrow("REDIRECT:/password-reset/confirm?error=weak-password");
+
+    expect(updateUserMock).not.toHaveBeenCalled();
+  });
+
+  it("signs out through Supabase and redirects to login", async () => {
+    signOutMock.mockResolvedValue({ error: null });
+
+    await expect(signOutAction()).rejects.toThrow("REDIRECT:/login");
+
+    expect(signOutMock).toHaveBeenCalled();
+  });
+
+  it("expires app sessions after the configured idle timeout", () => {
+    const now = 10_000;
+
+    expect(
+      assertActiveSession(String(now - DEFAULT_SESSION_IDLE_TIMEOUT_SECONDS - 1), now).expired,
+    ).toBe(true);
+    expect(assertActiveSession(String(now - 60), now).active).toBe(true);
   });
 });

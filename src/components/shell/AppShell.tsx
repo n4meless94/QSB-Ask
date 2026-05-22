@@ -3,10 +3,12 @@ import type { ReactNode } from "react";
 type AppShellProps = {
   children: ReactNode;
   currentDestination: string;
+  accountAction?: ReactNode;
   currentUserLabel?: string;
 };
 
 export function AppShell({
+  accountAction,
   children,
   currentDestination,
   currentUserLabel = "Local setup",
@@ -28,7 +30,7 @@ export function AppShell({
           </div>
           <div className="text-right text-sm leading-[1.4] text-slate-600">
             <span className="block text-slate-900">{currentUserLabel}</span>
-            <span>Setup mode</span>
+            {accountAction ?? <span>Setup mode</span>}
           </div>
         </div>
       </header>
