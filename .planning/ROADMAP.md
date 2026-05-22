@@ -19,7 +19,7 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 
 ### Phase 1: Foundation, Auth, And Data
 
-**Goal:** Create the working Next.js/Supabase foundation that supports authenticated organiser workflows and the initial event dashboard.
+**Goal:** As a QSB event organiser, I want to sign in, create an event, and see its join code and link on the Event Dashboard, so that I can prepare a controlled live Q&A and survey event.
 **Mode:** mvp
 
 **Requirements:** AUTH-01, AUTH-02, AUTH-03, AUTH-04, EVNT-01, EVNT-02, EVNT-03, DEPL-01, DEPL-05
