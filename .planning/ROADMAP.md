@@ -58,6 +58,18 @@ Plans:
 
 **UI hint:** yes
 
+**Plans:** 8 plans
+
+Plans:
+- [ ] 02-01-PLAN.md - Event Workspace shell, member access management, and staff role helpers.
+- [ ] 02-02-PLAN.md - Organiser event settings, close/archive lifecycle, and moderation-off warning.
+- [ ] 02-03-PLAN.md - Participant join, identity modes, and secure event-scoped session token.
+- [ ] 02-04-PLAN.md - Question submission, rate/duplicate checks, and approved-only public reads.
+- [ ] 02-05-PLAN.md - Moderator queue, audited moderation actions, edit history, search, and sort.
+- [ ] 02-06-PLAN.md - Audience approved-question list, Popular/Recent sorting, and one-vote behavior.
+- [ ] 02-07-PLAN.md - Presenter View access and approved-only display surface.
+- [ ] 02-08-PLAN.md - Normal-condition Q&A realtime subscriptions and cross-surface integration verification.
+
 ### Phase 3: Surveys, Results, Presentation, And CSV
 
 **Goal:** Add the survey workflow and reporting surfaces needed for live feedback collection, chart presentation, and CSV export.
