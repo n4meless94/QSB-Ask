@@ -10,16 +10,16 @@
 - [ ] **AUTH-01**: Signed-in user can log in with email and password.
 - [ ] **AUTH-02**: Signed-in user can request and complete password reset by email link.
 - [ ] **AUTH-03**: Signed-in user session expires after 8 hours of inactivity.
-- [ ] **AUTH-04**: System locks an account for 30 minutes after five failed sign-in attempts within 15 minutes.
+- [x] **AUTH-04**: System locks an account for 30 minutes after five failed sign-in attempts within 15 minutes.
 - [ ] **AUTH-05**: Organiser can invite and remove Moderator and Speaker access for an event.
 - [ ] **AUTH-06**: Speaker can access Presenter View for assigned events only.
 - [ ] **AUTH-07**: Moderator can access moderation tools for assigned events only.
 
 ### Events
 
-- [ ] **EVNT-01**: Organiser can create an event with name, date, time zone, status, participant identity mode, and moderation setting.
-- [ ] **EVNT-02**: Organiser can open an Event Dashboard listing accessible events with name, date, status, and join code.
-- [ ] **EVNT-03**: Organiser can copy a join code or link for an event.
+- [x] **EVNT-01**: Organiser can create an event with name, date, time zone, status, participant identity mode, and moderation setting.
+- [x] **EVNT-02**: Organiser can open an Event Dashboard listing accessible events with name, date, status, and join code.
+- [x] **EVNT-03**: Organiser can copy a join code or link for an event.
 - [ ] **EVNT-04**: Organiser can edit event settings from the Event Workspace.
 - [ ] **EVNT-05**: Organiser can close and archive an event while preserving records.
 - [ ] **EVNT-06**: Participant can join an active event by code or shared link.
@@ -82,7 +82,7 @@
 - [ ] **DEPL-02**: Application exposes a health route suitable for Coolify verification.
 - [ ] **DEPL-03**: Application deploys as a Coolify-managed Next.js resource on QSB VPS.
 - [ ] **DEPL-04**: Production public URL is prepared for `https://ask.qsbportal.com.my`.
-- [ ] **DEPL-05**: Supabase Row Level Security policies enforce role and visibility rules at the database layer.
+- [x] **DEPL-05**: Supabase Row Level Security policies enforce role and visibility rules at the database layer.
 
 ## v2 Requirements
 
@@ -125,13 +125,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-01 | Phase 1 | Pending |
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 2 | Pending |
 | AUTH-06 | Phase 2 | Pending |
 | AUTH-07 | Phase 2 | Pending |
-| EVNT-01 | Phase 1 | Pending |
-| EVNT-02 | Phase 1 | Pending |
-| EVNT-03 | Phase 1 | Pending |
+| EVNT-01 | Phase 1 | Complete |
+| EVNT-02 | Phase 1 | Complete |
+| EVNT-03 | Phase 1 | Complete |
 | EVNT-04 | Phase 2 | Pending |
 | EVNT-05 | Phase 2 | Pending |
 | EVNT-06 | Phase 2 | Pending |
@@ -179,7 +179,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEPL-02 | Phase 4 | Pending |
 | DEPL-03 | Phase 4 | Pending |
 | DEPL-04 | Phase 4 | Pending |
-| DEPL-05 | Phase 1 | Pending |
+| DEPL-05 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 59 total

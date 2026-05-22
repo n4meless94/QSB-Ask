@@ -4,13 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: Phase 1 - Foundation, Auth, And Data
 status: in_progress
-last_updated: "2026-05-22T07:18:00Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-05-22T07:44:09.594Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
-  percent: 25
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State: QSB Ask
@@ -41,7 +42,7 @@ Phase 1 prepares the technical and product foundation:
 
 | Phase | Status | Requirements | Notes |
 |-------|--------|--------------|-------|
-| 1 | In Progress | 9 | Foundation, auth, event dashboard, data security. Plan 01 complete. |
+| 1 | In Progress | 9 | Foundation, auth, event dashboard, data security. Plans 01-02 complete. |
 | 2 | Pending | 27 | Live Q&A, moderation, audience, presenter. |
 | 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
 | 4 | Pending | 4 | Deployment, reconnect handling, UAT readiness. |
@@ -59,25 +60,30 @@ Phase 1 prepares the technical and product foundation:
 - 2026-05-22: GSD project initialized.
 - 2026-05-22: PROJECT.md, research files, REQUIREMENTS.md, ROADMAP.md, and STATE.md created from approved docs.
 - 2026-05-22: Completed Phase 1 Plan 01 foundation scaffold, health route, env contract, UI primitives, README, and smoke tests.
+- 2026-05-22: Completed Phase 1 Plan 02 Supabase schema, RLS policies, generated database types, and typed client helpers.
 
 ## Decisions
 
 - Phase 1 Plan 01 used Tailwind CSS v4 PostCSS setup with `@import "tailwindcss"` in `globals.css`.
 - Health route reports missing environment variable names but never serializes secret values.
 - Root screen is an operational setup shell with auth and health links, not a landing page.
+- Participant/public question reads are guarded by participant-session context and restricted to live or answered statuses only.
+- Service-role Supabase access is isolated in a server-only admin helper with session persistence and token refresh disabled.
+- Database types are generated from the local Supabase schema after a successful local database reset.
 
 ## Performance Metrics
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 12min | 3 tasks | 24 files |
+| Phase 01 P02 | 19min | 3 tasks | 14 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-22T07:18:00Z
-- **Stopped At:** Completed 01-01-PLAN.md
+- **Last session:** 2026-05-22T07:44:09.574Z
+- **Stopped At:** Completed 01-02-PLAN.md
 - **Resume File:** None
 
 ## Next Recommended Command
 
-`$gsd-execute-phase 1 --wave 1`
+`$gsd-execute-phase 1 --wave 3`
