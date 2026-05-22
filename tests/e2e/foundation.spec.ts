@@ -10,8 +10,13 @@ test("health route returns non-secret operational JSON", async ({ request }) => 
     ok: true,
     service: "qsb-ask",
   });
-  expect(JSON.stringify(payload).toLowerCase()).not.toContain("service_role");
-  expect(JSON.stringify(payload).toLowerCase()).not.toContain("supabase_service_role_key");
+  const serializedPayload = JSON.stringify(payload);
+  const serviceRoleValue = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (serviceRoleValue) {
+    expect(serializedPayload).not.toContain(serviceRoleValue);
+  }
+  expect(serializedPayload).not.toContain("replace-with-supabase-service-role-key");
 });
 
 test("root page renders one h1 without mobile horizontal overflow", async ({ page }) => {
