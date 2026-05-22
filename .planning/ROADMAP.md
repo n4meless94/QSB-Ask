@@ -11,7 +11,7 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 | Phase | Name | Goal | Requirements |
 |-------|------|------|--------------|
 | 1 | Foundation, Auth, And Data | Establish the app shell, local development, authentication baseline, event dashboard, and Supabase data/security foundation. Complete 2026-05-22. | AUTH-01 to AUTH-04, EVNT-01 to EVNT-03, DEPL-01, DEPL-05 |
-| 2 | Live Event Q&A And Moderation | Deliver the core moderated Q&A experience across organiser, moderator, audience, and presenter views. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-07, QNA-01 to QNA-15, LIVE-01 to LIVE-04 |
+| 2 | Live Event Q&A And Moderation | As a QSB event organiser or moderator, I want to collect questions through a join link, review them before they appear publicly, and show approved questions to participants and speakers, so that live event Q&A stays controlled and useful. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-07, QNA-01 to QNA-15, LIVE-01 to LIVE-04 |
 | 3 | Surveys, Results, Presentation, And CSV | Deliver survey creation, participant responses, chart/data analytics UI, presentation view, and CSV exports. | LIVE-05, SURV-01 to SURV-13, EXPT-01 to EXPT-05 |
 | 4 | Hardening, Deployment, And UAT | Prepare production deployment through Coolify, verify live behaviour, handle reconnect states, and complete UAT readiness. | LIVE-06, DEPL-02 to DEPL-04 |
 
@@ -43,7 +43,7 @@ Plans:
 
 ### Phase 2: Live Event Q&A And Moderation
 
-**Goal:** Deliver the main product value: moderated live Q&A where only approved questions are visible to participants and speakers.
+**Goal:** As a QSB event organiser or moderator, I want to collect questions through a join link, review them before they appear publicly, and show approved questions to participants and speakers, so that live event Q&A stays controlled and useful.
 **Mode:** mvp
 
 **Requirements:** AUTH-05, AUTH-06, AUTH-07, EVNT-04, EVNT-05, EVNT-06, EVNT-07, QNA-01, QNA-02, QNA-03, QNA-04, QNA-05, QNA-06, QNA-07, QNA-08, QNA-09, QNA-10, QNA-11, QNA-12, QNA-13, QNA-14, QNA-15, LIVE-01, LIVE-02, LIVE-03, LIVE-04
