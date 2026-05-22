@@ -250,4 +250,23 @@ describe("create event action", () => {
       expect(result.fieldErrors.starts_at).toBe("Event date/time cannot be in the past.");
     }
   });
+
+  it("redirects to the dashboard after a valid event save", async () => {
+    const usersQuery = makeUsersQuery();
+    const eventsQuery = makeEventsInsertQuery();
+    const membershipQuery = makeMembershipQuery();
+
+    getUserMock.mockResolvedValue({
+      data: { user: { id: "user-1", email: "organiser@qsb.com" } },
+      error: null,
+    });
+    fromMock.mockImplementation((table: string) => {
+      if (table === "users") return usersQuery;
+      if (table === "events") return eventsQuery;
+      if (table === "event_members") return membershipQuery;
+      throw new Error(`Unexpected table: ${table}`);
+    });
+
+    await expect(createEventAction(form(validEventFields()))).rejects.toThrow("REDIRECT:/dashboard");
+  });
 });

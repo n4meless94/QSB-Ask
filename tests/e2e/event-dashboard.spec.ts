@@ -50,3 +50,62 @@ test("dashboard has no mobile horizontal overflow at 360px", async ({ page }) =>
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
 });
+
+test("create event form renders required Phase 1 fields", async ({ page }) => {
+  await page.goto("/events/new");
+
+  await expect(page.getByRole("heading", { level: 1, name: "Create Event" })).toBeVisible();
+  await expect(page.getByLabel("Event name")).toBeVisible();
+  await expect(page.getByLabel("Event date/time")).toBeVisible();
+  await expect(page.getByLabel("Time zone")).toBeVisible();
+  await expect(page.getByLabel("Status")).toBeVisible();
+  await expect(page.getByLabel("Participant identity mode")).toBeVisible();
+  await expect(page.getByLabel("Moderation enabled")).toBeChecked();
+  await expect(page.getByRole("button", { name: "Save event" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Cancel" })).toHaveAttribute("href", "/dashboard");
+});
+
+test("turning moderation off shows the required warning dialog", async ({ page }) => {
+  await page.goto("/events/new");
+
+  await page.getByLabel("Moderation enabled").uncheck();
+
+  await expect(page.getByRole("dialog", { name: "Turn moderation off?" })).toBeVisible();
+  await expect(
+    page.getByText(
+      "Audience questions may appear publicly without review. Keep moderation on unless this event is intentionally unmoderated.",
+    ),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Keep moderation on" }).click();
+  await expect(page.getByLabel("Moderation enabled")).toBeChecked();
+
+  await page.getByLabel("Moderation enabled").uncheck();
+  await page.getByRole("button", { name: "Turn off moderation" }).click();
+  await expect(page.getByLabel("Moderation enabled")).not.toBeChecked();
+});
+
+test("create event validation shows field errors and summary", async ({ page }) => {
+  await page.goto("/events/new");
+
+  await page.getByRole("button", { name: "Save event" }).click();
+
+  await expect(page.getByRole("alert")).toContainText("Fix the highlighted fields and try again.");
+  await expect(page.getByText("Event name is required.")).toBeVisible();
+  await expect(page.getByText("Event date/time is required.")).toBeVisible();
+});
+
+test("successful create event save redirects to dashboard with join details", async ({ page }) => {
+  await page.goto("/events/new");
+
+  await page.getByLabel("Event name").fill("Board Briefing");
+  await page.getByLabel("Event date/time").fill("2099-08-20T10:30");
+  await page.getByLabel("Time zone").fill("Asia/Kuala_Lumpur");
+  await page.getByLabel("Status").selectOption("draft");
+  await page.getByLabel("Participant identity mode").selectOption("name_email_required");
+  await page.getByRole("button", { name: "Save event" }).click();
+
+  await expect(page).toHaveURL(/\/dashboard/);
+  const row = page.getByRole("listitem").filter({ hasText: "Board Briefing" });
+  await expect(row).toBeVisible();
+  await expect(row).toContainText("E2E9SAVE");
+});
