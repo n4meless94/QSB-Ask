@@ -33,10 +33,10 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 
 **UI hint:** yes
 
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 
 Plans:
-- [ ] 01-01-PLAN.md - Scaffold Next.js/Tailwind foundation, local docs, health route, and UI primitives.
+- [x] 01-01-PLAN.md - Scaffold Next.js/Tailwind foundation, local docs, health route, and UI primitives.
 - [ ] 01-02-PLAN.md - Create Supabase schema, RLS foundations, generated types, and client helpers.
 - [ ] 01-03-PLAN.md - Implement login, password reset, lockout, inactivity timeout, and protected shell.
 - [ ] 01-04-PLAN.md - Implement Event Dashboard, Create Event flow, accessible event listing, and join detail copy.

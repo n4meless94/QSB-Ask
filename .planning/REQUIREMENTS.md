@@ -78,7 +78,7 @@
 
 ### Deployment And Operations
 
-- [ ] **DEPL-01**: Application runs locally with documented environment variables.
+- [x] **DEPL-01**: Application runs locally with documented environment variables.
 - [ ] **DEPL-02**: Application exposes a health route suitable for Coolify verification.
 - [ ] **DEPL-03**: Application deploys as a Coolify-managed Next.js resource on QSB VPS.
 - [ ] **DEPL-04**: Production public URL is prepared for `https://ask.qsbportal.com.my`.
@@ -175,7 +175,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXPT-03 | Phase 3 | Pending |
 | EXPT-04 | Phase 3 | Pending |
 | EXPT-05 | Phase 3 | Pending |
-| DEPL-01 | Phase 1 | Pending |
+| DEPL-01 | Phase 1 | Complete |
 | DEPL-02 | Phase 4 | Pending |
 | DEPL-03 | Phase 4 | Pending |
 | DEPL-04 | Phase 4 | Pending |
