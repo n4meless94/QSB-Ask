@@ -23,7 +23,7 @@ test("dashboard shows shell, title, create action, search, and event rows", asyn
 test("dashboard search filters by event name and join code case-insensitively", async ({ page }) => {
   await page.goto("/dashboard");
 
-  await page.getByLabel("Search events").fill("town");
+  await page.getByLabel("Search events").fill("qsb7hall");
   await expect(page.getByRole("link", { name: /Town Hall/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Quarterly Briefing/ })).toHaveCount(0);
 
@@ -68,7 +68,7 @@ test("create event form renders required Phase 1 fields", async ({ page }) => {
 test("turning moderation off shows the required warning dialog", async ({ page }) => {
   await page.goto("/events/new");
 
-  await page.getByLabel("Moderation enabled").uncheck();
+  await page.getByLabel("Moderation enabled").click();
 
   await expect(page.getByRole("dialog", { name: "Turn moderation off?" })).toBeVisible();
   await expect(
@@ -79,7 +79,7 @@ test("turning moderation off shows the required warning dialog", async ({ page }
   await page.getByRole("button", { name: "Keep moderation on" }).click();
   await expect(page.getByLabel("Moderation enabled")).toBeChecked();
 
-  await page.getByLabel("Moderation enabled").uncheck();
+  await page.getByLabel("Moderation enabled").click();
   await page.getByRole("button", { name: "Turn off moderation" }).click();
   await expect(page.getByLabel("Moderation enabled")).not.toBeChecked();
 });
@@ -89,9 +89,11 @@ test("create event validation shows field errors and summary", async ({ page }) 
 
   await page.getByRole("button", { name: "Save event" }).click();
 
-  await expect(page.getByRole("alert")).toContainText("Fix the highlighted fields and try again.");
-  await expect(page.getByText("Event name is required.")).toBeVisible();
-  await expect(page.getByText("Event date/time is required.")).toBeVisible();
+  await expect(page.getByText("Fix the highlighted fields and try again.")).toBeVisible();
+  await expect(page.getByLabel("Event details").getByText("Event name is required.")).toBeVisible();
+  await expect(
+    page.getByLabel("Event details").getByText("Event date/time is required."),
+  ).toBeVisible();
 });
 
 test("successful create event save redirects to dashboard with join details", async ({ page }) => {

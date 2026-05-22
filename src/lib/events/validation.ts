@@ -68,11 +68,11 @@ function parseModeration(value: string | boolean | unknown) {
 }
 
 function isEventStatus(value: string): value is EventStatus {
-  return EVENT_STATUSES.includes(value as EventStatus);
+  return (EVENT_STATUSES as readonly string[]).includes(value);
 }
 
 function isIdentityMode(value: string): value is IdentityMode {
-  return IDENTITY_MODES.includes(value as IdentityMode);
+  return (IDENTITY_MODES as readonly string[]).includes(value);
 }
 
 export const createEventSchema = {
@@ -84,6 +84,8 @@ export const createEventSchema = {
     const identityMode = String(getValue(input, "identity_mode")).trim();
     const moderationEnabled = parseModeration(getValue(input, "moderation_enabled"));
     const fieldErrors: CreateEventFieldErrors = {};
+    let parsedStatus: EventStatus | null = null;
+    let parsedIdentityMode: IdentityMode | null = null;
 
     if (!name) {
       fieldErrors.name = "Event name is required.";
@@ -109,19 +111,28 @@ export const createEventSchema = {
       fieldErrors.status = "Status is required.";
     } else if (!isEventStatus(status)) {
       fieldErrors.status = "Choose a valid event status.";
+    } else {
+      parsedStatus = status;
     }
 
     if (!identityMode) {
       fieldErrors.identity_mode = "Participant identity mode is required.";
     } else if (!isIdentityMode(identityMode)) {
       fieldErrors.identity_mode = "Choose a valid participant identity mode.";
+    } else {
+      parsedIdentityMode = identityMode;
     }
 
     if (moderationEnabled === null) {
       fieldErrors.moderation_enabled = "Moderation setting is required.";
     }
 
-    if (Object.keys(fieldErrors).length > 0) {
+    if (
+      Object.keys(fieldErrors).length > 0 ||
+      !parsedStatus ||
+      !parsedIdentityMode ||
+      moderationEnabled === null
+    ) {
       return { success: false, fieldErrors };
     }
 
@@ -131,8 +142,8 @@ export const createEventSchema = {
         name,
         starts_at: new Date(startsAt).toISOString(),
         time_zone: timeZone,
-        status,
-        identity_mode: identityMode,
+        status: parsedStatus,
+        identity_mode: parsedIdentityMode,
         moderation_enabled: moderationEnabled,
         question_character_limit: DEFAULT_QUESTION_CHARACTER_LIMIT,
         duplicate_block_enabled: true,

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import type { EventSummary } from "@/lib/events/events";
@@ -31,10 +31,16 @@ function matchesSearch(event: DashboardEvent, query: string) {
 
 export function EventDashboard({ error, events, loading = false }: EventDashboardProps) {
   const [query, setQuery] = useState("");
+  const [isReady, setIsReady] = useState(false);
   const visibleEvents = useMemo(
     () => events.filter((event) => matchesSearch(event, query)),
     [events, query],
   );
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setIsReady(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   return (
     <div className="grid gap-5">
@@ -59,7 +65,8 @@ export function EventDashboard({ error, events, loading = false }: EventDashboar
         <input
           className="min-h-11 rounded-[6px] border border-slate-300 bg-white px-3 text-base leading-6 text-slate-900 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-700 focus:ring-offset-2 sm:min-h-10"
           id="event-search"
-          onChange={(event) => setQuery(event.target.value)}
+          disabled={!isReady}
+          onInput={(event) => setQuery(event.currentTarget.value)}
           placeholder="Search by event name or join code"
           type="search"
           value={query}
