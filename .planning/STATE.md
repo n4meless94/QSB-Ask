@@ -3,26 +3,26 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: Phase 2 - Live Event Q&A And Moderation
-current_plan: 3
+current_plan: 4
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-05-26T01:20:00.000Z"
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-05-26T01:28:00.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 6
-  percent: 50
+  completed_plans: 7
+  percent: 58
 ---
 
 # Project State: QSB Ask
 
 **Last updated:** 2026-05-26  
 **Current phase:** Phase 2 - Live Event Q&A And Moderation  
-**Current Plan:** 3
+**Current Plan:** 4
 **Total Plans in Phase:** 8
-**Status:** Phase in progress - Plans 01-02 complete
+**Status:** Phase in progress - Plans 01-03 complete
 **Last Activity:** 2026-05-26
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
@@ -35,19 +35,20 @@ See: `.planning/PROJECT.md` (updated 2026-05-22)
 
 ## Current Focus
 
-Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-02 are complete and established:
+Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-03 are complete and established:
 
 - Server-side event role assertions for organiser, moderator, and speaker access.
 - Organiser member access management with pending moderator/speaker records.
 - Authenticated Event Workspace shell with Access and Settings panels.
 - Organiser-only event settings updates, close/archive lifecycle actions, and moderation-off warning acknowledgement.
+- Public join route, identity-mode-aware participant form, and event-scoped participant session cookies with hashed database tokens.
 
 ## Roadmap Status
 
 | Phase | Status | Requirements | Notes |
 |-------|--------|--------------|-------|
 | 1 | Complete | 9 | Foundation, auth, event dashboard, data security. Plans 01-04 complete. |
-| 2 | In Progress | 27 | Plans 01-02 complete: workspace access, role helpers, access panel, settings, lifecycle, and moderation warning. |
+| 2 | In Progress | 27 | Plans 01-03 complete: workspace access, settings/lifecycle, moderation warning, and participant join/session flow. |
 | 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
 | 4 | Pending | 4 | Deployment, reconnect handling, UAT readiness. |
 
@@ -69,6 +70,7 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - 2026-05-22: Completed Phase 1 Plan 04 Event Dashboard, Create Event flow, scoped event listing, and join-detail copy.
 - 2026-05-26: Completed Phase 2 Plan 01 Event Workspace access helpers, access actions, Access panel, and workspace shell.
 - 2026-05-26: Completed Phase 2 Plan 02 organiser event settings, close/archive lifecycle actions, and moderation-off warning.
+- 2026-05-26: Completed Phase 2 Plan 03 participant join, identity modes, and secure event-scoped session token.
 
 ## Decisions
 
@@ -89,6 +91,9 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - [Phase 02]: Plan 02 settings helpers require organiser role server-side before event settings or lifecycle updates.
 - [Phase 02]: Plan 02 close/archive actions update event status only and preserve records.
 - [Phase 02]: Plan 02 moderation can be turned off only when the warning acknowledgement field is submitted.
+- [Phase 02]: Plan 03 participant cookies store only the raw token client-side; the database stores SHA-256 token hashes.
+- [Phase 02]: Plan 03 participant cookies are HTTP-only, SameSite=Lax, and scoped to `/events/{eventId}`.
+- [Phase 02]: Plan 03 public join pages must not render organiser controls, member data, or private settings.
 
 ## Performance Metrics
 
@@ -100,13 +105,14 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 | Phase 01 P04 | 36min | 3 tasks | 15 files |
 | Phase 02 P01 | 28min | 3 tasks | 7 files |
 | Phase 02 P02 | 31min | 3 tasks | 7 files |
+| Phase 02 P03 | 26min | 3 tasks | 7 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-26T01:20:00.000Z
-- **Stopped At:** Completed 02-02-PLAN.md
+- **Last session:** 2026-05-26T01:28:00.000Z
+- **Stopped At:** Completed 02-03-PLAN.md
 - **Resume File:** None
 
 ## Next Recommended Command
 
-Continue Phase 2 execution with `02-03-PLAN.md`.
+Continue Phase 2 execution with `02-04-PLAN.md`.

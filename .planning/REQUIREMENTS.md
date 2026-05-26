@@ -22,8 +22,8 @@
 - [x] **EVNT-03**: Organiser can copy a join code or link for an event.
 - [x] **EVNT-04**: Organiser can edit event settings from the Event Workspace.
 - [x] **EVNT-05**: Organiser can close and archive an event while preserving records.
-- [ ] **EVNT-06**: Participant can join an active event by code or shared link.
-- [ ] **EVNT-07**: Participant identity mode supports Anonymous, Name required, and Name plus email required.
+- [x] **EVNT-06**: Participant can join an active event by code or shared link.
+- [x] **EVNT-07**: Participant identity mode supports Anonymous, Name required, and Name plus email required.
 
 ### Moderated Q&A
 
@@ -134,8 +134,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVNT-03 | Phase 1 | Complete |
 | EVNT-04 | Phase 2 | Complete |
 | EVNT-05 | Phase 2 | Complete |
-| EVNT-06 | Phase 2 | Pending |
-| EVNT-07 | Phase 2 | Pending |
+| EVNT-06 | Phase 2 | Complete |
+| EVNT-07 | Phase 2 | Complete |
 | QNA-01 | Phase 2 | Pending |
 | QNA-02 | Phase 2 | Pending |
 | QNA-03 | Phase 2 | Pending |
