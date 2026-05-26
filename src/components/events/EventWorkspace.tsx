@@ -13,6 +13,7 @@ type WorkspaceTab = "qa" | "access" | "settings" | "presenter";
 type EventWorkspaceProps = {
   access: EventAccessContext;
   accessPanel: ReactNode;
+  qnaPanel: ReactNode;
   settingsPanel: ReactNode;
 };
 
@@ -47,7 +48,7 @@ function LaterPlanPanel({ title, body }: { title: string; body: string }) {
   );
 }
 
-export function EventWorkspace({ access, accessPanel, settingsPanel }: EventWorkspaceProps) {
+export function EventWorkspace({ access, accessPanel, qnaPanel, settingsPanel }: EventWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("qa");
   const { event, role } = access;
 
@@ -122,12 +123,7 @@ export function EventWorkspace({ access, accessPanel, settingsPanel }: EventWork
         id={`${activeTab}-panel`}
         role="tabpanel"
       >
-        {activeTab === "qa" ? (
-          <LaterPlanPanel
-            body="Question submission and moderation queue controls are planned in the later Phase 2 Q&A plans. This workspace slice establishes staff access first."
-            title="Q&A workspace"
-          />
-        ) : null}
+        {activeTab === "qa" ? qnaPanel : null}
         {activeTab === "access" ? accessPanel : null}
         {activeTab === "settings" ? settingsPanel : null}
         {activeTab === "presenter" ? (

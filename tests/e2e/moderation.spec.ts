@@ -36,7 +36,7 @@ test("moderator queue supports tabs, search, sort, actions, edit marker, history
   await expect(editBox).toBeFocused();
   await editBox.fill("Will slides be shared after the briefing?");
   await page.getByRole("button", { name: "Save edit" }).click();
-  await expect(page.getByText("Edited")).toBeVisible();
+  await expect(page.getByText("Edited", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Approve question Will slides be shared after the briefing?" }).click();
   await expect(page.getByText("Question approved.")).toBeVisible();

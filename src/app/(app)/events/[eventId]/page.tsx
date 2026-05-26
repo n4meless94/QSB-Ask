@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { EventAccessPanel } from "@/components/events/EventAccessPanel";
 import { EventSettingsPanel } from "@/components/events/EventSettingsPanel";
 import { EventWorkspace } from "@/components/events/EventWorkspace";
+import { ModeratorQueue } from "@/components/qna/ModeratorQueue";
 import { Button } from "@/components/ui/Button";
 import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import {
@@ -13,8 +14,15 @@ import {
   type EventAccessContext,
   type EventMemberSummary,
 } from "@/lib/events/access";
+import {
+  listModerationHistory,
+  listModerationQuestions,
+  type ModerationHistoryEntry,
+  type ModerationQuestion,
+} from "@/lib/qna/moderation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PRESENTER_ROLES } from "@/lib/supabase/rls";
+import type { EventRole } from "@/types/app";
 
 type EventDetailPageProps = {
   params: Promise<{ eventId: string }>;
@@ -25,7 +33,15 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   const cookieStore = await cookies();
 
   if (isE2EAuthEnabled(cookieStore.get(E2E_AUTH_COOKIE)?.value)) {
-    return <EventDetailContent access={e2eAccess(eventId)} members={e2eMembers()} />;
+    return (
+      <EventDetailContent
+        access={e2eAccess(eventId)}
+        fixtureMode
+        history={e2eModerationHistory()}
+        members={e2eMembers()}
+        moderationQuestions={e2eModerationQuestions()}
+      />
+    );
   }
 
   const supabase = await createSupabaseServerClient();
@@ -40,10 +56,23 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
   let access: EventAccessContext;
   let members: EventMemberSummary[];
+  let moderationQuestions: ModerationQuestion[] = [];
+  let history: ModerationHistoryEntry[] = [];
 
   try {
     access = await assertEventRole(user.id, eventId, PRESENTER_ROLES);
     members = access.role === "organiser" ? await listEventMembersForOrganiser(user.id, eventId) : [];
+    if (canModerate(access.role)) {
+      const [pending, live, answered, archived, actionHistory] = await Promise.all([
+        listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "pending" }),
+        listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "live" }),
+        listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "answered" }),
+        listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "archived" }),
+        listModerationHistory(user.id, eventId),
+      ]);
+      moderationQuestions = [...pending, ...live, ...answered, ...archived];
+      history = actionHistory;
+    }
   } catch {
     return (
       <div className="grid max-w-3xl gap-4">
@@ -63,23 +92,58 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     );
   }
 
-  return <EventDetailContent access={access} members={members} />;
+  return (
+    <EventDetailContent
+      access={access}
+      history={history}
+      members={members}
+      moderationQuestions={moderationQuestions}
+    />
+  );
 }
 
 function EventDetailContent({
   access,
+  fixtureMode = false,
+  history,
   members,
+  moderationQuestions,
 }: {
   access: EventAccessContext;
+  fixtureMode?: boolean;
+  history: ModerationHistoryEntry[];
   members: EventMemberSummary[];
+  moderationQuestions: ModerationQuestion[];
 }) {
   return (
     <EventWorkspace
       access={access}
       accessPanel={<EventAccessPanel eventId={access.event.id} members={members} role={access.role} />}
+      qnaPanel={
+        canModerate(access.role) ? (
+          <ModeratorQueue
+            eventId={access.event.id}
+            fixtureMode={fixtureMode}
+            history={history}
+            questions={moderationQuestions}
+          />
+        ) : (
+          <section className="grid gap-2 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6">
+            <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900">Q&A workspace</h2>
+            <p className="text-base leading-6 text-slate-700">
+              Speakers use Presenter View for approved questions only. Moderation controls are not
+              available to this role.
+            </p>
+          </section>
+        )
+      }
       settingsPanel={<EventSettingsPanel event={access.event} role={access.role} />}
     />
   );
+}
+
+function canModerate(role: EventRole) {
+  return role === "organiser" || role === "moderator";
 }
 
 function e2eAccess(eventId: string): EventAccessContext {
@@ -137,6 +201,86 @@ function e2eMembers(): EventMemberSummary[] {
       role: "moderator",
       status: "invited",
       user_id: null,
+    },
+  ];
+}
+
+function e2eModerationQuestions(): ModerationQuestion[] {
+  return [
+    {
+      current_text: "Will slides be shared?",
+      id: "question-pending-1",
+      is_edited: false,
+      participantEmail: "aina@qsb.com",
+      participantIdentity: "Aina",
+      previous_status: null,
+      status: "pending",
+      submitted_at: "2026-05-26T01:00:00.000Z",
+      updated_at: "2026-05-26T01:00:00.000Z",
+      vote_count: 4,
+    },
+    {
+      current_text: "Can we get lunch timing?",
+      id: "question-pending-2",
+      is_edited: false,
+      participantEmail: null,
+      participantIdentity: "Anonymous",
+      previous_status: null,
+      status: "pending",
+      submitted_at: "2026-05-26T01:02:00.000Z",
+      updated_at: "2026-05-26T01:02:00.000Z",
+      vote_count: 1,
+    },
+    {
+      current_text: "How will follow-up actions be shared?",
+      id: "question-live-1",
+      is_edited: false,
+      participantEmail: null,
+      participantIdentity: "Anonymous",
+      previous_status: null,
+      status: "live",
+      submitted_at: "2026-05-26T00:50:00.000Z",
+      updated_at: "2026-05-26T00:50:00.000Z",
+      vote_count: 8,
+    },
+    {
+      current_text: "Who owns the next briefing?",
+      id: "question-answered-1",
+      is_edited: false,
+      participantEmail: null,
+      participantIdentity: "Anonymous",
+      previous_status: null,
+      status: "answered",
+      submitted_at: "2026-05-26T00:40:00.000Z",
+      updated_at: "2026-05-26T00:45:00.000Z",
+      vote_count: 3,
+    },
+    {
+      current_text: "Archived duplicate question",
+      id: "question-archived-1",
+      is_edited: false,
+      participantEmail: null,
+      participantIdentity: "Anonymous",
+      previous_status: "pending",
+      status: "archived",
+      submitted_at: "2026-05-26T00:30:00.000Z",
+      updated_at: "2026-05-26T00:35:00.000Z",
+      vote_count: 0,
+    },
+  ];
+}
+
+function e2eModerationHistory(): ModerationHistoryEntry[] {
+  return [
+    {
+      action: "archive",
+      actor_user_id: "moderator-1",
+      created_at: "2026-05-26T00:35:00.000Z",
+      from_status: "pending",
+      id: "history-1",
+      metadata: {},
+      question_id: "question-archived-1",
+      to_status: "archived",
     },
   ];
 }

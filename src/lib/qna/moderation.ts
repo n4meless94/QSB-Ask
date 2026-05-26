@@ -4,26 +4,22 @@ import { assertEventRole } from "@/lib/events/access";
 import type { Json, Tables } from "@/lib/supabase/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { MODERATION_ROLES } from "@/lib/supabase/rls";
+import {
+  STALE_MODERATION_MESSAGE,
+  type ModerationHistoryEntry,
+  type ModerationQuestion,
+  type ModerationQueueStatus,
+  type ModerationSort,
+} from "@/lib/qna/moderation-shared";
 import type { ModerationAction, QuestionStatus } from "@/types/app";
 
-export const STALE_MODERATION_MESSAGE =
-  "This question was updated by another moderator. Review the latest version before taking action.";
-
-export type ModerationQueueStatus = QuestionStatus;
-export type ModerationSort = "most_recent" | "oldest" | "most_votes";
-
-export type ModerationQuestion = {
-  current_text: string;
-  id: string;
-  is_edited: boolean;
-  participantEmail: string | null;
-  participantIdentity: string;
-  previous_status: QuestionStatus | null;
-  status: QuestionStatus;
-  submitted_at: string;
-  updated_at: string;
-  vote_count: number;
-};
+export {
+  STALE_MODERATION_MESSAGE,
+  type ModerationHistoryEntry,
+  type ModerationQuestion,
+  type ModerationQueueStatus,
+  type ModerationSort,
+} from "@/lib/qna/moderation-shared";
 
 type QuestionRow = Tables<"questions"> & {
   participant_sessions?:
@@ -123,6 +119,26 @@ export async function listModerationQuestions(
   }
 
   return ((data ?? []) as QuestionRow[]).map(toModerationQuestion);
+}
+
+export async function listModerationHistory(
+  userId: string,
+  eventId: string,
+): Promise<ModerationHistoryEntry[]> {
+  await assertEventRole(userId, eventId, MODERATION_ROLES);
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("moderation_actions")
+    .select("id,question_id,event_id,actor_user_id,action,from_status,to_status,metadata,created_at")
+    .eq("event_id", eventId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error("Moderation history could not be loaded.");
+  }
+
+  return (data ?? []) as ModerationHistoryEntry[];
 }
 
 function firstRpcQuestion(data: ModerationResult[] | null) {
