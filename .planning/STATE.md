@@ -2,28 +2,28 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: Phase 1 - Foundation, Auth, And Data
-current_plan: 4
-status: verifying
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-05-22T08:52:38.461Z"
-last_activity: 2026-05-22
+current_phase: Phase 2 - Live Event Q&A And Moderation
+current_plan: 2
+status: executing
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-05-26T01:09:52.799Z"
+last_activity: 2026-05-26
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 25
+  total_plans: 12
+  completed_plans: 5
+  percent: 42
 ---
 
 # Project State: QSB Ask
 
-**Last updated:** 2026-05-22  
-**Current phase:** Phase 1 - Foundation, Auth, And Data  
-**Current Plan:** 4
-**Total Plans in Phase:** 4
-**Status:** Phase complete - ready for verification
-**Last Activity:** 2026-05-22
+**Last updated:** 2026-05-26  
+**Current phase:** Phase 2 - Live Event Q&A And Moderation  
+**Current Plan:** 2
+**Total Plans in Phase:** 8
+**Status:** Phase in progress - Plan 01 complete
+**Last Activity:** 2026-05-26
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
 
@@ -35,21 +35,18 @@ See: `.planning/PROJECT.md` (updated 2026-05-22)
 
 ## Current Focus
 
-Phase 1 prepares the technical and product foundation:
+Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plan 01 is complete and established:
 
-- Next.js/TypeScript/Tailwind app shell.
-- Supabase client/server setup.
-- Database schema and RLS foundation.
-- Email/password login and password reset.
-- Event dashboard and create event flow.
-- Local development environment documentation.
+- Server-side event role assertions for organiser, moderator, and speaker access.
+- Organiser member access management with pending moderator/speaker records.
+- Authenticated Event Workspace shell with honest later-plan Q&A, settings, and presenter panels.
 
 ## Roadmap Status
 
 | Phase | Status | Requirements | Notes |
 |-------|--------|--------------|-------|
 | 1 | Complete | 9 | Foundation, auth, event dashboard, data security. Plans 01-04 complete. |
-| 2 | Pending | 27 | Live Q&A, moderation, audience, presenter. |
+| 2 | In Progress | 27 | Plan 01 complete: workspace access, role helpers, and access panel. |
 | 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
 | 4 | Pending | 4 | Deployment, reconnect handling, UAT readiness. |
 
@@ -69,6 +66,7 @@ Phase 1 prepares the technical and product foundation:
 - 2026-05-22: Completed Phase 1 Plan 02 Supabase schema, RLS policies, generated database types, and typed client helpers.
 - 2026-05-22: Completed Phase 1 Plan 03 login, password reset, lockout, protected shell, sign out, and inactivity timeout.
 - 2026-05-22: Completed Phase 1 Plan 04 Event Dashboard, Create Event flow, scoped event listing, and join-detail copy.
+- 2026-05-26: Completed Phase 2 Plan 01 Event Workspace access helpers, access actions, Access panel, and workspace shell.
 
 ## Decisions
 
@@ -83,6 +81,9 @@ Phase 1 prepares the technical and product foundation:
 - [Phase 01]: The app inactivity marker is a secure same-site HTTP-only cookie refreshed by middleware on protected route access.
 - [Phase 01]: Event creation upserts the organiser profile before inserting the event because events.created_by references public.users and no auth-user profile trigger exists yet.
 - [Phase 01]: Playwright uses QSB_ASK_E2E_AUTH=1 as an env-gated fixture for protected-route UI tests without weakening production auth.
+- [Phase 02]: Plan 01 invite flow creates pending event_members rows only; UI and action copy explicitly say manual account onboarding, not email delivery.
+- [Phase 02]: Plan 01 presenter and moderator access helpers are separate server-side entry points so later surfaces do not rely on client-side role filtering.
+- [Phase 02]: Plan 01 keeps Q&A, settings, and presenter tab content limited to honest later-plan panels.
 
 ## Performance Metrics
 
@@ -92,13 +93,14 @@ Phase 1 prepares the technical and product foundation:
 | Phase 01 P02 | 19min | 3 tasks | 14 files |
 | Phase 01 P03 | 15min | 3 tasks | 16 files |
 | Phase 01 P04 | 36min | 3 tasks | 15 files |
+| Phase 02 P01 | 28min | 3 tasks | 7 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-22T09:00:00.000Z
-- **Stopped At:** Completed 01-04-PLAN.md
+- **Last session:** 2026-05-26T01:09:52.786Z
+- **Stopped At:** Completed 02-01-PLAN.md
 - **Resume File:** None
 
 ## Next Recommended Command
 
-`$gsd-verify-work Phase 1` or continue autonomous execution with Phase 2 planning.
+Continue Phase 2 execution with `02-02-PLAN.md`.
