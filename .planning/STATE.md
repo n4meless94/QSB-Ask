@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: Phase 2 - Live Event Q&A And Moderation
 current_plan: 8
-status: executing
-stopped_at: Completed 02-07-PLAN.md
-last_updated: "2026-05-26T07:10:08.353Z"
+status: verifying
+stopped_at: Completed 02-08-PLAN.md
+last_updated: "2026-05-26T07:22:09.766Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 12
-  completed_plans: 11
-  percent: 92
+  completed_plans: 12
+  percent: 50
 ---
 
 # Project State: QSB Ask
@@ -22,7 +22,7 @@ progress:
 **Current phase:** Phase 2 - Live Event Q&A And Moderation  
 **Current Plan:** 8
 **Total Plans in Phase:** 8
-**Status:** Ready to execute
+**Status:** Phase complete — ready for verification
 **Last Activity:** 2026-05-26
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
@@ -35,7 +35,7 @@ See: `.planning/PROJECT.md` (updated 2026-05-22)
 
 ## Current Focus
 
-Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-07 are complete and established:
+Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-08 are complete and established:
 
 - Server-side event role assertions for organiser, moderator, and speaker access.
 - Organiser member access management with pending moderator/speaker records.
@@ -46,13 +46,14 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - Staff moderation queue with audited compare-and-set actions, edit version history, search, and sort.
 - Audience approved-question list with Popular/Recent sorting and one-vote behavior.
 - Presenter View for assigned speakers and staff with approved-only question display.
+- Normal-condition realtime refresh across moderator, audience, and presenter Q&A surfaces.
 
 ## Roadmap Status
 
 | Phase | Status | Requirements | Notes |
 |-------|--------|--------------|-------|
 | 1 | Complete | 9 | Foundation, auth, event dashboard, data security. Plans 01-04 complete. |
-| 2 | In Progress | 27 | Plans 01-07 complete: workspace access, settings/lifecycle, participant join/session, submission, moderation, audience voting, and presenter view. |
+| 2 | Complete | 27 | Plans 01-08 complete: workspace access, settings/lifecycle, participant join/session, submission, moderation, audience voting, presenter view, and realtime. |
 | 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
 | 4 | Pending | 4 | Deployment, reconnect handling, UAT readiness. |
 
@@ -79,6 +80,7 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - 2026-05-26: Completed Phase 2 Plan 05 moderator queue, audited moderation actions, edit history, search, and sort.
 - 2026-05-26: Completed Phase 2 Plan 06 audience approved-question list, Popular/Recent sorting, and session-bound voting.
 - 2026-05-26: Completed Phase 2 Plan 07 Presenter View access and approved-only display surface.
+- 2026-05-26: Completed Phase 2 Plan 08 normal-condition Q&A realtime subscriptions and cross-surface integration verification.
 
 ## Decisions
 
@@ -113,6 +115,9 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - [Phase 02]: Plan 06 answered questions remain visible to participants but are not votable.
 - [Phase 02]: Plan 07 Presenter View uses `getPresenterEventAccess` and safe live/answered public question fields only.
 - [Phase 02]: Plan 07 Presenter View remains in the authenticated route tree but does not render Event Workspace management tabs.
+- [Phase 02]: Plan 08 public and presenter realtime callbacks refresh server-rendered safe data instead of storing raw row payloads.
+- [Phase 02]: Plan 08 staff realtime subscriptions are separate from public/presenter subscriptions and refresh moderation/history surfaces.
+- [Phase 02]: Plan 08 prolonged reconnect hardening remains Phase 4 scope; Phase 2 exposes connected/reconnecting/refresh-needed states only.
 
 ## Performance Metrics
 
@@ -129,13 +134,14 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 | Phase 02 P05 | 14min | 3 tasks | 11 files |
 | Phase 02 P06 | 19min | 3 tasks | 9 files |
 | Phase 02 P07 | 10min | 3 tasks | 5 files |
+| Phase 02 P08 | 20min | 3 tasks | 12 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-26T07:10:08.341Z
-- **Stopped At:** Completed 02-07-PLAN.md
+- **Last session:** 2026-05-26T07:22:09.752Z
+- **Stopped At:** Completed 02-08-PLAN.md
 - **Resume File:** None
 
 ## Next Recommended Command
 
-Continue Phase 2 execution with `02-08-PLAN.md`.
+Phase 2 is complete. Continue with Phase 3 planning/execution for surveys, results, presentation, and CSV.
