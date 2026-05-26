@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { EventAccessPanel } from "@/components/events/EventAccessPanel";
 import { EventWorkspace } from "@/components/events/EventWorkspace";
 import { Button } from "@/components/ui/Button";
+import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import {
   assertEventRole,
   listEventMembersForOrganiser,
@@ -19,8 +21,9 @@ type EventDetailPageProps = {
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { eventId } = await params;
+  const cookieStore = await cookies();
 
-  if (process.env.QSB_ASK_E2E_AUTH === "1") {
+  if (isE2EAuthEnabled(cookieStore.get(E2E_AUTH_COOKIE)?.value)) {
     return <EventDetailContent access={e2eAccess(eventId)} members={e2eMembers()} />;
   }
 

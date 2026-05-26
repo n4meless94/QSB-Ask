@@ -109,10 +109,18 @@ completed: 2026-05-26
 - **Verification:** `npm run test:e2e -- tests/e2e/event-workspace.spec.ts`
 - **Committed in:** `c27da9e`
 
+**3. [Rule 1 - Bug] Restored cookie-scoped E2E auth fixture on event workspace route**
+- **Found during:** Parent review after subagent execution
+- **Issue:** The event detail route used `QSB_ASK_E2E_AUTH=1` without also requiring the E2E auth cookie, recreating the prior global-auth-bypass risk that Phase 1 had already fixed.
+- **Fix:** The route now uses `isE2EAuthEnabled(cookie)` and the E2E suite includes a no-cookie redirect regression.
+- **Files modified:** `src/app/(app)/events/[eventId]/page.tsx`, `tests/e2e/event-workspace.spec.ts`
+- **Verification:** `npm run test -- tests/events/event-access.test.ts`; `npm run test:e2e -- tests/e2e/event-workspace.spec.ts`; `npm run lint`
+- **Committed in:** follow-up parent fix
+
 ---
 
-**Total deviations:** 2 auto-fixed (1 bug, 1 blocking test correction)  
-**Impact on plan:** Both fixes tightened verification and role separation. No later Phase 2 scope was added.
+**Total deviations:** 3 auto-fixed (2 bugs, 1 blocking test correction)  
+**Impact on plan:** Fixes tightened verification, auth fixture isolation, and role separation. No later Phase 2 scope was added.
 
 ## Issues Encountered
 
@@ -131,7 +139,7 @@ These stubs are intentional scope boundaries and do not block Plan 02-01's acces
 ## Verification
 
 - `npm run test -- tests/events/event-access.test.ts` - passed, 5 tests.
-- `npm run test:e2e -- tests/e2e/event-workspace.spec.ts` - passed, 2 tests.
+- `npm run test:e2e -- tests/e2e/event-workspace.spec.ts` - passed, 3 tests.
 - `npm run lint` - passed.
 
 ## User Setup Required

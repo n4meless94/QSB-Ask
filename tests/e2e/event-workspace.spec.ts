@@ -12,6 +12,16 @@ test.beforeEach(async ({ context }) => {
   ]);
 });
 
+test("event workspace E2E fixture requires the auth cookie as well as the env flag", async ({
+  context,
+  page,
+}) => {
+  await context.clearCookies();
+  await page.goto("/events/event-1");
+
+  await expect(page).toHaveURL(/\/login/);
+});
+
 test("D-01/D-03 event workspace renders tabs and organiser Access content with E2E auth fixture", async ({
   page,
 }) => {
