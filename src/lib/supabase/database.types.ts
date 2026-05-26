@@ -589,6 +589,17 @@ export type Database = {
     }
     Functions: {
       current_participant_session_id: { Args: never; Returns: string }
+      edit_question_action: {
+        Args: {
+          actor_user_id: string
+          expected_status: Database["public"]["Enums"]["question_status"]
+          expected_updated_at: string
+          next_text: string
+          target_event_id: string
+          target_question_id: string
+        }
+        Returns: Database["public"]["Tables"]["questions"]["Row"][]
+      }
       generate_unique_join_code: { Args: never; Returns: string }
       has_event_role: {
         Args: {
@@ -605,6 +616,19 @@ export type Database = {
       is_current_participant_for_event: {
         Args: { target_event_id: string }
         Returns: boolean
+      }
+      moderate_question_action: {
+        Args: {
+          action_metadata?: Json
+          actor_user_id: string
+          expected_status: Database["public"]["Enums"]["question_status"]
+          expected_updated_at: string
+          moderation_action: Database["public"]["Enums"]["moderation_action"]
+          target_event_id: string
+          target_question_id: string
+          target_status: Database["public"]["Enums"]["question_status"] | null
+        }
+        Returns: Database["public"]["Tables"]["questions"]["Row"][]
       }
     }
     Enums: {
