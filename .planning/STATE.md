@@ -3,24 +3,24 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: Phase 2 - Live Event Q&A And Moderation
-current_plan: 6
+current_plan: 7
 status: executing
-stopped_at: Completed 02-05-PLAN.md
-last_updated: "2026-05-26T06:54:12.917Z"
+stopped_at: Completed 02-06-PLAN.md
+last_updated: "2026-05-26T07:04:34.554Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 9
-  percent: 75
+  completed_plans: 10
+  percent: 83
 ---
 
 # Project State: QSB Ask
 
 **Last updated:** 2026-05-26  
 **Current phase:** Phase 2 - Live Event Q&A And Moderation  
-**Current Plan:** 6
+**Current Plan:** 7
 **Total Plans in Phase:** 8
 **Status:** Ready to execute
 **Last Activity:** 2026-05-26
@@ -35,7 +35,7 @@ See: `.planning/PROJECT.md` (updated 2026-05-22)
 
 ## Current Focus
 
-Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-05 are complete and established:
+Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-06 are complete and established:
 
 - Server-side event role assertions for organiser, moderator, and speaker access.
 - Organiser member access management with pending moderator/speaker records.
@@ -44,13 +44,14 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - Public join route, identity-mode-aware participant form, and event-scoped participant session cookies with hashed database tokens.
 - Participant question submission with pending-by-default moderation, rate/duplicate checks, and approved-only public reads.
 - Staff moderation queue with audited compare-and-set actions, edit version history, search, and sort.
+- Audience approved-question list with Popular/Recent sorting and one-vote behavior.
 
 ## Roadmap Status
 
 | Phase | Status | Requirements | Notes |
 |-------|--------|--------------|-------|
 | 1 | Complete | 9 | Foundation, auth, event dashboard, data security. Plans 01-04 complete. |
-| 2 | In Progress | 27 | Plans 01-04 complete: workspace access, settings/lifecycle, participant join/session, and moderated question submission. |
+| 2 | In Progress | 27 | Plans 01-06 complete: workspace access, settings/lifecycle, participant join/session, submission, moderation, and audience voting. |
 | 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
 | 4 | Pending | 4 | Deployment, reconnect handling, UAT readiness. |
 
@@ -75,6 +76,7 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - 2026-05-26: Completed Phase 2 Plan 03 participant join, identity modes, and secure event-scoped session token.
 - 2026-05-26: Completed Phase 2 Plan 04 participant question submission, rate/duplicate checks, and approved-only public reads.
 - 2026-05-26: Completed Phase 2 Plan 05 moderator queue, audited moderation actions, edit history, search, and sort.
+- 2026-05-26: Completed Phase 2 Plan 06 audience approved-question list, Popular/Recent sorting, and session-bound voting.
 
 ## Decisions
 
@@ -104,6 +106,9 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - [Phase 02]: Plan 05 moderation actions use Postgres RPCs for atomic compare-and-set question updates, edit versions, and moderation_actions audit rows.
 - [Phase 02]: Plan 05 staff moderation queue is rendered only for organiser and moderator roles; speakers remain approved-only Presenter View users.
 - [Phase 02]: Plan 05 client moderation UI imports only client-safe shared DTOs/copy, not server-only moderation helpers.
+- [Phase 02]: Plan 06 voting uses a service-role-only Postgres RPC after server-side participant token validation.
+- [Phase 02]: Plan 06 public question sorting remains inside the approved-only live/answered query boundary.
+- [Phase 02]: Plan 06 answered questions remain visible to participants but are not votable.
 
 ## Performance Metrics
 
@@ -118,13 +123,14 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 | Phase 02 P03 | 26min | 3 tasks | 7 files |
 | Phase 02 P04 | 38min | 3 tasks | 8 files |
 | Phase 02 P05 | 14min | 3 tasks | 11 files |
+| Phase 02 P06 | 19min | 3 tasks | 9 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-26T06:54:12.905Z
-- **Stopped At:** Completed 02-05-PLAN.md
+- **Last session:** 2026-05-26T07:04:34.300Z
+- **Stopped At:** Completed 02-06-PLAN.md
 - **Resume File:** None
 
 ## Next Recommended Command
 
-Continue Phase 2 execution with `02-06-PLAN.md`.
+Continue Phase 2 execution with `02-07-PLAN.md`.

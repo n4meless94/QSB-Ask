@@ -36,8 +36,8 @@
 - [x] **QNA-07**: Moderator can archive and restore questions to the correct prior state.
 - [x] **QNA-08**: Moderator can mark a Live question as Answered.
 - [x] **QNA-09**: Moderator can search question text and sort questions by recency, age, or votes.
-- [ ] **QNA-10**: Participant can upvote an approved Live question once per session.
-- [ ] **QNA-11**: Participant can sort approved questions by Popular or Recent.
+- [x] **QNA-10**: Participant can upvote an approved Live question once per session.
+- [x] **QNA-11**: Participant can sort approved questions by Popular or Recent.
 - [x] **QNA-12**: Organiser can turn moderation off only after confirming a warning.
 - [x] **QNA-13**: System rate-limits participant question submissions according to event settings.
 - [x] **QNA-14**: System blocks duplicate participant question submissions when duplicate block is enabled.
@@ -145,8 +145,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QNA-07 | Phase 2 | Complete |
 | QNA-08 | Phase 2 | Complete |
 | QNA-09 | Phase 2 | Complete |
-| QNA-10 | Phase 2 | Pending |
-| QNA-11 | Phase 2 | Pending |
+| QNA-10 | Phase 2 | Complete |
+| QNA-11 | Phase 2 | Complete |
 | QNA-12 | Phase 2 | Complete |
 | QNA-13 | Phase 2 | Complete |
 | QNA-14 | Phase 2 | Complete |
