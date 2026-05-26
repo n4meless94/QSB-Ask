@@ -41,6 +41,7 @@ vi.mock("@/lib/supabase/server", () => ({
 type EventFixture = {
   id: string;
   identity_mode: "anonymous" | "name_required" | "name_email_required";
+  join_code: string;
   name: string;
   status: "draft" | "active" | "ended" | "archived";
 };
@@ -48,6 +49,7 @@ type EventFixture = {
 const activeEvent: EventFixture = {
   id: "event-1",
   identity_mode: "name_required",
+  join_code: "QSB2X9ZA",
   name: "Quarterly Briefing",
   status: "active",
 };
@@ -204,7 +206,7 @@ describe("join participant action", () => {
   it("sets an HTTP-only SameSite=Lax event-scoped cookie and redirects to event Q&A", async () => {
     await expect(
       joinParticipantAction(form({ join_code: "QSB2X9ZA", display_name: "Jerry" })),
-    ).rejects.toThrow("REDIRECT:/events/event-1/qna");
+    ).rejects.toThrow("REDIRECT:/join/QSB2X9ZA/qna");
 
     expect(cookiesSetMock).toHaveBeenCalledWith(
       "qsb_ask_participant_event-1",

@@ -50,12 +50,12 @@ export async function joinParticipantAction(
     cookieStore.set(getParticipantCookieName(joined.event.id), joined.rawToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 8,
-      path: `/events/${joined.event.id}`,
+      path: `/join/${joined.event.join_code}`,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
     });
 
-    redirect(`/events/${joined.event.id}/qna`);
+    redirect(`/join/${joined.event.join_code}/qna`);
   } catch (error) {
     if (
       error instanceof Error &&
