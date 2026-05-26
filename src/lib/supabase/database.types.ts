@@ -630,6 +630,17 @@ export type Database = {
         }
         Returns: Database["public"]["Tables"]["questions"]["Row"][]
       }
+      upvote_question: {
+        Args: {
+          target_event_id: string
+          target_participant_session_id: string
+          target_question_id: string
+        }
+        Returns: {
+          already_voted: boolean
+          question: Database["public"]["Tables"]["questions"]["Row"]
+        }[]
+      }
     }
     Enums: {
       event_role: "organiser" | "moderator" | "speaker"

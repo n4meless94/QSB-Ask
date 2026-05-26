@@ -13,14 +13,34 @@ export type PublicQuestion = {
   vote_count: number;
 };
 
-export async function listPublicQuestions(eventId: string): Promise<PublicQuestion[]> {
+export type PublicQuestionSort = "popular" | "recent";
+
+type ListPublicQuestionsOptions = {
+  sort?: PublicQuestionSort;
+};
+
+function orderPublicQuestions(
+  query: ReturnType<Awaited<ReturnType<typeof createSupabaseServerClient>>["from"]>,
+  sort: PublicQuestionSort,
+) {
+  if (sort === "recent") {
+    return query.order("submitted_at", { ascending: false });
+  }
+
+  return query.order("vote_count", { ascending: false }).order("submitted_at", { ascending: false });
+}
+
+export async function listPublicQuestions(
+  eventId: string,
+  options: ListPublicQuestionsOptions = {},
+): Promise<PublicQuestion[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  const query = supabase
     .from("questions")
     .select("id,current_text,status,vote_count,is_edited,submitted_at,updated_at")
     .eq("event_id", eventId)
-    .in("status", PUBLIC_QUESTION_STATUSES)
-    .order("vote_count", { ascending: false });
+    .in("status", PUBLIC_QUESTION_STATUSES);
+  const { data, error } = await orderPublicQuestions(query, options.sort ?? "popular");
 
   if (error) {
     throw new Error("Approved questions could not be loaded.");

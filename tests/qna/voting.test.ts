@@ -41,6 +41,11 @@ vi.mock("@/lib/participants/session", async () => {
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn(async () => ({
     from: fromMock,
+  })),
+}));
+
+vi.mock("@/lib/supabase/admin", () => ({
+  createSupabaseAdminClient: vi.fn(() => ({
     rpc: rpcMock,
   })),
 }));

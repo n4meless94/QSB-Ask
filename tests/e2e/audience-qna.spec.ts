@@ -9,11 +9,11 @@ test("audience list shows approved questions only, sorts, and votes once", async
   await expect(page.getByText("Pending private question")).toHaveCount(0);
   await expect(page.getByText("Archived private question")).toHaveCount(0);
 
-  await page.getByRole("radio", { name: "Recent" }).check();
+  await page.getByRole("radio", { name: "Recent" }).click();
   const cards = page.locator("[data-testid='audience-question-card']");
   await expect(cards.first()).toContainText("Newest approved question");
 
-  await page.getByRole("radio", { name: "Popular" }).check();
+  await page.getByRole("radio", { name: "Popular" }).click();
   await expect(cards.first()).toContainText("Will slides be shared?");
 
   const voteButton = page.getByRole("button", { name: "Vote for question Will slides be shared?" });
@@ -24,7 +24,7 @@ test("audience list shows approved questions only, sorts, and votes once", async
   await expect(voteButton).toHaveAttribute("aria-pressed", "true");
   await expect(voteButton).toBeDisabled();
 
-  await expect(page.getByText("Answered")).toBeVisible();
+  await expect(page.getByText("Answered", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Voting closed for question Already answered item" })).toBeDisabled();
 });
 

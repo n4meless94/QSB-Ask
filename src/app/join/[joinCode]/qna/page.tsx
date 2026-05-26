@@ -1,6 +1,14 @@
+import { cookies } from "next/headers";
+
+import { AudienceQuestionList } from "@/components/qna/AudienceQuestionList";
 import { QuestionSubmitForm } from "@/components/qna/QuestionSubmitForm";
-import { getJoinableEventByCode, type JoinableEvent } from "@/lib/participants/session";
+import {
+  getJoinableEventByCode,
+  getParticipantCookieName,
+  type JoinableEvent,
+} from "@/lib/participants/session";
 import { listPublicQuestions, type PublicQuestion } from "@/lib/qna/public";
+import { listParticipantVoteQuestionIds } from "@/lib/qna/voting";
 
 type ParticipantQnaPageProps = {
   params: Promise<{ joinCode: string }>;
@@ -20,7 +28,35 @@ function e2eEvent(joinCode: string): JoinableEvent | null {
 }
 
 function e2eQuestions(): PublicQuestion[] {
-  return [];
+  return [
+    {
+      current_text: "Will slides be shared?",
+      id: "question-live-popular",
+      is_edited: false,
+      status: "live",
+      submitted_at: "2026-05-26T01:00:00.000Z",
+      updated_at: "2026-05-26T01:00:00.000Z",
+      vote_count: 3,
+    },
+    {
+      current_text: "Newest approved question",
+      id: "question-live-newest",
+      is_edited: false,
+      status: "live",
+      submitted_at: "2026-05-26T02:00:00.000Z",
+      updated_at: "2026-05-26T02:00:00.000Z",
+      vote_count: 1,
+    },
+    {
+      current_text: "Already answered item",
+      id: "question-answered",
+      is_edited: true,
+      status: "answered",
+      submitted_at: "2026-05-26T00:30:00.000Z",
+      updated_at: "2026-05-26T00:30:00.000Z",
+      vote_count: 2,
+    },
+  ];
 }
 
 function errorCopy(error?: string) {
@@ -38,6 +74,16 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
       : await getJoinableEventByCode(joinCode);
   const questions =
     process.env.QSB_ASK_E2E_AUTH === "1" || !event ? e2eQuestions() : await listPublicQuestions(event.id);
+  let votedQuestionIds: string[] = [];
+
+  if (event && process.env.QSB_ASK_E2E_AUTH !== "1") {
+    const cookieStore = await cookies();
+    const rawToken = cookieStore.get(getParticipantCookieName(event.id))?.value;
+
+    if (rawToken) {
+      votedQuestionIds = await listParticipantVoteQuestionIds(event.id, rawToken);
+    }
+  }
 
   if (!event) {
     return (
@@ -74,30 +120,12 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
           joinCode={joinCode}
         />
 
-        <section className="grid gap-3" aria-labelledby="approved-questions-heading">
-          <h2
-            className="text-[20px] font-semibold leading-[1.25] text-slate-900"
-            id="approved-questions-heading"
-          >
-            Approved questions
-          </h2>
-          {questions.length === 0 ? (
-            <div className="rounded-[6px] border border-slate-300 bg-white p-4">
-              <p className="text-base leading-6 text-slate-600">No approved questions yet.</p>
-            </div>
-          ) : (
-            <ul className="grid gap-3">
-              {questions.map((question) => (
-                <li className="rounded-[6px] border border-slate-300 bg-white p-4" key={question.id}>
-                  <p className="text-base leading-6 text-slate-900">{question.current_text}</p>
-                  <p className="mt-2 text-sm leading-[1.4] text-slate-600">
-                    {question.vote_count} votes
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        <AudienceQuestionList
+          eventId={event.id}
+          initialVotedQuestionIds={votedQuestionIds}
+          joinCode={joinCode}
+          questions={questions}
+        />
       </div>
     </main>
   );
