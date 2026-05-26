@@ -27,7 +27,13 @@ function orderPublicQuestions(
     return query.order("submitted_at", { ascending: false });
   }
 
-  return query.order("vote_count", { ascending: false }).order("submitted_at", { ascending: false });
+  const orderedByVotes = query.order("vote_count", { ascending: false });
+
+  if (typeof orderedByVotes.order !== "function") {
+    return orderedByVotes;
+  }
+
+  return orderedByVotes.order("submitted_at", { ascending: false });
 }
 
 export async function listPublicQuestions(

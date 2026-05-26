@@ -122,8 +122,10 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
 
         <AudienceQuestionList
           eventId={event.id}
+          fixtureMode={process.env.QSB_ASK_E2E_AUTH === "1"}
           initialVotedQuestionIds={votedQuestionIds}
           joinCode={joinCode}
+          key={questions.map((question) => `${question.id}:${question.updated_at}:${question.vote_count}`).join("|")}
           questions={questions}
         />
       </div>

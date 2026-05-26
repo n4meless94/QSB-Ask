@@ -1,11 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
+import { ConnectionStatus } from "@/components/qna/ConnectionStatus";
 import type { PublicQuestion } from "@/lib/qna/public";
+import { subscribeToPublicQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 
 type PresenterViewProps = {
+  eventId: string;
   eventName: string;
+  fixtureMode?: boolean;
   questions: PublicQuestion[];
 };
 
@@ -28,14 +33,39 @@ function statusLabel(status: PublicQuestion["status"]) {
   return status === "answered" ? "Answered" : "Live";
 }
 
-export function PresenterView({ eventName, questions }: PresenterViewProps) {
+export function PresenterView({ eventId, eventName, fixtureMode = false, questions }: PresenterViewProps) {
+  const router = useRouter();
   const [sort, setSort] = useState<PresenterSort>("popular");
-  const sortedQuestions = useMemo(() => sortQuestions(questions, sort), [questions, sort]);
+  const [questionState, setQuestionState] = useState(questions);
+  const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
+  const sortedQuestions = useMemo(() => sortQuestions(questionState, sort), [questionState, sort]);
+
+  useEffect(() => {
+    if (fixtureMode) {
+      function refreshFromFixture(event: Event) {
+        const detail = (event as CustomEvent<{ questions?: PublicQuestion[] }>).detail;
+
+        if (detail?.questions) {
+          setQuestionState(detail.questions);
+          setConnectionState("live");
+        }
+      }
+
+      window.addEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
+      return () => window.removeEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
+    }
+
+    return subscribeToPublicQuestions({
+      eventId,
+      onConnectionChange: setConnectionState,
+      onRefresh: () => router.refresh(),
+    });
+  }, [eventId, fixtureMode, router]);
 
   return (
     <div className="grid gap-6">
       <header className="grid gap-3 border-b border-slate-300 pb-5">
-        <p className="text-sm font-semibold leading-[1.4] text-teal-700">Connected</p>
+        <ConnectionStatus state={connectionState} />
         <h1 className="text-[32px] font-semibold leading-[1.15] text-slate-950 sm:text-[44px]">
           {eventName} Presenter View
         </h1>

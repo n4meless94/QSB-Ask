@@ -1,12 +1,16 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import { voteQuestionAction } from "@/app/join/[joinCode]/qna/vote-actions";
+import { ConnectionStatus } from "@/components/qna/ConnectionStatus";
 import type { PublicQuestion } from "@/lib/qna/public";
+import { subscribeToPublicQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 
 type AudienceQuestionListProps = {
   eventId: string;
+  fixtureMode?: boolean;
   initialVotedQuestionIds: string[];
   joinCode: string;
   questions: PublicQuestion[];
@@ -29,16 +33,41 @@ function sortQuestions(questions: PublicQuestion[], sort: AudienceSort) {
 
 export function AudienceQuestionList({
   eventId,
+  fixtureMode = false,
   initialVotedQuestionIds,
   joinCode,
   questions,
 }: AudienceQuestionListProps) {
+  const router = useRouter();
   const [sort, setSort] = useState<AudienceSort>("popular");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const [votedQuestionIds, setVotedQuestionIds] = useState(() => new Set(initialVotedQuestionIds));
   const [questionState, setQuestionState] = useState(questions);
+  const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
   const sortedQuestions = useMemo(() => sortQuestions(questionState, sort), [questionState, sort]);
+
+  useEffect(() => {
+    if (fixtureMode) {
+      function refreshFromFixture(event: Event) {
+        const detail = (event as CustomEvent<{ questions?: PublicQuestion[] }>).detail;
+
+        if (detail?.questions) {
+          setQuestionState(detail.questions);
+          setConnectionState("live");
+        }
+      }
+
+      window.addEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
+      return () => window.removeEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
+    }
+
+    return subscribeToPublicQuestions({
+      eventId,
+      onConnectionChange: setConnectionState,
+      onRefresh: () => router.refresh(),
+    });
+  }, [eventId, fixtureMode, router]);
 
   function vote(question: PublicQuestion) {
     const formData = new FormData();
@@ -67,12 +96,15 @@ export function AudienceQuestionList({
   return (
     <section className="grid gap-3" aria-labelledby="approved-questions-heading">
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-        <h2
-          className="text-[20px] font-semibold leading-[1.25] text-slate-900"
-          id="approved-questions-heading"
-        >
-          Approved questions
-        </h2>
+        <div className="grid gap-2">
+          <h2
+            className="text-[20px] font-semibold leading-[1.25] text-slate-900"
+            id="approved-questions-heading"
+          >
+            Approved questions
+          </h2>
+          <ConnectionStatus state={connectionState} />
+        </div>
         <div aria-label="Sort approved questions" className="flex min-w-0 flex-wrap gap-2" role="radiogroup">
           {(["popular", "recent"] as const).map((option) => (
             <button

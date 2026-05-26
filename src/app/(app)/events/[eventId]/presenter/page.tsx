@@ -21,7 +21,15 @@ export default async function PresenterPage({ params }: PresenterPageProps) {
       return <PresenterAccessDenied />;
     }
 
-    return <PresenterView eventName="Quarterly Briefing" questions={e2ePresenterQuestions()} />;
+    return (
+      <PresenterView
+        eventId={eventId}
+        eventName="Quarterly Briefing"
+        fixtureMode
+        key={e2ePresenterQuestions().map((question) => `${question.id}:${question.updated_at}:${question.vote_count}`).join("|")}
+        questions={e2ePresenterQuestions()}
+      />
+    );
   }
 
   const supabase = await createSupabaseServerClient();
@@ -42,7 +50,14 @@ export default async function PresenterPage({ params }: PresenterPageProps) {
     return <PresenterAccessDenied />;
   }
 
-  return <PresenterView eventName={result.access.event.name} questions={result.questions} />;
+  return (
+    <PresenterView
+      eventId={eventId}
+      eventName={result.access.event.name}
+      key={result.questions.map((question) => `${question.id}:${question.updated_at}:${question.vote_count}`).join("|")}
+      questions={result.questions}
+    />
+  );
 }
 
 function PresenterAccessDenied() {

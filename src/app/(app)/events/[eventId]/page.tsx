@@ -125,6 +125,7 @@ function EventDetailContent({
             eventId={access.event.id}
             fixtureMode={fixtureMode}
             history={history}
+            key={moderationQuestions.map((question) => `${question.id}:${question.updated_at}:${question.status}`).join("|")}
             questions={moderationQuestions}
           />
         ) : (

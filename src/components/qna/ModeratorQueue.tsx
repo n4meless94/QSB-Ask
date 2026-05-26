@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   archiveQuestionAction,
@@ -10,6 +11,7 @@ import {
   markQuestionAnsweredAction,
   restoreQuestionAction,
 } from "@/app/(app)/events/[eventId]/qna-actions";
+import { ConnectionStatus } from "@/components/qna/ConnectionStatus";
 import { ModerationHistoryPanel } from "@/components/qna/ModerationHistoryPanel";
 import { Button } from "@/components/ui/Button";
 import {
@@ -17,6 +19,7 @@ import {
   type ModerationQuestion,
   STALE_MODERATION_MESSAGE,
 } from "@/lib/qna/moderation-shared";
+import { subscribeToModeratorQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 import type { ModerationAction, QuestionStatus } from "@/types/app";
 
 type QueueStatus = "pending" | "live" | "answered" | "archived";
@@ -140,6 +143,7 @@ export function ModeratorQueue({
   history,
   questions,
 }: ModeratorQueueProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<QueueStatus>("pending");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<QueueSort>("most_recent");
@@ -149,7 +153,30 @@ export function ModeratorQueue({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [pendingActionId, setPendingActionId] = useState<string | null>(null);
+  const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (fixtureMode) {
+      function refreshFromFixture(event: Event) {
+        const detail = (event as CustomEvent<{ moderationQuestions?: ModerationQuestion[] }>).detail;
+
+        if (detail?.moderationQuestions) {
+          setItems(detail.moderationQuestions);
+          setConnectionState("live");
+        }
+      }
+
+      window.addEventListener("qsb-ask:e2e-moderation-refresh", refreshFromFixture);
+      return () => window.removeEventListener("qsb-ask:e2e-moderation-refresh", refreshFromFixture);
+    }
+
+    return subscribeToModeratorQuestions({
+      eventId,
+      onConnectionChange: setConnectionState,
+      onRefresh: () => router.refresh(),
+    });
+  }, [eventId, fixtureMode, router]);
 
   const counts = useMemo(
     () =>
@@ -276,6 +303,7 @@ export function ModeratorQueue({
           <p className="text-sm leading-[1.4] text-slate-600">
             Review audience questions before they become visible to participants and speakers.
           </p>
+          <ConnectionStatus state={connectionState} />
         </div>
 
         {message ? (
@@ -357,7 +385,7 @@ export function ModeratorQueue({
           ) : (
             visibleQuestions.map((question) => {
               const isEditing = editingId === question.id;
-              const busy = pendingActionId === question.id || isPending;
+              const busy = pendingActionId === question.id || isPending || connectionState !== "live";
 
               return (
                 <article
@@ -492,6 +520,11 @@ export function ModeratorQueue({
               Simulate stale update
             </Button>
           </div>
+        ) : null}
+        {connectionState !== "live" ? (
+          <p className="text-sm font-semibold leading-[1.4] text-amber-700" role="status">
+            Reconnect to continue.
+          </p>
         ) : null}
       </section>
 
