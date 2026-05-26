@@ -3,26 +3,26 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: Phase 2 - Live Event Q&A And Moderation
-current_plan: 5
+current_plan: 6
 status: executing
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-05-26T01:43:00.000Z"
+stopped_at: Completed 02-05-PLAN.md
+last_updated: "2026-05-26T06:54:12.917Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 8
-  percent: 67
+  completed_plans: 9
+  percent: 75
 ---
 
 # Project State: QSB Ask
 
 **Last updated:** 2026-05-26  
 **Current phase:** Phase 2 - Live Event Q&A And Moderation  
-**Current Plan:** 5
+**Current Plan:** 6
 **Total Plans in Phase:** 8
-**Status:** Phase in progress - Plans 01-04 complete
+**Status:** Ready to execute
 **Last Activity:** 2026-05-26
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
@@ -35,7 +35,7 @@ See: `.planning/PROJECT.md` (updated 2026-05-22)
 
 ## Current Focus
 
-Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-04 are complete and established:
+Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-05 are complete and established:
 
 - Server-side event role assertions for organiser, moderator, and speaker access.
 - Organiser member access management with pending moderator/speaker records.
@@ -43,6 +43,7 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - Organiser-only event settings updates, close/archive lifecycle actions, and moderation-off warning acknowledgement.
 - Public join route, identity-mode-aware participant form, and event-scoped participant session cookies with hashed database tokens.
 - Participant question submission with pending-by-default moderation, rate/duplicate checks, and approved-only public reads.
+- Staff moderation queue with audited compare-and-set actions, edit version history, search, and sort.
 
 ## Roadmap Status
 
@@ -73,6 +74,7 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - 2026-05-26: Completed Phase 2 Plan 02 organiser event settings, close/archive lifecycle actions, and moderation-off warning.
 - 2026-05-26: Completed Phase 2 Plan 03 participant join, identity modes, and secure event-scoped session token.
 - 2026-05-26: Completed Phase 2 Plan 04 participant question submission, rate/duplicate checks, and approved-only public reads.
+- 2026-05-26: Completed Phase 2 Plan 05 moderator queue, audited moderation actions, edit history, search, and sort.
 
 ## Decisions
 
@@ -99,6 +101,9 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - [Phase 02]: Plan 04 participant Q&A route is `/join/{joinCode}/qna`, outside the protected organiser `/events` shell.
 - [Phase 02]: Plan 04 public reads use `PUBLIC_QUESTION_STATUSES` at the query boundary and select only safe public columns.
 - [Phase 02]: Plan 04 pending moderated question text is cleared after successful submission and is not rendered in public lists.
+- [Phase 02]: Plan 05 moderation actions use Postgres RPCs for atomic compare-and-set question updates, edit versions, and moderation_actions audit rows.
+- [Phase 02]: Plan 05 staff moderation queue is rendered only for organiser and moderator roles; speakers remain approved-only Presenter View users.
+- [Phase 02]: Plan 05 client moderation UI imports only client-safe shared DTOs/copy, not server-only moderation helpers.
 
 ## Performance Metrics
 
@@ -112,13 +117,14 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 | Phase 02 P02 | 31min | 3 tasks | 7 files |
 | Phase 02 P03 | 26min | 3 tasks | 7 files |
 | Phase 02 P04 | 38min | 3 tasks | 8 files |
+| Phase 02 P05 | 14min | 3 tasks | 11 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-26T01:43:00.000Z
-- **Stopped At:** Completed 02-04-PLAN.md
+- **Last session:** 2026-05-26T06:54:12.905Z
+- **Stopped At:** Completed 02-05-PLAN.md
 - **Resume File:** None
 
 ## Next Recommended Command
 
-Continue Phase 2 execution with `02-05-PLAN.md`.
+Continue Phase 2 execution with `02-06-PLAN.md`.

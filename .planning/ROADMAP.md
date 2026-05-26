@@ -11,7 +11,7 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 | Phase | Name | Goal | Requirements |
 |-------|------|------|--------------|
 | 1 | Foundation, Auth, And Data | Establish the app shell, local development, authentication baseline, event dashboard, and Supabase data/security foundation. Complete 2026-05-22. | AUTH-01 to AUTH-04, EVNT-01 to EVNT-03, DEPL-01, DEPL-05 |
-| 2 | Live Event Q&A And Moderation | In progress: Plans 01-04 complete; workspace access, settings/lifecycle, participant join/session, and moderated question submission are available. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-07, QNA-01 to QNA-03, QNA-12 to QNA-14 complete; QNA-04 to QNA-11, QNA-15, LIVE-01 to LIVE-04 pending |
+| 2 | Live Event Q&A And Moderation | Collect questions through a join link, moderate before public display, and show approved questions to participants and speakers. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-07, QNA-01 to QNA-15, LIVE-01 to LIVE-04 |
 | 3 | Surveys, Results, Presentation, And CSV | Deliver survey creation, participant responses, chart/data analytics UI, presentation view, and CSV exports. | LIVE-05, SURV-01 to SURV-13, EXPT-01 to EXPT-05 |
 | 4 | Hardening, Deployment, And UAT | Prepare production deployment through Coolify, verify live behaviour, handle reconnect states, and complete UAT readiness. | LIVE-06, DEPL-02 to DEPL-04 |
 
@@ -58,14 +58,14 @@ Plans:
 
 **UI hint:** yes
 
-**Plans:** 4/8 plans executed
+**Plans:** 5/8 plans executed
 
 Plans:
 - [x] 02-01-PLAN.md - Event Workspace shell, member access management, and staff role helpers.
 - [x] 02-02-PLAN.md - Organiser event settings, close/archive lifecycle, and moderation-off warning.
 - [x] 02-03-PLAN.md - Participant join, identity modes, and secure event-scoped session token.
 - [x] 02-04-PLAN.md - Question submission, rate/duplicate checks, and approved-only public reads.
-- [ ] 02-05-PLAN.md - Moderator queue, audited moderation actions, edit history, search, and sort.
+- [x] 02-05-PLAN.md - Moderator queue, audited moderation actions, edit history, search, and sort.
 - [ ] 02-06-PLAN.md - Audience approved-question list, Popular/Recent sorting, and one-vote behavior.
 - [ ] 02-07-PLAN.md - Presenter View access and approved-only display surface.
 - [ ] 02-08-PLAN.md - Normal-condition Q&A realtime subscriptions and cross-surface integration verification.
@@ -112,7 +112,7 @@ Plans:
 
 ## Next Step
 
-Phase 2 Plans 01-04 are implemented. Continue with `$gsd-execute-phase 2` for `02-05-PLAN.md`.
+Phase 2 Plans 01-05 are implemented. Continue with `$gsd-execute-phase 2` for `02-06-PLAN.md`.
 
 ---
 *Roadmap created: 2026-05-22*
