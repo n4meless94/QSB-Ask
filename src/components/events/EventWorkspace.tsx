@@ -13,6 +13,7 @@ type WorkspaceTab = "qa" | "access" | "settings" | "presenter";
 type EventWorkspaceProps = {
   access: EventAccessContext;
   accessPanel: ReactNode;
+  settingsPanel: ReactNode;
 };
 
 const tabs: Array<{ id: WorkspaceTab; label: string }> = [
@@ -46,7 +47,7 @@ function LaterPlanPanel({ title, body }: { title: string; body: string }) {
   );
 }
 
-export function EventWorkspace({ access, accessPanel }: EventWorkspaceProps) {
+export function EventWorkspace({ access, accessPanel, settingsPanel }: EventWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("qa");
   const { event, role } = access;
 
@@ -128,12 +129,7 @@ export function EventWorkspace({ access, accessPanel }: EventWorkspaceProps) {
           />
         ) : null}
         {activeTab === "access" ? accessPanel : null}
-        {activeTab === "settings" ? (
-          <LaterPlanPanel
-            body="Event lifecycle and moderation settings are planned in the settings lifecycle slice. Organiser-only editing is not enabled in this access slice."
-            title="Event settings"
-          />
-        ) : null}
+        {activeTab === "settings" ? settingsPanel : null}
         {activeTab === "presenter" ? (
           <LaterPlanPanel
             body="Presenter display data is planned in the presenter slice. Assigned speakers can use the Presenter View entry point once that route is implemented."

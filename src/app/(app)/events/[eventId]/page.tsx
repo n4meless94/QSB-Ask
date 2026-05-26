@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { EventAccessPanel } from "@/components/events/EventAccessPanel";
+import { EventSettingsPanel } from "@/components/events/EventSettingsPanel";
 import { EventWorkspace } from "@/components/events/EventWorkspace";
 import { Button } from "@/components/ui/Button";
 import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
@@ -76,6 +77,7 @@ function EventDetailContent({
     <EventWorkspace
       access={access}
       accessPanel={<EventAccessPanel eventId={access.event.id} members={members} role={access.role} />}
+      settingsPanel={<EventSettingsPanel event={access.event} role={access.role} />}
     />
   );
 }
