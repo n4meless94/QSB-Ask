@@ -3,24 +3,24 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: Phase 2 - Live Event Q&A And Moderation
-current_plan: 7
+current_plan: 8
 status: executing
-stopped_at: Completed 02-06-PLAN.md
-last_updated: "2026-05-26T07:04:34.554Z"
+stopped_at: Completed 02-07-PLAN.md
+last_updated: "2026-05-26T07:10:08.353Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 10
-  percent: 83
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State: QSB Ask
 
 **Last updated:** 2026-05-26  
 **Current phase:** Phase 2 - Live Event Q&A And Moderation  
-**Current Plan:** 7
+**Current Plan:** 8
 **Total Plans in Phase:** 8
 **Status:** Ready to execute
 **Last Activity:** 2026-05-26
@@ -35,7 +35,7 @@ See: `.planning/PROJECT.md` (updated 2026-05-22)
 
 ## Current Focus
 
-Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-06 are complete and established:
+Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-07 are complete and established:
 
 - Server-side event role assertions for organiser, moderator, and speaker access.
 - Organiser member access management with pending moderator/speaker records.
@@ -45,13 +45,14 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - Participant question submission with pending-by-default moderation, rate/duplicate checks, and approved-only public reads.
 - Staff moderation queue with audited compare-and-set actions, edit version history, search, and sort.
 - Audience approved-question list with Popular/Recent sorting and one-vote behavior.
+- Presenter View for assigned speakers and staff with approved-only question display.
 
 ## Roadmap Status
 
 | Phase | Status | Requirements | Notes |
 |-------|--------|--------------|-------|
 | 1 | Complete | 9 | Foundation, auth, event dashboard, data security. Plans 01-04 complete. |
-| 2 | In Progress | 27 | Plans 01-06 complete: workspace access, settings/lifecycle, participant join/session, submission, moderation, and audience voting. |
+| 2 | In Progress | 27 | Plans 01-07 complete: workspace access, settings/lifecycle, participant join/session, submission, moderation, audience voting, and presenter view. |
 | 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
 | 4 | Pending | 4 | Deployment, reconnect handling, UAT readiness. |
 
@@ -77,6 +78,7 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - 2026-05-26: Completed Phase 2 Plan 04 participant question submission, rate/duplicate checks, and approved-only public reads.
 - 2026-05-26: Completed Phase 2 Plan 05 moderator queue, audited moderation actions, edit history, search, and sort.
 - 2026-05-26: Completed Phase 2 Plan 06 audience approved-question list, Popular/Recent sorting, and session-bound voting.
+- 2026-05-26: Completed Phase 2 Plan 07 Presenter View access and approved-only display surface.
 
 ## Decisions
 
@@ -109,6 +111,8 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - [Phase 02]: Plan 06 voting uses a service-role-only Postgres RPC after server-side participant token validation.
 - [Phase 02]: Plan 06 public question sorting remains inside the approved-only live/answered query boundary.
 - [Phase 02]: Plan 06 answered questions remain visible to participants but are not votable.
+- [Phase 02]: Plan 07 Presenter View uses `getPresenterEventAccess` and safe live/answered public question fields only.
+- [Phase 02]: Plan 07 Presenter View remains in the authenticated route tree but does not render Event Workspace management tabs.
 
 ## Performance Metrics
 
@@ -124,13 +128,14 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 | Phase 02 P04 | 38min | 3 tasks | 8 files |
 | Phase 02 P05 | 14min | 3 tasks | 11 files |
 | Phase 02 P06 | 19min | 3 tasks | 9 files |
+| Phase 02 P07 | 10min | 3 tasks | 5 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-26T07:04:34.300Z
-- **Stopped At:** Completed 02-06-PLAN.md
+- **Last session:** 2026-05-26T07:10:08.341Z
+- **Stopped At:** Completed 02-07-PLAN.md
 - **Resume File:** None
 
 ## Next Recommended Command
 
-Continue Phase 2 execution with `02-07-PLAN.md`.
+Continue Phase 2 execution with `02-08-PLAN.md`.

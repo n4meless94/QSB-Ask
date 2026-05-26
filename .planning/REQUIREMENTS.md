@@ -47,7 +47,7 @@
 
 - [ ] **LIVE-01**: Q&A Moderation updates Pending count and question state changes within 2 seconds.
 - [ ] **LIVE-02**: Audience Q&A updates approved questions, vote counts, and answered status within 2 seconds.
-- [ ] **LIVE-03**: Presenter View shows approved questions, vote counts, and status without moderation controls.
+- [x] **LIVE-03**: Presenter View shows approved questions, vote counts, and status without moderation controls.
 - [ ] **LIVE-04**: Presenter View updates approved questions, vote changes, and status changes within 2 seconds.
 - [ ] **LIVE-05**: Presentation View shows survey charts without admin controls and updates results within 2 seconds.
 - [ ] **LIVE-06**: Live views show reconnect state and prompt refresh after prolonged reconnection failure.
@@ -153,7 +153,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QNA-15 | Phase 2 | Complete |
 | LIVE-01 | Phase 2 | Pending |
 | LIVE-02 | Phase 2 | Pending |
-| LIVE-03 | Phase 2 | Pending |
+| LIVE-03 | Phase 2 | Complete |
 | LIVE-04 | Phase 2 | Pending |
 | LIVE-05 | Phase 3 | Pending |
 | LIVE-06 | Phase 4 | Pending |

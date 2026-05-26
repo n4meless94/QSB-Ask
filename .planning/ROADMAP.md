@@ -11,7 +11,7 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 | Phase | Name | Goal | Requirements |
 |-------|------|------|--------------|
 | 1 | Foundation, Auth, And Data | Establish the app shell, local development, authentication baseline, event dashboard, and Supabase data/security foundation. Complete 2026-05-22. | AUTH-01 to AUTH-04, EVNT-01 to EVNT-03, DEPL-01, DEPL-05 |
-| 2 | 6/8 | In Progress|  |
+| 2 | 7/8 | In Progress|  |
 | 3 | Surveys, Results, Presentation, And CSV | Deliver survey creation, participant responses, chart/data analytics UI, presentation view, and CSV exports. | LIVE-05, SURV-01 to SURV-13, EXPT-01 to EXPT-05 |
 | 4 | Hardening, Deployment, And UAT | Prepare production deployment through Coolify, verify live behaviour, handle reconnect states, and complete UAT readiness. | LIVE-06, DEPL-02 to DEPL-04 |
 
@@ -58,7 +58,7 @@ Plans:
 
 **UI hint:** yes
 
-**Plans:** 6/8 plans executed
+**Plans:** 7/8 plans executed
 
 Plans:
 - [x] 02-01-PLAN.md - Event Workspace shell, member access management, and staff role helpers.
@@ -67,7 +67,7 @@ Plans:
 - [x] 02-04-PLAN.md - Question submission, rate/duplicate checks, and approved-only public reads.
 - [x] 02-05-PLAN.md - Moderator queue, audited moderation actions, edit history, search, and sort.
 - [x] 02-06-PLAN.md - Audience approved-question list, Popular/Recent sorting, and one-vote behavior.
-- [ ] 02-07-PLAN.md - Presenter View access and approved-only display surface.
+- [x] 02-07-PLAN.md - Presenter View access and approved-only display surface.
 - [ ] 02-08-PLAN.md - Normal-condition Q&A realtime subscriptions and cross-surface integration verification.
 
 ### Phase 3: Surveys, Results, Presentation, And CSV
@@ -112,7 +112,7 @@ Plans:
 
 ## Next Step
 
-Phase 2 Plans 01-06 are implemented. Continue with `$gsd-execute-phase 2` for `02-07-PLAN.md`.
+Phase 2 Plans 01-07 are implemented. Continue with `$gsd-execute-phase 2` for `02-08-PLAN.md`.
 
 ---
 *Roadmap created: 2026-05-22*
