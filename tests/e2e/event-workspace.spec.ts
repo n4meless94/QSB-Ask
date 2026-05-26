@@ -18,7 +18,7 @@ test("D-01/D-03 event workspace renders tabs and organiser Access content with E
   await page.goto("/events/event-1");
 
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing" })).toBeVisible();
-  await expect(page.getByText("QSB2X9ZA")).toBeVisible();
+  await expect(page.getByText("QSB2X9ZA", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy join link for Quarterly Briefing" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open Presenter View" })).toHaveAttribute(
     "href",
@@ -36,10 +36,15 @@ test("D-01/D-03 event workspace renders tabs and organiser Access content with E
   await expect(page.getByRole("heading", { level: 2, name: "Event access" })).toBeVisible();
   await expect(page.getByText("Invite email delivery is not active yet.")).toBeVisible();
   await expect(page.getByLabel("Invite email")).toBeVisible();
-  await expect(page.getByLabel("Role")).toHaveValues(["moderator", "speaker"]);
+  await expect(
+    page.getByLabel("Role").locator("option").evaluateAll((options) =>
+      options.map((option) => (option as HTMLOptionElement).value),
+    ),
+  ).resolves.toEqual(["moderator", "speaker"]);
   await expect(page.getByRole("button", { name: "Invite member" })).toBeVisible();
-  await expect(page.getByText("organiser@qsb.com")).toBeVisible();
-  await expect(page.getByText("Original organiser")).toBeVisible();
+  const accessPanel = page.getByLabel("Event access");
+  await expect(accessPanel.getByText("organiser@qsb.com")).toBeVisible();
+  await expect(accessPanel.getByText("Original organiser", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Remove access for moderator@qsb.com" })).toBeVisible();
 });
 
