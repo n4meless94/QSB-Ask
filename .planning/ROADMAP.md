@@ -11,7 +11,7 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 | Phase | Name | Goal | Requirements |
 |-------|------|------|--------------|
 | 1 | Foundation, Auth, And Data | Establish the app shell, local development, authentication baseline, event dashboard, and Supabase data/security foundation. Complete 2026-05-22. | AUTH-01 to AUTH-04, EVNT-01 to EVNT-03, DEPL-01, DEPL-05 |
-| 2 | Live Event Q&A And Moderation | In progress: Plan 01 complete; access workspace, staff role helpers, and organiser member management are available. | AUTH-05 to AUTH-07 complete; EVNT-04 to EVNT-07, QNA-01 to QNA-15, LIVE-01 to LIVE-04 pending |
+| 2 | Live Event Q&A And Moderation | In progress: Plans 01-02 complete; access workspace, staff role helpers, organiser member management, event settings, lifecycle, and moderation-off warning are available. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-05, and QNA-12 complete; EVNT-06 to EVNT-07, QNA-01 to QNA-11, QNA-13 to QNA-15, LIVE-01 to LIVE-04 pending |
 | 3 | Surveys, Results, Presentation, And CSV | Deliver survey creation, participant responses, chart/data analytics UI, presentation view, and CSV exports. | LIVE-05, SURV-01 to SURV-13, EXPT-01 to EXPT-05 |
 | 4 | Hardening, Deployment, And UAT | Prepare production deployment through Coolify, verify live behaviour, handle reconnect states, and complete UAT readiness. | LIVE-06, DEPL-02 to DEPL-04 |
 
@@ -58,11 +58,11 @@ Plans:
 
 **UI hint:** yes
 
-**Plans:** 1/8 plans executed
+**Plans:** 2/8 plans executed
 
 Plans:
 - [x] 02-01-PLAN.md - Event Workspace shell, member access management, and staff role helpers.
-- [ ] 02-02-PLAN.md - Organiser event settings, close/archive lifecycle, and moderation-off warning.
+- [x] 02-02-PLAN.md - Organiser event settings, close/archive lifecycle, and moderation-off warning.
 - [ ] 02-03-PLAN.md - Participant join, identity modes, and secure event-scoped session token.
 - [ ] 02-04-PLAN.md - Question submission, rate/duplicate checks, and approved-only public reads.
 - [ ] 02-05-PLAN.md - Moderator queue, audited moderation actions, edit history, search, and sort.
@@ -112,7 +112,7 @@ Plans:
 
 ## Next Step
 
-Phase 1 is implemented. Continue with `$gsd-discuss-phase 2 --auto` and `$gsd-plan-phase 2`.
+Phase 2 Plans 01-02 are implemented. Continue with `$gsd-execute-phase 2` for `02-03-PLAN.md`.
 
 ---
 *Roadmap created: 2026-05-22*

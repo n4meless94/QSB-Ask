@@ -20,8 +20,8 @@
 - [x] **EVNT-01**: Organiser can create an event with name, date, time zone, status, participant identity mode, and moderation setting.
 - [x] **EVNT-02**: Organiser can open an Event Dashboard listing accessible events with name, date, status, and join code.
 - [x] **EVNT-03**: Organiser can copy a join code or link for an event.
-- [ ] **EVNT-04**: Organiser can edit event settings from the Event Workspace.
-- [ ] **EVNT-05**: Organiser can close and archive an event while preserving records.
+- [x] **EVNT-04**: Organiser can edit event settings from the Event Workspace.
+- [x] **EVNT-05**: Organiser can close and archive an event while preserving records.
 - [ ] **EVNT-06**: Participant can join an active event by code or shared link.
 - [ ] **EVNT-07**: Participant identity mode supports Anonymous, Name required, and Name plus email required.
 
@@ -38,7 +38,7 @@
 - [ ] **QNA-09**: Moderator can search question text and sort questions by recency, age, or votes.
 - [ ] **QNA-10**: Participant can upvote an approved Live question once per session.
 - [ ] **QNA-11**: Participant can sort approved questions by Popular or Recent.
-- [ ] **QNA-12**: Moderator can turn moderation off only after confirming a warning.
+- [x] **QNA-12**: Organiser can turn moderation off only after confirming a warning.
 - [ ] **QNA-13**: System rate-limits participant question submissions according to event settings.
 - [ ] **QNA-14**: System blocks duplicate participant question submissions when duplicate block is enabled.
 - [ ] **QNA-15**: System records moderation actions with actor, action, status change, metadata, and timestamp.
@@ -132,8 +132,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVNT-01 | Phase 1 | Complete |
 | EVNT-02 | Phase 1 | Complete |
 | EVNT-03 | Phase 1 | Complete |
-| EVNT-04 | Phase 2 | Pending |
-| EVNT-05 | Phase 2 | Pending |
+| EVNT-04 | Phase 2 | Complete |
+| EVNT-05 | Phase 2 | Complete |
 | EVNT-06 | Phase 2 | Pending |
 | EVNT-07 | Phase 2 | Pending |
 | QNA-01 | Phase 2 | Pending |
@@ -147,7 +147,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QNA-09 | Phase 2 | Pending |
 | QNA-10 | Phase 2 | Pending |
 | QNA-11 | Phase 2 | Pending |
-| QNA-12 | Phase 2 | Pending |
+| QNA-12 | Phase 2 | Complete |
 | QNA-13 | Phase 2 | Pending |
 | QNA-14 | Phase 2 | Pending |
 | QNA-15 | Phase 2 | Pending |
