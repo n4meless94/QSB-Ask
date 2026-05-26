@@ -27,9 +27,9 @@
 
 ### Moderated Q&A
 
-- [ ] **QNA-01**: Participant can submit a question to an active event.
-- [ ] **QNA-02**: Submitted questions enter Pending when moderation is enabled.
-- [ ] **QNA-03**: Participant-visible and speaker-visible views never show Pending, dismissed, or Archived questions.
+- [x] **QNA-01**: Participant can submit a question to an active event.
+- [x] **QNA-02**: Submitted questions enter Pending when moderation is enabled.
+- [x] **QNA-03**: Participant-visible and speaker-visible views never show Pending, dismissed, or Archived questions.
 - [ ] **QNA-04**: Moderator can approve a Pending question and move it to Live.
 - [ ] **QNA-05**: Moderator can dismiss a question and move it to Archived.
 - [ ] **QNA-06**: Moderator can edit question text while preserving original and edited versions.
@@ -39,8 +39,8 @@
 - [ ] **QNA-10**: Participant can upvote an approved Live question once per session.
 - [ ] **QNA-11**: Participant can sort approved questions by Popular or Recent.
 - [x] **QNA-12**: Organiser can turn moderation off only after confirming a warning.
-- [ ] **QNA-13**: System rate-limits participant question submissions according to event settings.
-- [ ] **QNA-14**: System blocks duplicate participant question submissions when duplicate block is enabled.
+- [x] **QNA-13**: System rate-limits participant question submissions according to event settings.
+- [x] **QNA-14**: System blocks duplicate participant question submissions when duplicate block is enabled.
 - [ ] **QNA-15**: System records moderation actions with actor, action, status change, metadata, and timestamp.
 
 ### Live Views
@@ -136,9 +136,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVNT-05 | Phase 2 | Complete |
 | EVNT-06 | Phase 2 | Complete |
 | EVNT-07 | Phase 2 | Complete |
-| QNA-01 | Phase 2 | Pending |
-| QNA-02 | Phase 2 | Pending |
-| QNA-03 | Phase 2 | Pending |
+| QNA-01 | Phase 2 | Complete |
+| QNA-02 | Phase 2 | Complete |
+| QNA-03 | Phase 2 | Complete |
 | QNA-04 | Phase 2 | Pending |
 | QNA-05 | Phase 2 | Pending |
 | QNA-06 | Phase 2 | Pending |
@@ -148,8 +148,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QNA-10 | Phase 2 | Pending |
 | QNA-11 | Phase 2 | Pending |
 | QNA-12 | Phase 2 | Complete |
-| QNA-13 | Phase 2 | Pending |
-| QNA-14 | Phase 2 | Pending |
+| QNA-13 | Phase 2 | Complete |
+| QNA-14 | Phase 2 | Complete |
 | QNA-15 | Phase 2 | Pending |
 | LIVE-01 | Phase 2 | Pending |
 | LIVE-02 | Phase 2 | Pending |
