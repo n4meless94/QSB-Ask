@@ -12,6 +12,7 @@ import { EVENT_MANAGEMENT_ROLES } from "@/lib/supabase/rls";
 
 const assertEventRoleMock = vi.hoisted(() => vi.fn());
 const fromMock = vi.hoisted(() => vi.fn());
+const rpcMock = vi.hoisted(() => vi.fn());
 
 vi.mock("server-only", () => ({}));
 
@@ -27,6 +28,7 @@ vi.mock("@/lib/events/access", async () => {
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn(async () => ({
     from: fromMock,
+    rpc: rpcMock,
   })),
 }));
 
@@ -139,6 +141,16 @@ function makeQueries() {
   const insertedOptions: unknown[] = [];
   const deletedSurveyQuestions: unknown[] = [];
   const selectedSurveyIds: string[] = [];
+  const replacedDrafts: unknown[] = [];
+
+  rpcMock.mockImplementation((name: string, args: unknown) => {
+    if (name !== "replace_survey_draft") {
+      throw new Error(`Unexpected RPC: ${name}`);
+    }
+
+    replacedDrafts.push(args);
+    return Promise.resolve({ error: null });
+  });
 
   function surveysQuery() {
     return {
@@ -216,7 +228,7 @@ function makeQueries() {
     throw new Error(`Unexpected table: ${table}`);
   });
 
-  return { deletedSurveyQuestions, insertedOptions, insertedQuestions, insertedSurveys, selectedSurveyIds, updatedSurveys };
+  return { insertedSurveys, replacedDrafts, selectedSurveyIds, updatedSurveys };
 }
 
 describe("organiser survey management", () => {
@@ -268,45 +280,43 @@ describe("organiser survey management", () => {
 
     await saveSurveyDraft("organiser-1", "event-1", draftInput());
 
-    expect(queries.updatedSurveys[0]).toMatchObject({ title: "Pulse check" });
-    expect(queries.deletedSurveyQuestions[0]).toEqual({ column: "survey_id", value: "survey-1" });
-    expect(queries.insertedQuestions[0]).toEqual([
-      {
-        position: 0,
-        prompt: "Is the pace clear?",
-        rating_scale: null,
-        survey_id: "survey-1",
-        type: "multiple_choice",
-      },
-      {
-        position: 1,
-        prompt: "Which topics should we expand?",
-        rating_scale: null,
-        survey_id: "survey-1",
-        type: "multiple_select",
-      },
-      {
-        position: 2,
-        prompt: "Rate the session",
-        rating_scale: 5,
-        survey_id: "survey-1",
-        type: "rating",
-      },
-      {
-        position: 3,
-        prompt: "What should we clarify next?",
-        rating_scale: null,
-        survey_id: "survey-1",
-        type: "open_text",
-      },
-    ]);
-    expect(queries.insertedOptions[0]).toEqual([
-      { label: "Yes", position: 0, survey_question_id: "question-1" },
-      { label: "No", position: 1, survey_question_id: "question-1" },
-      { label: "Budget", position: 0, survey_question_id: "question-2" },
-      { label: "Timeline", position: 1, survey_question_id: "question-2" },
-      { label: "Risks", position: 2, survey_question_id: "question-2" },
-    ]);
+    expect(queries.replacedDrafts[0]).toMatchObject({
+      next_title: "Pulse check",
+      target_event_id: "event-1",
+      target_survey_id: "survey-1",
+    });
+    expect(queries.replacedDrafts[0]).toMatchObject({
+      next_questions: [
+        {
+          options: ["Yes", "No"],
+          position: 0,
+          prompt: "Is the pace clear?",
+          rating_scale: null,
+          type: "multiple_choice",
+        },
+        {
+          options: ["Budget", "Timeline", "Risks"],
+          position: 1,
+          prompt: "Which topics should we expand?",
+          rating_scale: null,
+          type: "multiple_select",
+        },
+        {
+          options: [],
+          position: 2,
+          prompt: "Rate the session",
+          rating_scale: 5,
+          type: "rating",
+        },
+        {
+          options: [],
+          position: 3,
+          prompt: "What should we clarify next?",
+          rating_scale: null,
+          type: "open_text",
+        },
+      ],
+    });
   });
 
   it("returns publish validation errors without changing status when a survey is incomplete", async () => {
@@ -344,7 +354,6 @@ describe("organiser survey management", () => {
 
     expect(queries.selectedSurveyIds).toContain("survey-1");
     expect(queries.updatedSurveys).toEqual([
-      { title: "Pulse check" },
       { status: "published" },
       { status: "closed" },
       { results_visible_to_participants: true },

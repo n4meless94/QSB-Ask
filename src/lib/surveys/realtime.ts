@@ -8,6 +8,7 @@ type SurveyResultsSubscriptionOptions = {
   eventId: string;
   onConnectionChange?: (state: SurveyConnectionState) => void;
   onRefresh: () => void;
+  refreshIntervalMs?: number;
   surveyId: string;
 };
 
@@ -15,9 +16,11 @@ export function subscribeToSurveyResults({
   eventId,
   onConnectionChange,
   onRefresh,
+  refreshIntervalMs = 2000,
   surveyId,
 }: SurveyResultsSubscriptionOptions) {
   const supabase = createSupabaseBrowserClient();
+  const interval = globalThis.setInterval(onRefresh, refreshIntervalMs);
   const channel = supabase
     .channel(`qsb-ask-survey-results-${eventId}-${surveyId}`)
     .on(
@@ -27,25 +30,6 @@ export function subscribeToSurveyResults({
         filter: `id=eq.${surveyId}`,
         schema: "public",
         table: "surveys",
-      },
-      () => onRefresh(),
-    )
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        filter: `survey_id=eq.${surveyId}`,
-        schema: "public",
-        table: "survey_responses",
-      },
-      () => onRefresh(),
-    )
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "survey_answers",
       },
       () => onRefresh(),
     );
@@ -67,6 +51,7 @@ export function subscribeToSurveyResults({
   });
 
   return () => {
+    globalThis.clearInterval(interval);
     void supabase.removeChannel(channel);
   };
 }

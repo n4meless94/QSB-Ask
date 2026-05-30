@@ -2,6 +2,7 @@ import "server-only";
 
 import { assertEventRole, getPresenterEventAccess, type EventAccessContext } from "@/lib/events/access";
 import { validateParticipantSession } from "@/lib/participants/session";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Tables } from "@/lib/supabase/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { EVENT_MANAGEMENT_ROLES } from "@/lib/supabase/rls";
@@ -223,8 +224,8 @@ function buildResults(
   });
 }
 
-async function loadResultRows(eventId: string) {
-  const supabase = await createSupabaseServerClient();
+async function loadResultRows(eventId: string, options: { useAdmin?: boolean } = {}) {
+  const supabase = options.useAdmin ? createSupabaseAdminClient() : await createSupabaseServerClient();
   const { data: surveyData, error: surveyError } = await supabase
     .from("surveys")
     .select(SURVEY_RESULT_SELECT)
@@ -306,11 +307,21 @@ export async function getPresentationSurveyResults(
 export async function getParticipantVisibleSurveyResults(
   eventId: string,
   rawToken: string,
+  surveyId: string,
 ): Promise<SurveyResult[]> {
-  await validateParticipantSession(eventId, rawToken);
-  const { answers, responses, surveys } = await loadResultRows(eventId);
+  const participantSession = await validateParticipantSession(eventId, rawToken);
+  const { answers, responses, surveys } = await loadResultRows(eventId, { useAdmin: true });
+  const hasCompletedSurvey = responses.some(
+    (response) => response.survey_id === surveyId && response.participant_session_id === participantSession.id,
+  );
+
+  if (!hasCompletedSurvey) {
+    return [];
+  }
+
   const visibleSurveys = surveys.filter(
     (survey) =>
+      survey.id === surveyId &&
       survey.results_visible_to_participants && (survey.status === "published" || survey.status === "closed"),
   );
 

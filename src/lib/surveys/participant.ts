@@ -3,7 +3,6 @@ import "server-only";
 import { validateParticipantSession } from "@/lib/participants/session";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Json, Tables } from "@/lib/supabase/database.types";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { SurveyQuestionType, SurveyStatus } from "@/types/app";
 
 type SurveyRow = Tables<"surveys">;
@@ -175,8 +174,8 @@ function answerForQuestion(
 }
 
 async function loadSurveyForParticipant(eventId: string, surveyId?: string) {
-  const supabase = await createSupabaseServerClient();
-  const query = supabase
+  const admin = createSupabaseAdminClient();
+  const query = admin
     .from("surveys")
     .select(PARTICIPANT_SURVEY_SELECT)
     .eq("event_id", eventId)
@@ -193,8 +192,8 @@ async function loadSurveyForParticipant(eventId: string, surveyId?: string) {
 }
 
 async function hasSubmittedSurvey(surveyId: string, participantSessionId: string) {
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
     .from("survey_responses")
     .select("id")
     .eq("survey_id", surveyId)

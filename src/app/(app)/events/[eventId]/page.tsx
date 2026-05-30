@@ -33,10 +33,33 @@ import type { EventRole } from "@/types/app";
 
 type EventDetailPageProps = {
   params: Promise<{ eventId: string }>;
+  searchParams: Promise<{
+    resultSurveyId?: string;
+    surveyId?: string;
+    tab?: string;
+  }>;
 };
 
-export default async function EventDetailPage({ params }: EventDetailPageProps) {
+type WorkspaceTab = "qa" | "surveys" | "results" | "exports" | "access" | "settings" | "presenter";
+
+function workspaceTabFromQuery(value: string | undefined): WorkspaceTab {
+  if (
+    value === "surveys" ||
+    value === "results" ||
+    value === "exports" ||
+    value === "access" ||
+    value === "settings" ||
+    value === "presenter"
+  ) {
+    return value;
+  }
+
+  return "qa";
+}
+
+export default async function EventDetailPage({ params, searchParams }: EventDetailPageProps) {
   const { eventId } = await params;
+  const query = await searchParams;
   const cookieStore = await cookies();
 
   if (isE2EAuthEnabled(cookieStore.get(E2E_AUTH_COOKIE)?.value)) {
@@ -49,6 +72,9 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         members={e2eMembers()}
         moderationQuestions={e2eModerationQuestions()}
         results={e2eSurveyResults(eventId)}
+        resultSurveyId={query.resultSurveyId}
+        selectedTab={workspaceTabFromQuery(query.tab)}
+        surveyId={query.surveyId}
         surveys={e2eSurveys(eventId)}
       />
     );
@@ -116,6 +142,9 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       members={members}
       moderationQuestions={moderationQuestions}
       results={results}
+      resultSurveyId={query.resultSurveyId}
+      selectedTab={workspaceTabFromQuery(query.tab)}
+      surveyId={query.surveyId}
       surveys={surveys}
     />
   );
@@ -129,6 +158,9 @@ function EventDetailContent({
   members,
   moderationQuestions,
   results,
+  resultSurveyId,
+  selectedTab,
+  surveyId,
   surveys,
 }: {
   access: EventAccessContext;
@@ -138,9 +170,13 @@ function EventDetailContent({
   members: EventMemberSummary[];
   moderationQuestions: ModerationQuestion[];
   results: SurveyResult[];
+  resultSurveyId?: string;
+  selectedTab: WorkspaceTab;
+  surveyId?: string;
   surveys: SurveySummary[];
 }) {
-  const selectedSurvey = surveys[0];
+  const selectedSurvey = surveys.find((survey) => survey.id === surveyId) ?? surveys[0];
+  const selectedResult = results.find((result) => result.id === resultSurveyId) ?? results[0];
 
   return (
     <EventWorkspace
@@ -158,6 +194,7 @@ function EventDetailContent({
           </section>
         )
       }
+      initialTab={selectedTab}
       qnaPanel={
         canModerate(access.role) ? (
           <ModeratorQueue
@@ -179,7 +216,11 @@ function EventDetailContent({
       }
       resultsPanel={
         access.role === "organiser" ? (
-          <SurveyResultsPanel eventId={access.event.id} results={results} />
+          <SurveyResultsPanel
+            eventId={access.event.id}
+            results={results}
+            selectedResultId={selectedResult?.id}
+          />
         ) : (
           <section className="grid gap-2 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6">
             <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900">Results</h2>

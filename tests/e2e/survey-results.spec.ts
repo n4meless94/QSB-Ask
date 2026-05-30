@@ -20,7 +20,7 @@ test("organiser can inspect survey result counts, charts, tables, and open text 
   const resultsPanel = page.getByRole("tabpanel", { name: "Results" });
 
   await expect(page.getByRole("heading", { name: "Survey results" })).toBeVisible();
-  await expect(page.getByText("Pulse check")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pulse check" })).toBeVisible();
   await expect(
     page
       .getByRole("heading", { name: "Pulse check" })

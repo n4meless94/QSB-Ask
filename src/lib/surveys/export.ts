@@ -47,7 +47,7 @@ type SurveyQuestionWithOptions = SurveyQuestionRow & {
   survey_options?: SurveyOptionRow[] | null;
 };
 
-const FORMULA_LEADING_PATTERN = /^[=+\-@]/;
+const FORMULA_LEADING_PATTERN = /^[\s]*[=+\-@]/;
 
 const QUESTION_HEADERS = [
   "record_type",

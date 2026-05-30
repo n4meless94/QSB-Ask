@@ -30,7 +30,7 @@ describe("survey realtime subscriptions", () => {
     });
   });
 
-  it("subscribes to survey response and answer changes as refresh triggers only", () => {
+  it("does not subscribe browser clients to raw survey response or answer rows", () => {
     const onRefresh = vi.fn();
     const onConnectionChange = vi.fn();
 
@@ -46,31 +46,21 @@ describe("survey realtime subscriptions", () => {
       "postgres_changes",
       {
         event: "*",
-        filter: "survey_id=eq.survey-1",
+        filter: "id=eq.survey-1",
         schema: "public",
-        table: "survey_responses",
+        table: "surveys",
       },
       expect.any(Function),
     );
-    expect(onMock).toHaveBeenCalledWith(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "survey_answers",
-      },
-      expect.any(Function),
-    );
+    expect(onMock.mock.calls.map((call) => call[1]?.table)).not.toContain("survey_responses");
+    expect(onMock.mock.calls.map((call) => call[1]?.table)).not.toContain("survey_answers");
     expect(onConnectionChange).toHaveBeenCalledWith("live");
 
-    const responseCall = onMock.mock.calls.find((call) => call[1]?.table === "survey_responses");
-    const answerCall = onMock.mock.calls.find((call) => call[1]?.table === "survey_answers");
-    const responseCallback = responseCall?.[2] as () => void;
-    const answerCallback = answerCall?.[2] as () => void;
-    responseCallback();
-    answerCallback();
+    const surveyCall = onMock.mock.calls.find((call) => call[1]?.table === "surveys");
+    const surveyCallback = surveyCall?.[2] as () => void;
+    surveyCallback();
 
-    expect(onRefresh).toHaveBeenCalledTimes(2);
+    expect(onRefresh).toHaveBeenCalled();
     unsubscribe();
     expect(removeChannelMock).toHaveBeenCalled();
   });

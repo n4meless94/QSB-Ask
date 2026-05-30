@@ -1,4 +1,7 @@
-import { inviteMemberAction, removeMemberAction } from "@/app/(app)/events/[eventId]/access-actions";
+import {
+  inviteMemberFormAction,
+  removeMemberFormAction,
+} from "@/app/(app)/events/[eventId]/access-actions";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import type { EventMemberSummary } from "@/lib/events/access";
@@ -35,8 +38,8 @@ function badgeClass(value: EventRole | MemberStatus) {
 }
 
 export function EventAccessPanel({ eventId, members, role }: EventAccessPanelProps) {
-  const inviteAction = inviteMemberAction.bind(null, eventId);
-  const removeAction = removeMemberAction.bind(null, eventId);
+  const inviteAction = inviteMemberFormAction.bind(null, eventId);
+  const removeAction = removeMemberFormAction.bind(null, eventId);
   const canManageAccess = role === "organiser";
 
   return (

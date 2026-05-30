@@ -3,8 +3,8 @@
 import { useActionState, useState } from "react";
 
 import {
-  archiveEventAction,
-  closeEventAction,
+  archiveEventFormAction,
+  closeEventFormAction,
   updateEventSettingsAction,
   type EventSettingsActionResult,
 } from "@/app/(app)/events/[eventId]/settings-actions";
@@ -30,8 +30,8 @@ function toDatetimeLocal(value: string) {
 
 export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
   const updateAction = updateEventSettingsAction.bind(null, event.id);
-  const closeAction = closeEventAction.bind(null, event.id);
-  const archiveAction = archiveEventAction.bind(null, event.id);
+  const closeAction = closeEventFormAction.bind(null, event.id);
+  const archiveAction = archiveEventFormAction.bind(null, event.id);
   const [state, formAction, isPending] = useActionState(updateAction, initialState);
   const [moderationEnabled, setModerationEnabled] = useState(event.moderation_enabled);
   const [moderationWarningAcknowledged, setModerationWarningAcknowledged] = useState(

@@ -9,6 +9,7 @@ import type { SurveyQuestionResult, SurveyResult } from "@/lib/surveys/results";
 type SurveyResultsPanelProps = {
   eventId: string;
   results: SurveyResult[];
+  selectedResultId?: string;
 };
 
 const statusLabels: Record<SurveyResult["status"], string> = {
@@ -39,8 +40,8 @@ function ChartOrText({ question }: { question: SurveyQuestionResult }) {
   return <SurveyBarChart data={question.chartData} title={question.prompt} />;
 }
 
-export function SurveyResultsPanel({ eventId, results }: SurveyResultsPanelProps) {
-  const selected = results[0];
+export function SurveyResultsPanel({ eventId, results, selectedResultId }: SurveyResultsPanelProps) {
+  const selected = results.find((result) => result.id === selectedResultId) ?? results[0];
 
   return (
     <section
@@ -68,6 +69,30 @@ export function SurveyResultsPanel({ eventId, results }: SurveyResultsPanelProps
         </div>
       ) : (
         <div className="grid gap-5">
+          <div className="grid gap-3 border-b border-slate-200 pb-4">
+            <h3 className="text-base font-semibold leading-6 text-slate-900">Survey selector</h3>
+            <div className="grid gap-2 md:grid-cols-2">
+              {results.map((result) => (
+                <Link
+                  aria-current={result.id === selected.id ? "true" : undefined}
+                  className={[
+                    "grid gap-1 rounded-[6px] border bg-white p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2",
+                    result.id === selected.id
+                      ? "border-teal-700 text-slate-900"
+                      : "border-slate-300 text-slate-900 hover:bg-slate-50",
+                  ].join(" ")}
+                  href={`/events/${eventId}?tab=results&resultSurveyId=${result.id}`}
+                  key={result.id}
+                >
+                  <span className="break-words text-base font-semibold leading-6">{result.title}</span>
+                  <span className="text-sm leading-[1.4] text-slate-600">
+                    {responseCopy(result.responseCount)}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
           <div className="grid gap-3 rounded-[6px] border border-slate-300 bg-white p-4">
             <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
               <div className="min-w-0">

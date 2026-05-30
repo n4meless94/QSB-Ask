@@ -77,6 +77,10 @@ export async function inviteMemberAction(
   }
 }
 
+export async function inviteMemberFormAction(eventId: string, formData: FormData): Promise<void> {
+  await inviteMemberAction(eventId, formData);
+}
+
 export async function removeMemberAction(
   eventId: string,
   previousStateOrFormData: AccessActionResult | FormData,
@@ -109,4 +113,8 @@ export async function removeMemberAction(
       message: error instanceof Error ? error.message : "Member access could not be removed.",
     };
   }
+}
+
+export async function removeMemberFormAction(eventId: string, formData: FormData): Promise<void> {
+  await removeMemberAction(eventId, formData);
 }

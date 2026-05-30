@@ -14,6 +14,7 @@ type EventWorkspaceProps = {
   access: EventAccessContext;
   accessPanel: ReactNode;
   exportsPanel: ReactNode;
+  initialTab?: WorkspaceTab;
   qnaPanel: ReactNode;
   resultsPanel: ReactNode;
   settingsPanel: ReactNode;
@@ -58,12 +59,13 @@ export function EventWorkspace({
   access,
   accessPanel,
   exportsPanel,
+  initialTab = "qa",
   qnaPanel,
   resultsPanel,
   settingsPanel,
   surveysPanel,
 }: EventWorkspaceProps) {
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>("qa");
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(initialTab);
   const { event, role } = access;
 
   return (

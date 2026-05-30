@@ -180,7 +180,7 @@ describe("CSV export helpers", () => {
   });
 
   it("exports questions and question versions with stable headers and hardened CSV cells", async () => {
-    const { getExportCsv } = await import("@/lib/surveys/export");
+    const { getExportCsv, serializeCsv } = await import("@/lib/surveys/export");
     const payload = await getExportCsv("organiser-1", "event-1", "questions");
 
     expect(payload.headers).toEqual([
@@ -201,6 +201,12 @@ describe("CSV export helpers", () => {
     expect(payload.csv).toContain("'=SUM");
     expect(payload.csv).toContain('"Original question\nwith quote ""here"""');
     expect(payload.csv).toContain("Anonymous (session participant)");
+    expect(
+      serializeCsv(["value"], [{ value: " =SUM(1,1)" }, { value: "\t+cmd" }, { value: "\r@cmd" }]),
+    ).toContain("' =SUM");
+    expect(
+      serializeCsv(["value"], [{ value: " =SUM(1,1)" }, { value: "\t+cmd" }, { value: "\r@cmd" }]),
+    ).toContain("'\t+cmd");
   });
 
   it("exports moderation action history with actor, action, status, metadata, and timestamp headers", async () => {

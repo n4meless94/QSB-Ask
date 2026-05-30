@@ -630,6 +630,15 @@ export type Database = {
         }
         Returns: Database["public"]["Tables"]["questions"]["Row"][]
       }
+      replace_survey_draft: {
+        Args: {
+          next_questions: Json
+          next_title: string
+          target_event_id: string
+          target_survey_id: string
+        }
+        Returns: undefined
+      }
       submit_survey_response: {
         Args: {
           target_answers: Json

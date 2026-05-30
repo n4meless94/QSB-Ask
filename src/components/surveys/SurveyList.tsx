@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { createSurveyFormAction } from "@/app/(app)/events/[eventId]/survey-actions";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
@@ -45,16 +47,20 @@ export function SurveyList({ eventId, selectedSurveyId, surveys }: SurveyListPro
           <div className="rounded-[6px] border border-slate-300 bg-white p-4">
             <p className="text-base font-semibold leading-6 text-slate-900">No surveys yet</p>
             <p className="mt-1 text-sm leading-[1.4] text-slate-600">
-              Create a draft survey before adding questions.
+              Create a survey to collect structured feedback during this event.
             </p>
           </div>
         ) : (
           surveys.map((survey) => (
-            <div
+            <Link
+              aria-current={survey.id === selectedSurveyId ? "true" : undefined}
               className={[
-                "grid gap-2 rounded-[6px] border bg-white p-4",
-                survey.id === selectedSurveyId ? "border-teal-700" : "border-slate-300",
+                "grid gap-2 rounded-[6px] border bg-white p-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2",
+                survey.id === selectedSurveyId
+                  ? "border-teal-700 text-slate-900"
+                  : "border-slate-300 text-slate-900 hover:bg-slate-50",
               ].join(" ")}
+              href={`/events/${eventId}?tab=surveys&surveyId=${survey.id}`}
               key={survey.id}
             >
               <div className="flex flex-wrap items-center gap-2">
@@ -72,7 +78,7 @@ export function SurveyList({ eventId, selectedSurveyId, surveys }: SurveyListPro
               <p className="text-sm leading-[1.4] text-slate-600">
                 {survey.questions.length} {survey.questions.length === 1 ? "question" : "questions"}
               </p>
-            </div>
+            </Link>
           ))
         )}
       </div>

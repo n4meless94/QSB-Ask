@@ -1,9 +1,10 @@
 import "server-only";
 
 import { assertEventRole } from "@/lib/events/access";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Json } from "@/lib/supabase/database.types";
 import { EVENT_MANAGEMENT_ROLES } from "@/lib/supabase/rls";
 import type { Tables } from "@/lib/supabase/database.types";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   normaliseSurveyDraft,
   validateSurveyForPublish,
@@ -174,75 +175,24 @@ export async function createSurvey(
 
 async function persistSurveyDraft(eventId: string, draft: NormalisedSurveyDraft): Promise<SurveySummary> {
   const supabase = await createSupabaseServerClient();
-  const { data: updatedSurvey, error: surveyError } = await supabase
-    .from("surveys")
-    .update({ title: draft.title })
-    .eq("event_id", eventId)
-    .eq("id", draft.surveyId)
-    .select(SURVEY_SELECT)
-    .single();
+  const { error } = await supabase.rpc("replace_survey_draft", {
+    next_questions: draft.questions.map((question, position) => ({
+      options: question.options,
+      position,
+      prompt: question.prompt,
+      rating_scale: question.type === "rating" ? question.ratingScale : null,
+      type: question.type,
+    })) as Json,
+    next_title: draft.title,
+    target_event_id: eventId,
+    target_survey_id: draft.surveyId,
+  });
 
-  if (surveyError || !updatedSurvey) {
+  if (error) {
     throw new Error("Survey draft could not be saved. Refresh the page and try again.");
   }
 
-  const { error: deleteError } = await supabase
-    .from("survey_questions")
-    .delete()
-    .eq("survey_id", draft.surveyId);
-
-  if (deleteError) {
-    throw new Error("Survey questions could not be replaced. Refresh the page and try again.");
-  }
-
-  if (draft.questions.length === 0) {
-    return mapSurvey({ ...(updatedSurvey as SurveyWithQuestions), survey_questions: [] });
-  }
-
-  const questionRows = draft.questions.map((question, position) => ({
-    position,
-    prompt: question.prompt,
-    rating_scale: question.type === "rating" ? question.ratingScale : null,
-    survey_id: draft.surveyId,
-    type: question.type,
-  }));
-
-  const { data: insertedQuestions, error: questionError } = await supabase
-    .from("survey_questions")
-    .insert(questionRows)
-    .select("id,position")
-    .order("position", { ascending: true });
-
-  if (questionError || !insertedQuestions) {
-    throw new Error("Survey questions could not be saved. Check each question and try again.");
-  }
-
-  const optionRows = draft.questions.flatMap((question, questionIndex) => {
-    if (question.type !== "multiple_choice" && question.type !== "multiple_select") {
-      return [];
-    }
-
-    const insertedQuestion = insertedQuestions.find((row) => row.position === questionIndex);
-    if (!insertedQuestion) {
-      throw new Error("Survey options could not be matched to saved questions.");
-    }
-
-    return question.options.map((label, position) => ({
-      label,
-      position,
-      survey_question_id: insertedQuestion.id,
-    }));
-  });
-
-  if (optionRows.length > 0) {
-    const { error: optionError } = await supabase.from("survey_options").insert(optionRows);
-
-    if (optionError) {
-      throw new Error("Survey answer options could not be saved. Check each option and try again.");
-    }
-  }
-
-  return mapSurvey({ ...(updatedSurvey as SurveyWithQuestions), survey_questions: [] });
+  return loadSurvey(supabase, eventId, draft.surveyId);
 }
 
 export async function saveSurveyDraft(
@@ -367,8 +317,11 @@ export async function saveSurveyVisibility(
 export function surveyDraftFromFormData(formData: FormData): SurveyDraftInput {
   const surveyId = String(formData.get("surveyId") ?? "");
   const title = String(formData.get("title") ?? "");
-  const questionCount = Number(formData.get("questionCount") ?? 0);
-  const questions = Array.from({ length: Number.isFinite(questionCount) ? questionCount : 0 }, (_, index) => {
+  const rawQuestionCount = Number(formData.get("questionCount") ?? 0);
+  const questionCount = Number.isInteger(rawQuestionCount)
+    ? Math.min(Math.max(rawQuestionCount, 0), 50)
+    : 0;
+  const questions = Array.from({ length: questionCount }, (_, index) => {
     const type = String(formData.get(`questions.${index}.type`) ?? "") as SurveyQuestionType;
     const optionValues = String(formData.get(`questions.${index}.options`) ?? "")
       .split("\n")

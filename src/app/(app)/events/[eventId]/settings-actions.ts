@@ -82,6 +82,10 @@ export async function closeEventAction(eventId: string): Promise<EventSettingsAc
   }
 }
 
+export async function closeEventFormAction(eventId: string): Promise<void> {
+  await closeEventAction(eventId);
+}
+
 export async function archiveEventAction(eventId: string): Promise<EventSettingsActionResult> {
   try {
     const userId = await signedInUserId();
@@ -95,4 +99,8 @@ export async function archiveEventAction(eventId: string): Promise<EventSettings
       message: error instanceof Error ? error.message : "Event could not be archived.",
     };
   }
+}
+
+export async function archiveEventFormAction(eventId: string): Promise<void> {
+  await archiveEventAction(eventId);
 }

@@ -188,7 +188,9 @@ export default async function ParticipantSurveysPage({
 
     if (rawToken) {
       surveyState = await loadParticipantSurvey(event.id, rawToken);
-      visibleResults = await getParticipantVisibleSurveyResults(event.id, rawToken);
+      if (surveyState.completed && surveyState.results.visible && surveyState.survey) {
+        visibleResults = await getParticipantVisibleSurveyResults(event.id, rawToken, surveyState.survey.id);
+      }
     } else {
       surveyState = {
         completed: false,

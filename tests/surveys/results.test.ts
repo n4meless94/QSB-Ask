@@ -57,6 +57,12 @@ vi.mock("@/lib/supabase/server", () => ({
   })),
 }));
 
+vi.mock("@/lib/supabase/admin", () => ({
+  createSupabaseAdminClient: vi.fn(() => ({
+    from: fromMock,
+  })),
+}));
+
 const surveyRows = [
   {
     created_at: "2026-05-30T00:00:00.000Z",
@@ -338,7 +344,7 @@ describe("survey result aggregation", () => {
   });
 
   it("exposes participant-visible aggregate results only when visibility is enabled", async () => {
-    await expect(getParticipantVisibleSurveyResults("event-1", "raw-token")).resolves.toHaveLength(1);
+    await expect(getParticipantVisibleSurveyResults("event-1", "raw-token", "survey-1")).resolves.toHaveLength(1);
 
     mockResultQueries({
       surveys: [{ ...surveyRows[0], results_visible_to_participants: false }],
@@ -346,8 +352,14 @@ describe("survey result aggregation", () => {
       answers: answerRows,
     });
 
-    await expect(getParticipantVisibleSurveyResults("event-1", "raw-token")).resolves.toEqual([]);
+    await expect(getParticipantVisibleSurveyResults("event-1", "raw-token", "survey-1")).resolves.toEqual([]);
     expect(validateParticipantSessionMock).toHaveBeenCalledWith("event-1", "raw-token");
+  });
+
+  it("does not return participant-visible aggregates before the current participant completes the survey", async () => {
+    validateParticipantSessionMock.mockResolvedValueOnce({ event_id: "event-1", id: "participant-without-response" });
+
+    await expect(getParticipantVisibleSurveyResults("event-1", "raw-token", "survey-1")).resolves.toEqual([]);
   });
 
   it("loads presentation results through presenter event access and aggregate DTOs only", async () => {
