@@ -87,6 +87,15 @@ Plans:
 
 **UI hint:** yes
 
+**Plans:** 5 plans
+
+Plans:
+- [ ] 03-01-PLAN.md - Organiser survey authoring, lifecycle, visibility controls, and workspace tabs.
+- [ ] 03-02-PLAN.md - Participant survey submission with one-response enforcement and hidden-results behavior.
+- [ ] 03-03-PLAN.md - Organiser results, Recharts chart wrapper, accessible tables, and open text data view.
+- [ ] 03-04-PLAN.md - Survey presentation view, realtime refresh, and participant-visible aggregate results.
+- [ ] 03-05-PLAN.md - Organiser-only CSV exports for questions, moderation history, and survey responses.
+
 ### Phase 4: Hardening, Deployment, And UAT
 
 **Goal:** Prepare QSB Ask for controlled pilot use through Coolify deployment, health checks, reconnect handling, accessibility checks, and UAT readiness.
