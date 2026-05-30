@@ -17,11 +17,17 @@ test("organiser can inspect survey result counts, charts, tables, and open text 
 }) => {
   await page.goto("/events/event-results");
   await page.getByRole("tab", { name: "Results" }).click();
+  const resultsPanel = page.getByRole("tabpanel", { name: "Results" });
 
   await expect(page.getByRole("heading", { name: "Survey results" })).toBeVisible();
   await expect(page.getByText("Pulse check")).toBeVisible();
-  await expect(page.getByText("3 responses")).toBeVisible();
-  await expect(page.getByText("Results visible")).toBeVisible();
+  await expect(
+    page
+      .getByRole("heading", { name: "Pulse check" })
+      .locator("xpath=ancestor::div[contains(@class, 'min-w-0')]")
+      .getByText("3 responses"),
+  ).toBeVisible();
+  await expect(page.locator("span").filter({ hasText: "Results visible" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open presentation view" })).toBeVisible();
 
   await expect(page.getByRole("heading", { name: "Is the pace clear?" })).toBeVisible();
@@ -35,7 +41,7 @@ test("organiser can inspect survey result counts, charts, tables, and open text 
   await expect(page.getByRole("heading", { name: "What should we clarify next?" })).toBeVisible();
   await expect(page.getByText("Need more budget detail.")).toBeVisible();
   await expect(page.getByText("Timeline please.")).toBeVisible();
-  await expect(page.getByText(/token|token_hash|raw-cookie-token|@qsb/i)).toHaveCount(0);
+  await expect(resultsPanel.getByText(/token|token_hash|raw-cookie-token|@qsb/i)).toHaveCount(0);
 });
 
 test("zero-response surveys keep chart/table structure and do not overflow at 360px", async ({

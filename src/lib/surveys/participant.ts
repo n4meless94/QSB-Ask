@@ -143,6 +143,7 @@ function answerForQuestion(
     const ratingValue = answer.ratingValue;
 
     if (
+      typeof ratingValue !== "number" ||
       !Number.isInteger(ratingValue) ||
       !question.ratingScale ||
       ratingValue < 1 ||

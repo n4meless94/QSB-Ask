@@ -8,6 +8,7 @@ import { EventWorkspace } from "@/components/events/EventWorkspace";
 import { ModeratorQueue } from "@/components/qna/ModeratorQueue";
 import { SurveyEditor } from "@/components/surveys/SurveyEditor";
 import { SurveyList } from "@/components/surveys/SurveyList";
+import { SurveyResultsPanel } from "@/components/surveys/SurveyResultsPanel";
 import { Button } from "@/components/ui/Button";
 import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import {
@@ -22,6 +23,7 @@ import {
   type ModerationHistoryEntry,
   type ModerationQuestion,
 } from "@/lib/qna/moderation";
+import { getOrganiserSurveyResults, type SurveyResult } from "@/lib/surveys/results";
 import { listSurveysForOrganiser, type SurveySummary } from "@/lib/surveys/management";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PRESENTER_ROLES } from "@/lib/supabase/rls";
@@ -43,6 +45,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         history={e2eModerationHistory()}
         members={e2eMembers()}
         moderationQuestions={e2eModerationQuestions()}
+        results={e2eSurveyResults(eventId)}
         surveys={e2eSurveys(eventId)}
       />
     );
@@ -62,12 +65,14 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   let members: EventMemberSummary[];
   let moderationQuestions: ModerationQuestion[] = [];
   let history: ModerationHistoryEntry[] = [];
+  let results: SurveyResult[] = [];
   let surveys: SurveySummary[] = [];
 
   try {
     access = await assertEventRole(user.id, eventId, PRESENTER_ROLES);
     members = access.role === "organiser" ? await listEventMembersForOrganiser(user.id, eventId) : [];
     surveys = access.role === "organiser" ? await listSurveysForOrganiser(user.id, eventId) : [];
+    results = access.role === "organiser" ? await getOrganiserSurveyResults(user.id, eventId) : [];
     if (canModerate(access.role)) {
       const [pending, live, answered, archived, actionHistory] = await Promise.all([
         listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "pending" }),
@@ -104,6 +109,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       history={history}
       members={members}
       moderationQuestions={moderationQuestions}
+      results={results}
       surveys={surveys}
     />
   );
@@ -115,6 +121,7 @@ function EventDetailContent({
   history,
   members,
   moderationQuestions,
+  results,
   surveys,
 }: {
   access: EventAccessContext;
@@ -122,6 +129,7 @@ function EventDetailContent({
   history: ModerationHistoryEntry[];
   members: EventMemberSummary[];
   moderationQuestions: ModerationQuestion[];
+  results: SurveyResult[];
   surveys: SurveySummary[];
 }) {
   const selectedSurvey = surveys[0];
@@ -150,7 +158,18 @@ function EventDetailContent({
           </section>
         )
       }
-      resultsPanel={<LaterPhasePanel title="Results" />}
+      resultsPanel={
+        access.role === "organiser" ? (
+          <SurveyResultsPanel eventId={access.event.id} results={results} />
+        ) : (
+          <section className="grid gap-2 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6">
+            <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900">Results</h2>
+            <p className="text-base leading-6 text-slate-700">
+              Only organisers can view survey response counts and open text responses.
+            </p>
+          </section>
+        )
+      }
       settingsPanel={<EventSettingsPanel event={access.event} role={access.role} />}
       surveysPanel={
         access.role === "organiser" ? (
@@ -254,6 +273,116 @@ function e2eSurveys(eventId: string): SurveySummary[] {
       status: "draft",
       title: "Pulse check",
       updated_at: "2026-05-30T00:00:00.000Z",
+    },
+  ];
+}
+
+function e2eSurveyResults(eventId: string): SurveyResult[] {
+  if (eventId === "event-moderator" || eventId === "event-speaker") {
+    return [];
+  }
+
+  return [
+    {
+      id: "survey-1",
+      lastUpdated: "2026-05-30T00:13:00.000Z",
+      presentationHref: `/events/${eventId || "event-1"}/presentation/surveys/survey-1`,
+      responseCount: 3,
+      resultsVisibleToParticipants: true,
+      status: "published",
+      title: "Pulse check",
+      questions: [
+        {
+          chartData: [
+            { count: 2, label: "Yes", percentage: 67 },
+            { count: 1, label: "No", percentage: 33 },
+          ],
+          id: "question-choice",
+          openTextResponses: [],
+          options: [
+            { id: "option-yes", label: "Yes", position: 0 },
+            { id: "option-no", label: "No", position: 1 },
+          ],
+          position: 0,
+          prompt: "Is the pace clear?",
+          ratingScale: null,
+          responseCount: 3,
+          type: "multiple_choice",
+        },
+        {
+          chartData: [
+            { count: 1, label: "Budget", percentage: 50 },
+            { count: 2, label: "Risks", percentage: 100 },
+          ],
+          id: "question-select",
+          openTextResponses: [],
+          options: [
+            { id: "option-budget", label: "Budget", position: 0 },
+            { id: "option-risks", label: "Risks", position: 1 },
+          ],
+          position: 1,
+          prompt: "Which topics should we expand?",
+          ratingScale: null,
+          responseCount: 2,
+          type: "multiple_select",
+        },
+        {
+          chartData: [
+            { count: 0, label: "1", percentage: 0 },
+            { count: 0, label: "2", percentage: 0 },
+            { count: 0, label: "3", percentage: 0 },
+            { count: 2, label: "4", percentage: 67 },
+            { count: 1, label: "5", percentage: 33 },
+          ],
+          id: "question-rating",
+          openTextResponses: [],
+          options: [],
+          position: 2,
+          prompt: "Rate the session",
+          ratingScale: 5,
+          responseCount: 3,
+          type: "rating",
+        },
+        {
+          chartData: [],
+          id: "question-text",
+          openTextResponses: [
+            {
+              label: "Response 1",
+              submittedAt: "2026-05-30T00:11:00.000Z",
+              text: "Need more budget detail.",
+            },
+            {
+              label: "Response 2",
+              submittedAt: "2026-05-30T00:12:00.000Z",
+              text: "Timeline please.",
+            },
+          ],
+          options: [],
+          position: 3,
+          prompt: "What should we clarify next?",
+          ratingScale: null,
+          responseCount: 2,
+          type: "open_text",
+        },
+        {
+          chartData: [
+            { count: 0, label: "Agree", percentage: 0 },
+            { count: 0, label: "Disagree", percentage: 0 },
+          ],
+          id: "question-zero",
+          openTextResponses: [],
+          options: [
+            { id: "option-agree", label: "Agree", position: 0 },
+            { id: "option-disagree", label: "Disagree", position: 1 },
+          ],
+          position: 4,
+          prompt: "Should we repeat this format?",
+          ratingScale: null,
+          responseCount: 0,
+          type: "multiple_choice",
+        },
+      ],
     },
   ];
 }

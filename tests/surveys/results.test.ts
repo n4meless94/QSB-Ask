@@ -13,6 +13,21 @@ const fromMock = vi.hoisted(() => vi.fn());
 
 vi.mock("server-only", () => ({}));
 
+vi.mock("recharts", () => {
+  const passthrough = ({ children }: { children?: unknown }) => children ?? null;
+
+  return {
+    Bar: passthrough,
+    BarChart: passthrough,
+    CartesianGrid: () => null,
+    LabelList: () => null,
+    ResponsiveContainer: passthrough,
+    Tooltip: () => null,
+    XAxis: () => null,
+    YAxis: () => null,
+  };
+});
+
 vi.mock("@/lib/events/access", async () => {
   const actual = await vi.importActual<typeof import("@/lib/events/access")>("@/lib/events/access");
 
