@@ -1,18 +1,9 @@
-import { getRuntimeEnvStatus } from "@/lib/env";
+import { buildHealthResponse } from "@/lib/health";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const envStatus = getRuntimeEnvStatus();
+  const { payload, status } = buildHealthResponse();
 
-  return Response.json({
-    ok: true,
-    service: "qsb-ask",
-    environment: process.env.NODE_ENV ?? "development",
-    configuration: {
-      configured: envStatus.configured,
-      missingKeys: envStatus.missingKeys,
-    },
-    timestamp: new Date().toISOString(),
-  });
+  return Response.json(payload, { status });
 }
