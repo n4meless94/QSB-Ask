@@ -6,6 +6,8 @@ import { EventAccessPanel } from "@/components/events/EventAccessPanel";
 import { EventSettingsPanel } from "@/components/events/EventSettingsPanel";
 import { EventWorkspace } from "@/components/events/EventWorkspace";
 import { ModeratorQueue } from "@/components/qna/ModeratorQueue";
+import { SurveyEditor } from "@/components/surveys/SurveyEditor";
+import { SurveyList } from "@/components/surveys/SurveyList";
 import { Button } from "@/components/ui/Button";
 import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import {
@@ -20,6 +22,7 @@ import {
   type ModerationHistoryEntry,
   type ModerationQuestion,
 } from "@/lib/qna/moderation";
+import { listSurveysForOrganiser, type SurveySummary } from "@/lib/surveys/management";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PRESENTER_ROLES } from "@/lib/supabase/rls";
 import type { EventRole } from "@/types/app";
@@ -40,6 +43,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         history={e2eModerationHistory()}
         members={e2eMembers()}
         moderationQuestions={e2eModerationQuestions()}
+        surveys={e2eSurveys(eventId)}
       />
     );
   }
@@ -58,10 +62,12 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   let members: EventMemberSummary[];
   let moderationQuestions: ModerationQuestion[] = [];
   let history: ModerationHistoryEntry[] = [];
+  let surveys: SurveySummary[] = [];
 
   try {
     access = await assertEventRole(user.id, eventId, PRESENTER_ROLES);
     members = access.role === "organiser" ? await listEventMembersForOrganiser(user.id, eventId) : [];
+    surveys = access.role === "organiser" ? await listSurveysForOrganiser(user.id, eventId) : [];
     if (canModerate(access.role)) {
       const [pending, live, answered, archived, actionHistory] = await Promise.all([
         listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "pending" }),
@@ -98,6 +104,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       history={history}
       members={members}
       moderationQuestions={moderationQuestions}
+      surveys={surveys}
     />
   );
 }
@@ -108,17 +115,22 @@ function EventDetailContent({
   history,
   members,
   moderationQuestions,
+  surveys,
 }: {
   access: EventAccessContext;
   fixtureMode?: boolean;
   history: ModerationHistoryEntry[];
   members: EventMemberSummary[];
   moderationQuestions: ModerationQuestion[];
+  surveys: SurveySummary[];
 }) {
+  const selectedSurvey = surveys[0];
+
   return (
     <EventWorkspace
       access={access}
       accessPanel={<EventAccessPanel eventId={access.event.id} members={members} role={access.role} />}
+      exportsPanel={<LaterPhasePanel title="Exports" />}
       qnaPanel={
         canModerate(access.role) ? (
           <ModeratorQueue
@@ -138,7 +150,43 @@ function EventDetailContent({
           </section>
         )
       }
+      resultsPanel={<LaterPhasePanel title="Results" />}
       settingsPanel={<EventSettingsPanel event={access.event} role={access.role} />}
+      surveysPanel={
+        access.role === "organiser" ? (
+          <section
+            aria-labelledby="surveys-workspace-heading"
+            className="grid gap-5 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6"
+          >
+            <div className="grid gap-1">
+              <h2
+                className="text-[20px] font-semibold leading-[1.25] text-slate-900"
+                id="surveys-workspace-heading"
+              >
+                Survey authoring
+              </h2>
+              <p className="text-sm leading-[1.4] text-slate-600">
+                Organisers control survey drafts, lifecycle, and participant result visibility.
+              </p>
+            </div>
+            <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+              <SurveyList
+                eventId={access.event.id}
+                selectedSurveyId={selectedSurvey?.id}
+                surveys={surveys}
+              />
+              <SurveyEditor eventId={access.event.id} survey={selectedSurvey} />
+            </div>
+          </section>
+        ) : (
+          <section className="grid gap-2 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6">
+            <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900">Surveys</h2>
+            <p className="text-base leading-6 text-slate-700">
+              Only organisers can create and manage surveys for this event.
+            </p>
+          </section>
+        )
+      }
     />
   );
 }
@@ -147,8 +195,20 @@ function canModerate(role: EventRole) {
   return role === "organiser" || role === "moderator";
 }
 
+function LaterPhasePanel({ title }: { title: string }) {
+  return (
+    <section className="grid gap-2 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6">
+      <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900">{title}</h2>
+      <p className="text-base leading-6 text-slate-700">
+        This workspace section is reserved for the dedicated {title.toLowerCase()} slice.
+      </p>
+    </section>
+  );
+}
+
 function e2eAccess(eventId: string): EventAccessContext {
   const id = eventId || "event-1";
+  const role = id === "event-moderator" ? "moderator" : id === "event-speaker" ? "speaker" : "organiser";
 
   return {
     event: {
@@ -171,12 +231,31 @@ function e2eAccess(eventId: string): EventAccessContext {
       event_id: id,
       id: "member-owner",
       invited_email: null,
-      role: "organiser",
+      role,
       status: "active",
-      user_id: "organiser-1",
+      user_id: `${role}-1`,
     },
-    role: "organiser",
+    role,
   };
+}
+
+function e2eSurveys(eventId: string): SurveySummary[] {
+  if (eventId === "event-moderator" || eventId === "event-speaker") {
+    return [];
+  }
+
+  return [
+    {
+      created_at: "2026-05-30T00:00:00.000Z",
+      event_id: eventId || "event-1",
+      id: "survey-1",
+      questions: [],
+      results_visible_to_participants: false,
+      status: "draft",
+      title: "Pulse check",
+      updated_at: "2026-05-30T00:00:00.000Z",
+    },
+  ];
 }
 
 function e2eMembers(): EventMemberSummary[] {

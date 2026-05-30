@@ -8,17 +8,23 @@ import { CopyJoinLinkButton } from "@/components/events/CopyJoinLinkButton";
 import type { EventAccessContext } from "@/lib/events/access";
 import type { EventRole } from "@/types/app";
 
-type WorkspaceTab = "qa" | "access" | "settings" | "presenter";
+type WorkspaceTab = "qa" | "surveys" | "results" | "exports" | "access" | "settings" | "presenter";
 
 type EventWorkspaceProps = {
   access: EventAccessContext;
   accessPanel: ReactNode;
+  exportsPanel: ReactNode;
   qnaPanel: ReactNode;
+  resultsPanel: ReactNode;
   settingsPanel: ReactNode;
+  surveysPanel: ReactNode;
 };
 
 const tabs: Array<{ id: WorkspaceTab; label: string }> = [
   { id: "qa", label: "Q&A" },
+  { id: "surveys", label: "Surveys" },
+  { id: "results", label: "Results" },
+  { id: "exports", label: "Exports" },
   { id: "access", label: "Access" },
   { id: "settings", label: "Settings" },
   { id: "presenter", label: "Presenter" },
@@ -48,7 +54,15 @@ function LaterPlanPanel({ title, body }: { title: string; body: string }) {
   );
 }
 
-export function EventWorkspace({ access, accessPanel, qnaPanel, settingsPanel }: EventWorkspaceProps) {
+export function EventWorkspace({
+  access,
+  accessPanel,
+  exportsPanel,
+  qnaPanel,
+  resultsPanel,
+  settingsPanel,
+  surveysPanel,
+}: EventWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("qa");
   const { event, role } = access;
 
@@ -124,6 +138,9 @@ export function EventWorkspace({ access, accessPanel, qnaPanel, settingsPanel }:
         role="tabpanel"
       >
         {activeTab === "qa" ? qnaPanel : null}
+        {activeTab === "surveys" ? surveysPanel : null}
+        {activeTab === "results" ? resultsPanel : null}
+        {activeTab === "exports" ? exportsPanel : null}
         {activeTab === "access" ? accessPanel : null}
         {activeTab === "settings" ? settingsPanel : null}
         {activeTab === "presenter" ? (

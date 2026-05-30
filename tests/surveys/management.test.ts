@@ -152,7 +152,7 @@ function makeQueries() {
         };
       }),
       select: vi.fn(() => surveySelectQuery()),
-      update: vi.fn((payload: unknown) => {
+      update: vi.fn((payload: Record<string, unknown>) => {
         updatedSurveys.push(payload);
 
         const query = {
