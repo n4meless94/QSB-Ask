@@ -70,11 +70,11 @@
 
 ### Export And Records
 
-- [ ] **EXPT-01**: Organiser can export questions and question versions as CSV.
-- [ ] **EXPT-02**: Organiser can export moderation action history as CSV.
-- [ ] **EXPT-03**: Organiser can export survey responses as CSV.
-- [ ] **EXPT-04**: Exports include anonymous participants as Anonymous with a per-session audit identifier.
-- [ ] **EXPT-05**: Export with no records shows an empty-state message instead of downloading an empty file.
+- [x] **EXPT-01**: Organiser can export questions and question versions as CSV.
+- [x] **EXPT-02**: Organiser can export moderation action history as CSV.
+- [x] **EXPT-03**: Organiser can export survey responses as CSV.
+- [x] **EXPT-04**: Exports include anonymous participants as Anonymous with a per-session audit identifier.
+- [x] **EXPT-05**: Export with no records shows an empty-state message instead of downloading an empty file.
 
 ### Deployment And Operations
 
@@ -170,11 +170,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SURV-11 | Phase 3 | Pending |
 | SURV-12 | Phase 3 | Pending |
 | SURV-13 | Phase 3 | Complete |
-| EXPT-01 | Phase 3 | Pending |
-| EXPT-02 | Phase 3 | Pending |
-| EXPT-03 | Phase 3 | Pending |
-| EXPT-04 | Phase 3 | Pending |
-| EXPT-05 | Phase 3 | Pending |
+| EXPT-01 | Phase 3 | Complete |
+| EXPT-02 | Phase 3 | Complete |
+| EXPT-03 | Phase 3 | Complete |
+| EXPT-04 | Phase 3 | Complete |
+| EXPT-05 | Phase 3 | Complete |
 | DEPL-01 | Phase 1 | Complete |
 | DEPL-02 | Phase 4 | Pending |
 | DEPL-03 | Phase 4 | Pending |

@@ -12,7 +12,7 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 |-------|------|------|--------------|
 | 1 | Foundation, Auth, And Data | Establish the app shell, local development, authentication baseline, event dashboard, and Supabase data/security foundation. Complete 2026-05-22. | AUTH-01 to AUTH-04, EVNT-01 to EVNT-03, DEPL-01, DEPL-05 |
 | 2 | Live Event Q&A And Moderation | Complete 2026-05-26: moderated Q&A, audience voting, presenter view, and realtime refresh delivered. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-07, QNA-01 to QNA-15, LIVE-01 to LIVE-04 |
-| 3 | 4/5 | In Progress|  |
+| 3 | 5/5 | Complete   | 2026-05-30 |
 | 4 | Hardening, Deployment, And UAT | Prepare production deployment through Coolify, verify live behaviour, handle reconnect states, and complete UAT readiness. | LIVE-06, DEPL-02 to DEPL-04 |
 
 ## Phase Details
@@ -87,14 +87,14 @@ Plans:
 
 **UI hint:** yes
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 - [x] 03-01-PLAN.md - Organiser survey authoring, lifecycle, visibility controls, and workspace tabs.
 - [x] 03-02-PLAN.md - Participant survey submission with one-response enforcement and hidden-results behavior.
 - [x] 03-03-PLAN.md - Organiser results, Recharts chart wrapper, accessible tables, and open text data view.
 - [x] 03-04-PLAN.md - Survey presentation view, realtime refresh, and participant-visible aggregate results.
-- [ ] 03-05-PLAN.md - Organiser-only CSV exports for questions, moderation history, and survey responses.
+- [x] 03-05-PLAN.md - Organiser-only CSV exports for questions, moderation history, and survey responses.
 
 ### Phase 4: Hardening, Deployment, And UAT
 
