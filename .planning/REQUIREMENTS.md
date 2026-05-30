@@ -61,8 +61,8 @@
 - [ ] **SURV-05**: Organiser can add open text survey questions.
 - [ ] **SURV-06**: Organiser can publish and close a valid survey.
 - [ ] **SURV-07**: Organiser can set survey result visibility per survey, hidden from participants by default.
-- [ ] **SURV-08**: Participant can submit one response per survey session.
-- [ ] **SURV-09**: Participant sees survey results only when organiser enabled participant visibility.
+- [x] **SURV-08**: Participant can submit one response per survey session.
+- [x] **SURV-09**: Participant sees survey results only when organiser enabled participant visibility.
 - [ ] **SURV-10**: Organiser can view response counts for each survey and question.
 - [ ] **SURV-11**: Organiser can view chart results for choice and rating questions.
 - [ ] **SURV-12**: Organiser can view open text responses in a readable data view.
@@ -164,8 +164,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SURV-05 | Phase 3 | Pending |
 | SURV-06 | Phase 3 | Pending |
 | SURV-07 | Phase 3 | Pending |
-| SURV-08 | Phase 3 | Pending |
-| SURV-09 | Phase 3 | Pending |
+| SURV-08 | Phase 3 | Complete |
+| SURV-09 | Phase 3 | Complete |
 | SURV-10 | Phase 3 | Pending |
 | SURV-11 | Phase 3 | Pending |
 | SURV-12 | Phase 3 | Pending |
