@@ -49,7 +49,7 @@
 - [x] **LIVE-02**: Audience Q&A updates approved questions, vote counts, and answered status within 2 seconds.
 - [x] **LIVE-03**: Presenter View shows approved questions, vote counts, and status without moderation controls.
 - [x] **LIVE-04**: Presenter View updates approved questions, vote changes, and status changes within 2 seconds.
-- [ ] **LIVE-05**: Presentation View shows survey charts without admin controls and updates results within 2 seconds.
+- [x] **LIVE-05**: Presentation View shows survey charts without admin controls and updates results within 2 seconds.
 - [ ] **LIVE-06**: Live views show reconnect state and prompt refresh after prolonged reconnection failure.
 
 ### Surveys And Results
@@ -66,7 +66,7 @@
 - [ ] **SURV-10**: Organiser can view response counts for each survey and question.
 - [ ] **SURV-11**: Organiser can view chart results for choice and rating questions.
 - [ ] **SURV-12**: Organiser can view open text responses in a readable data view.
-- [ ] **SURV-13**: Charts include readable labels, values, and accessible data table alternatives.
+- [x] **SURV-13**: Charts include readable labels, values, and accessible data table alternatives.
 
 ### Export And Records
 
@@ -155,7 +155,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LIVE-02 | Phase 2 | Complete |
 | LIVE-03 | Phase 2 | Complete |
 | LIVE-04 | Phase 2 | Complete |
-| LIVE-05 | Phase 3 | Pending |
+| LIVE-05 | Phase 3 | Complete |
 | LIVE-06 | Phase 4 | Pending |
 | SURV-01 | Phase 3 | Pending |
 | SURV-02 | Phase 3 | Pending |
@@ -169,7 +169,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SURV-10 | Phase 3 | Pending |
 | SURV-11 | Phase 3 | Pending |
 | SURV-12 | Phase 3 | Pending |
-| SURV-13 | Phase 3 | Pending |
+| SURV-13 | Phase 3 | Complete |
 | EXPT-01 | Phase 3 | Pending |
 | EXPT-02 | Phase 3 | Pending |
 | EXPT-03 | Phase 3 | Pending |

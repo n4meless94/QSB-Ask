@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 03
-current_plan: 2
+current_plan: 5
 status: executing
-last_updated: "2026-05-30T03:28:53.322Z"
+last_updated: "2026-05-30T04:08:28.666Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 17
-  completed_plans: 14
+  completed_plans: 16
   percent: 50
 ---
 
@@ -19,7 +19,7 @@ progress:
 
 **Last updated:** 2026-05-26  
 **Current phase:** 03
-**Current Plan:** 2
+**Current Plan:** 5
 **Total Plans in Phase:** 5
 **Status:** Ready to execute
 **Last Activity:** 2026-05-30
@@ -117,6 +117,9 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - [Phase 02]: Plan 08 public and presenter realtime callbacks refresh server-rendered safe data instead of storing raw row payloads.
 - [Phase 02]: Plan 08 staff realtime subscriptions are separate from public/presenter subscriptions and refresh moderation/history surfaces.
 - [Phase 02]: Plan 08 prolonged reconnect hardening remains Phase 4 scope; Phase 2 exposes connected/reconnecting/refresh-needed states only.
+- [Phase 03]: Survey realtime events are refresh triggers only. — Presentation UI reloads safe server aggregate DTOs instead of rendering payload rows.
+- [Phase 03]: Participant result charts require completed visible surveys. — Charts render only after completion when results_visible_to_participants is enabled.
+- [Phase 03]: Presentation results use presenter event access. — Staff access is checked before aggregate survey data is loaded.
 
 ## Performance Metrics
 
@@ -134,10 +137,11 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 | Phase 02 P06 | 19min | 3 tasks | 9 files |
 | Phase 02 P07 | 10min | 3 tasks | 5 files |
 | Phase 02 P08 | 20min | 3 tasks | 12 files |
+| Phase 03 P04 | 11min | 3 tasks | 11 files |
 
 ## Last Session
 
-- **Last session:** 2026-05-30T03:28:53.306Z
+- **Last session:** 2026-05-30T04:07:51.795Z
 - **Stopped At:** Completed 02-08-PLAN.md
 - **Resume File:** None
 
