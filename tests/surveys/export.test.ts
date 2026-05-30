@@ -283,6 +283,6 @@ describe("CSV export helpers", () => {
 
     expect(response.status).toBe(204);
     expect(response.headers.get("content-disposition")).toBeNull();
-    expect(response.headers.get("content-type")).not.toContain("text/csv");
+    expect(response.headers.get("content-type") ?? "").not.toContain("text/csv");
   });
 });
