@@ -1,6 +1,6 @@
 import "server-only";
 
-import { assertEventRole } from "@/lib/events/access";
+import { assertEventRole, getPresenterEventAccess, type EventAccessContext } from "@/lib/events/access";
 import { validateParticipantSession } from "@/lib/participants/session";
 import type { Tables } from "@/lib/supabase/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -58,6 +58,11 @@ export type SurveyResult = {
   resultsVisibleToParticipants: boolean;
   status: SurveyStatus;
   title: string;
+};
+
+export type PresentationSurveyResults = {
+  access: EventAccessContext;
+  result: SurveyResult;
 };
 
 const SURVEY_RESULT_SELECT =
@@ -275,6 +280,27 @@ export async function getOrganiserSurveyResults(userId: string, eventId: string)
   const { answers, responses, surveys } = await loadResultRows(eventId);
 
   return buildResults(surveys, responses, answers, true);
+}
+
+export async function getPresentationSurveyResults(
+  userId: string,
+  eventId: string,
+  surveyId: string,
+): Promise<PresentationSurveyResults> {
+  const access = await getPresenterEventAccess(userId, eventId);
+  const { answers, responses, surveys } = await loadResultRows(eventId);
+  const [result] = buildResults(
+    surveys.filter((survey) => survey.id === surveyId),
+    responses,
+    answers,
+    false,
+  );
+
+  if (!result) {
+    throw new Error("Survey presentation results could not be loaded.");
+  }
+
+  return { access, result };
 }
 
 export async function getParticipantVisibleSurveyResults(

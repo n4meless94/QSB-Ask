@@ -63,8 +63,10 @@ describe("survey realtime subscriptions", () => {
     );
     expect(onConnectionChange).toHaveBeenCalledWith("live");
 
-    const responseCallback = onMock.mock.calls[0][2] as () => void;
-    const answerCallback = onMock.mock.calls[1][2] as () => void;
+    const responseCall = onMock.mock.calls.find((call) => call[1]?.table === "survey_responses");
+    const answerCall = onMock.mock.calls.find((call) => call[1]?.table === "survey_answers");
+    const responseCallback = responseCall?.[2] as () => void;
+    const answerCallback = answerCall?.[2] as () => void;
     responseCallback();
     answerCallback();
 
