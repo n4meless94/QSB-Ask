@@ -6,6 +6,7 @@ import { EventAccessPanel } from "@/components/events/EventAccessPanel";
 import { EventSettingsPanel } from "@/components/events/EventSettingsPanel";
 import { EventWorkspace } from "@/components/events/EventWorkspace";
 import { ModeratorQueue } from "@/components/qna/ModeratorQueue";
+import { ExportPanel } from "@/components/surveys/ExportPanel";
 import { SurveyEditor } from "@/components/surveys/SurveyEditor";
 import { SurveyList } from "@/components/surveys/SurveyList";
 import { SurveyResultsPanel } from "@/components/surveys/SurveyResultsPanel";
@@ -23,6 +24,7 @@ import {
   type ModerationHistoryEntry,
   type ModerationQuestion,
 } from "@/lib/qna/moderation";
+import { getOrganiserExportCounts, type ExportCounts } from "@/lib/surveys/export";
 import { getOrganiserSurveyResults, type SurveyResult } from "@/lib/surveys/results";
 import { listSurveysForOrganiser, type SurveySummary } from "@/lib/surveys/management";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -43,6 +45,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         access={e2eAccess(eventId)}
         fixtureMode
         history={e2eModerationHistory()}
+        exportCounts={e2eExportCounts(eventId)}
         members={e2eMembers()}
         moderationQuestions={e2eModerationQuestions()}
         results={e2eSurveyResults(eventId)}
@@ -62,6 +65,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   }
 
   let access: EventAccessContext;
+  let exportCounts: ExportCounts = zeroExportCounts();
   let members: EventMemberSummary[];
   let moderationQuestions: ModerationQuestion[] = [];
   let history: ModerationHistoryEntry[] = [];
@@ -73,6 +77,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     members = access.role === "organiser" ? await listEventMembersForOrganiser(user.id, eventId) : [];
     surveys = access.role === "organiser" ? await listSurveysForOrganiser(user.id, eventId) : [];
     results = access.role === "organiser" ? await getOrganiserSurveyResults(user.id, eventId) : [];
+    exportCounts = access.role === "organiser" ? await getOrganiserExportCounts(user.id, eventId) : zeroExportCounts();
     if (canModerate(access.role)) {
       const [pending, live, answered, archived, actionHistory] = await Promise.all([
         listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "pending" }),
@@ -106,6 +111,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   return (
     <EventDetailContent
       access={access}
+      exportCounts={exportCounts}
       history={history}
       members={members}
       moderationQuestions={moderationQuestions}
@@ -118,6 +124,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 function EventDetailContent({
   access,
   fixtureMode = false,
+  exportCounts,
   history,
   members,
   moderationQuestions,
@@ -126,6 +133,7 @@ function EventDetailContent({
 }: {
   access: EventAccessContext;
   fixtureMode?: boolean;
+  exportCounts: ExportCounts;
   history: ModerationHistoryEntry[];
   members: EventMemberSummary[];
   moderationQuestions: ModerationQuestion[];
@@ -138,7 +146,18 @@ function EventDetailContent({
     <EventWorkspace
       access={access}
       accessPanel={<EventAccessPanel eventId={access.event.id} members={members} role={access.role} />}
-      exportsPanel={<LaterPhasePanel title="Exports" />}
+      exportsPanel={
+        access.role === "organiser" ? (
+          <ExportPanel counts={exportCounts} eventId={access.event.id} />
+        ) : (
+          <section className="grid gap-2 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6">
+            <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900">CSV exports</h2>
+            <p className="text-base leading-6 text-slate-700">
+              Only organisers can export event records.
+            </p>
+          </section>
+        )
+      }
       qnaPanel={
         canModerate(access.role) ? (
           <ModeratorQueue
@@ -214,15 +233,12 @@ function canModerate(role: EventRole) {
   return role === "organiser" || role === "moderator";
 }
 
-function LaterPhasePanel({ title }: { title: string }) {
-  return (
-    <section className="grid gap-2 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6">
-      <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900">{title}</h2>
-      <p className="text-base leading-6 text-slate-700">
-        This workspace section is reserved for the dedicated {title.toLowerCase()} slice.
-      </p>
-    </section>
-  );
+function zeroExportCounts(): ExportCounts {
+  return {
+    moderation: 0,
+    questions: 0,
+    "survey-responses": 0,
+  };
 }
 
 function e2eAccess(eventId: string): EventAccessContext {
@@ -275,6 +291,26 @@ function e2eSurveys(eventId: string): SurveySummary[] {
       updated_at: "2026-05-30T00:00:00.000Z",
     },
   ];
+}
+
+function e2eExportCounts(eventId: string): ExportCounts {
+  if (eventId === "event-moderator" || eventId === "event-speaker" || eventId === "event-empty-exports") {
+    return zeroExportCounts();
+  }
+
+  if (eventId === "event-export") {
+    return {
+      moderation: 0,
+      questions: 2,
+      "survey-responses": 3,
+    };
+  }
+
+  return {
+    moderation: 1,
+    questions: 2,
+    "survey-responses": 2,
+  };
 }
 
 function e2eSurveyResults(eventId: string): SurveyResult[] {
