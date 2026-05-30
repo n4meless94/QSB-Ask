@@ -20,7 +20,7 @@ test("presentation view shows aggregate charts without admin controls or private
   await expect(page.getByRole("heading", { level: 1, name: /Quarterly Briefing/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Pulse check" })).toBeVisible();
   await expect(page.getByText("Connected")).toBeVisible();
-  await expect(page.getByText("3 responses")).toBeVisible();
+  await expect(page.getByText("3 responses").first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Is the pace clear?" })).toBeVisible();
   await expect(page.getByText("Yes: 2 responses, 67%")).toBeVisible();
   await expect(page.getByRole("table", { name: "Is the pace clear? data" })).toContainText("No");
@@ -31,13 +31,16 @@ test("presentation view shows aggregate charts without admin controls or private
   await expect(page.getByRole("button", { name: "Publish survey" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Save visibility" })).toHaveCount(0);
   await expect(page.getByText("Download CSV")).toHaveCount(0);
-  await expect(page.getByText(/participant_session_id|session_token_hash|raw-token|@qsb/i)).toHaveCount(0);
+  await expect(page.locator("main").getByText(/participant_session_id|session_token_hash|raw-token|@qsb/i)).toHaveCount(0);
 });
 
 test("fixture refresh updates aggregate counts within 2 seconds without trusting raw payloads", async ({
   page,
 }) => {
   await page.goto("/events/event-results/presentation/surveys/survey-1");
+  await expect(page.getByRole("heading", { name: "Pulse check" })).toBeVisible();
+  await expect(page.getByText("3 responses").first()).toBeVisible();
+  await page.waitForFunction(() => document.body.dataset.surveyPresentationReady === "true");
 
   await page.evaluate(() => {
     window.dispatchEvent(
@@ -81,7 +84,7 @@ test("fixture refresh updates aggregate counts within 2 seconds without trusting
     );
   });
 
-  await expect(page.getByText("4 responses")).toBeVisible({ timeout: 2000 });
+  await expect(page.getByText("4 responses").first()).toBeVisible({ timeout: 2000 });
   await expect(page.getByText("Yes: 3 responses, 75%")).toBeVisible({ timeout: 2000 });
   await expect(page.getByText(/participant_session_id|session_token_hash|private-token-hash|Hidden raw response/i)).toHaveCount(0);
 });

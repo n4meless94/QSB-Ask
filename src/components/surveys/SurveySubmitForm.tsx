@@ -6,13 +6,16 @@ import {
   submitSurveyAction,
   type SubmitSurveyActionResult,
 } from "@/app/join/[joinCode]/surveys/submit-actions";
+import { SurveyBarChart } from "@/components/surveys/SurveyBarChart";
 import { Button } from "@/components/ui/Button";
 import type { ParticipantSurvey } from "@/lib/surveys/participant";
+import type { SurveyResult } from "@/lib/surveys/results";
 
 type SurveySubmitFormProps = {
   completed: boolean;
   eventId: string;
   joinCode: string;
+  result?: SurveyResult | null;
   resultsVisible: boolean;
   survey: ParticipantSurvey;
 };
@@ -27,6 +30,7 @@ export function SurveySubmitForm({
   completed,
   eventId,
   joinCode,
+  result,
   resultsVisible,
   survey,
 }: SurveySubmitFormProps) {
@@ -58,7 +62,28 @@ export function SurveySubmitForm({
         </div>
         <p className="text-base leading-6 text-slate-700">You have already submitted this survey.</p>
         {resultsVisible ? (
-          <p className="text-base leading-6 text-slate-700">Survey results are available to participants.</p>
+          result ? (
+            <section className="grid gap-4 border-t border-slate-300 pt-3" aria-labelledby="participant-results-heading">
+              <div className="grid gap-1">
+                <h3
+                  className="text-[20px] font-semibold leading-[1.25] text-slate-900"
+                  id="participant-results-heading"
+                >
+                  Participant results
+                </h3>
+                <p className="text-base font-semibold leading-6 text-slate-900">
+                  {result.responseCount} {result.responseCount === 1 ? "response" : "responses"}
+                </p>
+              </div>
+              {result.questions
+                .filter((question) => question.type !== "open_text")
+                .map((question) => (
+                  <SurveyBarChart data={question.chartData} key={question.id} title={question.prompt} />
+                ))}
+            </section>
+          ) : (
+            <p className="text-base leading-6 text-slate-700">Survey results are available to participants.</p>
+          )
         ) : (
           <p className="text-base font-semibold leading-6 text-amber-700">
             Results are hidden by the organiser.

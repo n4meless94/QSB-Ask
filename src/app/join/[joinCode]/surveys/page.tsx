@@ -12,6 +12,7 @@ import {
   type ParticipantSurvey,
   type ParticipantSurveyPageState,
 } from "@/lib/surveys/participant";
+import { getParticipantVisibleSurveyResults, type SurveyResult } from "@/lib/surveys/results";
 
 type ParticipantSurveysPageProps = {
   params: Promise<{ joinCode: string }>;
@@ -30,7 +31,10 @@ function e2eEvent(joinCode: string): JoinableEvent | null {
   };
 }
 
-function e2eSurvey(status: "published" | "draft" | "closed" = "published"): ParticipantSurvey {
+function e2eSurvey(
+  status: "published" | "draft" | "closed" = "published",
+  resultsVisibleToParticipants = false,
+): ParticipantSurvey {
   return {
     id: "survey-1",
     questions: [
@@ -73,7 +77,7 @@ function e2eSurvey(status: "published" | "draft" | "closed" = "published"): Part
         type: "open_text",
       },
     ],
-    resultsVisibleToParticipants: false,
+    resultsVisibleToParticipants,
     status,
     title: "Pulse check",
   };
@@ -100,6 +104,16 @@ function e2eSurveyState(fixture?: string): ParticipantSurveyPageState {
     };
   }
 
+  if (fixture === "visible") {
+    return {
+      completed: true,
+      message: "You have already submitted this survey.",
+      results: { visible: true },
+      state: "available",
+      survey: e2eSurvey("published", true),
+    };
+  }
+
   return {
     completed: false,
     message: "",
@@ -107,6 +121,39 @@ function e2eSurveyState(fixture?: string): ParticipantSurveyPageState {
     state: "available",
     survey: e2eSurvey(),
   };
+}
+
+function e2eVisibleSurveyResults(): SurveyResult[] {
+  return [
+    {
+      id: "survey-1",
+      lastUpdated: "2026-05-30T00:13:00.000Z",
+      presentationHref: "/events/event-1/presentation/surveys/survey-1",
+      responseCount: 3,
+      resultsVisibleToParticipants: true,
+      status: "published",
+      title: "Pulse check",
+      questions: [
+        {
+          chartData: [
+            { count: 2, label: "Yes", percentage: 67 },
+            { count: 1, label: "No", percentage: 33 },
+          ],
+          id: "question-choice",
+          openTextResponses: [],
+          options: [
+            { id: "option-yes", label: "Yes", position: 0 },
+            { id: "option-no", label: "No", position: 1 },
+          ],
+          position: 0,
+          prompt: "Is the pace clear?",
+          ratingScale: null,
+          responseCount: 3,
+          type: "multiple_choice",
+        },
+      ],
+    },
+  ];
 }
 
 function AlertPanel({ children, title }: { children: ReactNode; title: string }) {
@@ -130,22 +177,27 @@ export default async function ParticipantSurveysPage({
       : await getJoinableEventByCode(joinCode);
 
   let surveyState: ParticipantSurveyPageState | null = null;
+  let visibleResults: SurveyResult[] = [];
 
   if (event && process.env.QSB_ASK_E2E_AUTH === "1") {
     surveyState = e2eSurveyState(query.fixture);
+    visibleResults = query.fixture === "visible" ? e2eVisibleSurveyResults() : [];
   } else if (event) {
     const cookieStore = await cookies();
     const rawToken = cookieStore.get(getParticipantCookieName(event.id))?.value;
 
-    surveyState = rawToken
-      ? await loadParticipantSurvey(event.id, rawToken)
-      : {
-          completed: false,
-          message: "Join this event again before opening surveys.",
-          results: { visible: false },
-          state: "unavailable",
-          survey: null,
-        };
+    if (rawToken) {
+      surveyState = await loadParticipantSurvey(event.id, rawToken);
+      visibleResults = await getParticipantVisibleSurveyResults(event.id, rawToken);
+    } else {
+      surveyState = {
+        completed: false,
+        message: "Join this event again before opening surveys.",
+        results: { visible: false },
+        state: "unavailable",
+        survey: null,
+      };
+    }
   }
 
   if (!event) {
@@ -200,6 +252,7 @@ export default async function ParticipantSurveysPage({
                 completed={surveyState.completed}
                 eventId={event.id}
                 joinCode={joinCode}
+                result={visibleResults.find((result) => result.id === surveyState.survey?.id) ?? null}
                 resultsVisible={surveyState.results.visible}
                 survey={surveyState.survey}
               />
