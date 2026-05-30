@@ -83,30 +83,52 @@ function draftInput(overrides: Partial<Parameters<typeof saveSurveyDraft>[2]> = 
 }
 
 function surveySelectQuery() {
-  return {
-    eq: vi.fn(() => ({
-      order: vi.fn(async () => ({
-        data: [
+  const query = {
+    eq: vi.fn(() => query),
+    order: vi.fn(async () => ({
+      data: [
+        {
+          ...surveyFixture,
+          survey_questions: [
+            {
+              id: "question-1",
+              position: 0,
+              prompt: "Is the pace clear?",
+              rating_scale: null,
+              survey_options: [
+                { id: "option-1", label: "Yes", position: 0 },
+                { id: "option-2", label: "No", position: 1 },
+              ],
+              type: "multiple_choice",
+            },
+          ],
+        },
+      ],
+      error: null,
+    })),
+    single: vi.fn(async () => ({
+      data: {
+        ...surveyFixture,
+        survey_questions: [
           {
-            ...surveyFixture,
-            survey_questions: [
-              {
-                id: "question-1",
-                position: 0,
-                prompt: "Is the pace clear?",
-                rating_scale: null,
-                survey_options: [
-                  { id: "option-1", label: "Yes", position: 0 },
-                  { id: "option-2", label: "No", position: 1 },
-                ],
-                type: "multiple_choice",
-              },
+            id: "question-1",
+            position: 0,
+            prompt: "Is the pace clear?",
+            rating_scale: null,
+            survey_options: [
+              { id: "option-1", label: "Yes", position: 0 },
+              { id: "option-2", label: "No", position: 1 },
             ],
+            type: "multiple_choice",
           },
         ],
-        error: null,
-      })),
+      },
+      error: null,
     })),
+  };
+
+  return {
+    eq: vi.fn(() => query),
   };
 }
 
@@ -218,11 +240,12 @@ describe("organiser survey management", () => {
       expect(call).toEqual(["organiser-1", "event-1", EVENT_MANAGEMENT_ROLES]);
     }
 
+    const callsBeforeDeniedAccess = fromMock.mock.calls.length;
     assertEventRoleMock.mockRejectedValueOnce(new Error("You do not have organiser access to this event."));
     await expect(listSurveysForOrganiser("moderator-1", "event-1")).rejects.toThrow(
       "You do not have organiser access to this event.",
     );
-    expect(fromMock).toHaveBeenCalledTimes(6);
+    expect(fromMock).toHaveBeenCalledTimes(callsBeforeDeniedAccess);
   });
 
   it("creates draft surveys with participant result visibility hidden by default", async () => {
