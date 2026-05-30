@@ -61,9 +61,11 @@ export function PresenterView({ eventId, eventName, fixtureMode = false, questio
 
       window.addEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
       window.addEventListener("qsb-ask:e2e-qna-connection", connectionFromFixture);
+      document.body.dataset.qnaRealtimeReady = "true";
       return () => {
         window.removeEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
         window.removeEventListener("qsb-ask:e2e-qna-connection", connectionFromFixture);
+        delete document.body.dataset.qnaRealtimeReady;
       };
     }
 
