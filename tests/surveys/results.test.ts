@@ -3,11 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SurveyBarChart } from "@/components/surveys/SurveyBarChart";
 import {
   getOrganiserSurveyResults,
+  getPresentationSurveyResults,
   getParticipantVisibleSurveyResults,
 } from "@/lib/surveys/results";
 import { EVENT_MANAGEMENT_ROLES } from "@/lib/supabase/rls";
 
 const assertEventRoleMock = vi.hoisted(() => vi.fn());
+const getPresenterEventAccessMock = vi.hoisted(() => vi.fn());
 const validateParticipantSessionMock = vi.hoisted(() => vi.fn());
 const fromMock = vi.hoisted(() => vi.fn());
 
@@ -34,6 +36,7 @@ vi.mock("@/lib/events/access", async () => {
   return {
     ...actual,
     assertEventRole: assertEventRoleMock,
+    getPresenterEventAccess: getPresenterEventAccessMock,
   };
 });
 
@@ -266,6 +269,13 @@ describe("survey result aggregation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     assertEventRoleMock.mockResolvedValue({ role: "organiser" });
+    getPresenterEventAccessMock.mockResolvedValue({
+      event: {
+        id: "event-1",
+        name: "Quarterly Briefing",
+      },
+      role: "speaker",
+    });
     validateParticipantSessionMock.mockResolvedValue({ event_id: "event-1", id: "participant-1" });
     mockResultQueries();
   });
@@ -338,6 +348,19 @@ describe("survey result aggregation", () => {
 
     await expect(getParticipantVisibleSurveyResults("event-1", "raw-token")).resolves.toEqual([]);
     expect(validateParticipantSessionMock).toHaveBeenCalledWith("event-1", "raw-token");
+  });
+
+  it("loads presentation results through presenter event access and aggregate DTOs only", async () => {
+    const result = await getPresentationSurveyResults("speaker-1", "event-1", "survey-1");
+
+    expect(getPresenterEventAccessMock).toHaveBeenCalledWith("speaker-1", "event-1");
+    expect(result.access.event.name).toBe("Quarterly Briefing");
+    expect(result.result).toMatchObject({
+      id: "survey-1",
+      responseCount: 3,
+      title: "Pulse check",
+    });
+    expect(JSON.stringify(result)).not.toMatch(/participant_session_id|session_token_hash|raw-token/i);
   });
 });
 
