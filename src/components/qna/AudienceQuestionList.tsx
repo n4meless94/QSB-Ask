@@ -58,8 +58,20 @@ export function AudienceQuestionList({
         }
       }
 
+      function connectionFromFixture(event: Event) {
+        const detail = (event as CustomEvent<{ state?: QnaConnectionState }>).detail;
+
+        if (detail?.state) {
+          setConnectionState(detail.state);
+        }
+      }
+
       window.addEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
-      return () => window.removeEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
+      window.addEventListener("qsb-ask:e2e-qna-connection", connectionFromFixture);
+      return () => {
+        window.removeEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
+        window.removeEventListener("qsb-ask:e2e-qna-connection", connectionFromFixture);
+      };
     }
 
     return subscribeToPublicQuestions({
@@ -103,7 +115,7 @@ export function AudienceQuestionList({
           >
             Approved questions
           </h2>
-          <ConnectionStatus state={connectionState} />
+          <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
         </div>
         <div aria-label="Sort approved questions" className="flex min-w-0 flex-wrap gap-2" role="radiogroup">
           {(["popular", "recent"] as const).map((option) => (

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { subscribeToSurveyResults } from "@/lib/surveys/realtime";
+import { subscribeToModeratorQuestions, subscribeToPublicQuestions } from "@/lib/qna/realtime";
 
 const removeChannelMock = vi.hoisted(() => vi.fn());
 const subscribeMock = vi.hoisted(() => vi.fn());
@@ -14,7 +14,7 @@ vi.mock("@/lib/supabase/client", () => ({
   })),
 }));
 
-describe("survey realtime subscriptions", () => {
+describe("qna realtime subscriptions", () => {
   let browserEvents: EventTarget;
   let subscribeCallback: ((status: string) => void) | undefined;
   let addEventListenerMock: ReturnType<typeof vi.fn>;
@@ -48,53 +48,45 @@ describe("survey realtime subscriptions", () => {
     });
   });
 
-  it("does not subscribe browser clients to raw survey response or answer rows", () => {
+  it("uses realtime payloads as refresh triggers only", () => {
     const onRefresh = vi.fn();
     const onConnectionChange = vi.fn();
 
-    const unsubscribe = subscribeToSurveyResults({
+    const unsubscribe = subscribeToPublicQuestions({
       eventId: "event-1",
       onConnectionChange,
       onRefresh,
-      surveyId: "survey-1",
     });
 
-    expect(channelMock).toHaveBeenCalledWith("qsb-ask-survey-results-event-1-survey-1");
+    expect(channelMock).toHaveBeenCalledWith("qsb-ask-qna-public-event-1");
     expect(onMock).toHaveBeenCalledWith(
       "postgres_changes",
       {
         event: "*",
-        filter: "id=eq.survey-1",
+        filter: "event_id=eq.event-1",
         schema: "public",
-        table: "surveys",
+        table: "questions",
       },
       expect.any(Function),
     );
-    expect(onMock.mock.calls.map((call) => call[1]?.table)).not.toContain("survey_responses");
-    expect(onMock.mock.calls.map((call) => call[1]?.table)).not.toContain("survey_answers");
 
-    subscribeCallback?.("SUBSCRIBED");
-    expect(onConnectionChange).toHaveBeenCalledWith("live");
+    const questionCallback = onMock.mock.calls.find((call) => call[1]?.table === "questions")?.[2] as
+      | (() => void)
+      | undefined;
+    questionCallback?.();
 
-    const surveyCall = onMock.mock.calls.find((call) => call[1]?.table === "surveys");
-    const surveyCallback = surveyCall?.[2] as () => void;
-    surveyCallback();
-
-    expect(onRefresh).toHaveBeenCalled();
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     unsubscribe();
-    expect(removeChannelMock).toHaveBeenCalled();
   });
 
   it("exposes live, reconnecting, offline, and refresh-needed states", () => {
     const onConnectionChange = vi.fn();
 
-    subscribeToSurveyResults({
+    subscribeToModeratorQuestions({
       eventId: "event-1",
       onConnectionChange,
       onRefresh: vi.fn(),
       reconnectTimeoutMs: 1000,
-      refreshIntervalMs: 5000,
-      surveyId: "survey-1",
     });
 
     subscribeCallback?.("SUBSCRIBED");
@@ -112,13 +104,11 @@ describe("survey realtime subscriptions", () => {
   it("escalates closed and interrupted channels only after the prolonged reconnect timeout", () => {
     const onConnectionChange = vi.fn();
 
-    subscribeToSurveyResults({
+    subscribeToPublicQuestions({
       eventId: "event-1",
       onConnectionChange,
       onRefresh: vi.fn(),
       reconnectTimeoutMs: 1000,
-      refreshIntervalMs: 5000,
-      surveyId: "survey-1",
     });
 
     subscribeCallback?.("CLOSED");
@@ -131,20 +121,18 @@ describe("survey realtime subscriptions", () => {
     vi.advanceTimersByTime(1);
     expect(onConnectionChange).toHaveBeenLastCalledWith("refresh-needed");
 
-    subscribeCallback?.("TIMED_OUT");
+    subscribeCallback?.("CHANNEL_ERROR");
     expect(onConnectionChange).toHaveBeenLastCalledWith("reconnecting");
   });
 
-  it("surfaces browser offline state, allows online recovery, and cleans up listeners", () => {
+  it("surfaces browser offline state and allows online recovery", () => {
     const onConnectionChange = vi.fn();
 
-    const unsubscribe = subscribeToSurveyResults({
+    subscribeToPublicQuestions({
       eventId: "event-1",
       onConnectionChange,
       onRefresh: vi.fn(),
       reconnectTimeoutMs: 1000,
-      refreshIntervalMs: 5000,
-      surveyId: "survey-1",
     });
 
     browserEvents.dispatchEvent(new Event("offline"));
@@ -154,6 +142,17 @@ describe("survey realtime subscriptions", () => {
     expect(onConnectionChange).toHaveBeenNthCalledWith(1, "offline");
     expect(onConnectionChange).toHaveBeenNthCalledWith(2, "reconnecting");
     expect(onConnectionChange).toHaveBeenNthCalledWith(3, "live");
+  });
+
+  it("cleans up timers, event listeners, and the realtime channel", () => {
+    const onConnectionChange = vi.fn();
+
+    const unsubscribe = subscribeToPublicQuestions({
+      eventId: "event-1",
+      onConnectionChange,
+      onRefresh: vi.fn(),
+      reconnectTimeoutMs: 1000,
+    });
 
     subscribeCallback?.("CLOSED");
     unsubscribe();

@@ -51,8 +51,20 @@ export function PresenterView({ eventId, eventName, fixtureMode = false, questio
         }
       }
 
+      function connectionFromFixture(event: Event) {
+        const detail = (event as CustomEvent<{ state?: QnaConnectionState }>).detail;
+
+        if (detail?.state) {
+          setConnectionState(detail.state);
+        }
+      }
+
       window.addEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
-      return () => window.removeEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
+      window.addEventListener("qsb-ask:e2e-qna-connection", connectionFromFixture);
+      return () => {
+        window.removeEventListener("qsb-ask:e2e-qna-refresh", refreshFromFixture);
+        window.removeEventListener("qsb-ask:e2e-qna-connection", connectionFromFixture);
+      };
     }
 
     return subscribeToPublicQuestions({
@@ -65,7 +77,7 @@ export function PresenterView({ eventId, eventName, fixtureMode = false, questio
   return (
     <div className="grid gap-6">
       <header className="grid gap-3 border-b border-slate-300 pb-5">
-        <ConnectionStatus state={connectionState} />
+        <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
         <h1 className="text-[32px] font-semibold leading-[1.15] text-slate-950 sm:text-[44px]">
           {eventName} Presenter View
         </h1>

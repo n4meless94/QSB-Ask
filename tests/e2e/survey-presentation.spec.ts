@@ -89,6 +89,48 @@ test("fixture refresh updates aggregate counts within 2 seconds without trusting
   await expect(page.getByText(/participant_session_id|session_token_hash|private-token-hash|Hidden raw response/i)).toHaveCount(0);
 });
 
+test("presentation view shows offline and refresh-needed reconnect actions without raw payloads", async ({
+  page,
+}) => {
+  await page.goto("/events/event-results/presentation/surveys/survey-1");
+  await page.waitForFunction(() => document.body.dataset.surveyPresentationReady === "true");
+
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new CustomEvent("qsb-ask:e2e-survey-connection", {
+        detail: {
+          rawPayload: "Hidden raw response",
+          state: "offline",
+        },
+      }),
+    );
+  });
+
+  await expect(
+    page.getByText("You are offline. Live updates will resume when the connection returns."),
+  ).toBeVisible();
+  await expect(page.getByText("Hidden raw response")).toHaveCount(0);
+
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new CustomEvent("qsb-ask:e2e-survey-connection", {
+        detail: {
+          rawPayload: "Hidden raw response",
+          state: "refresh-needed",
+        },
+      }),
+    );
+  });
+
+  await expect(
+    page.getByText("Live updates are not reconnecting. Refresh this view to continue."),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Refresh view" })).toBeVisible();
+  await page.getByRole("button", { name: "Refresh view" }).focus();
+  await expect(page.getByRole("button", { name: "Refresh view" })).toBeFocused();
+  await expect(page.getByText("Hidden raw response")).toHaveCount(0);
+});
+
 test("participant view shows aggregate results only when organiser visibility is enabled", async ({
   page,
 }) => {

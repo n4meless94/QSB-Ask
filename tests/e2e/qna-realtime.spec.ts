@@ -74,3 +74,47 @@ test("audience and presenter realtime updates use approved-only payloads", async
   await expect(audiencePage.getByText("Approved realtime question")).toHaveCount(0, { timeout: 2000 });
   await expect(presenterPage.getByText("Approved realtime question")).toHaveCount(0, { timeout: 2000 });
 });
+
+test("audience and presenter show offline and refresh-needed reconnect actions without raw payloads", async ({
+  context,
+}) => {
+  const audiencePage = await context.newPage();
+  const presenterPage = await context.newPage();
+
+  await audiencePage.goto("/join/QSB2X9ZA/qna");
+  await presenterPage.goto("/events/event-1/presenter");
+
+  await audiencePage.evaluate(() => {
+    window.dispatchEvent(
+      new CustomEvent("qsb-ask:e2e-qna-connection", {
+        detail: {
+          rawPayload: "Pending private realtime question",
+          state: "offline",
+        },
+      }),
+    );
+  });
+  await presenterPage.evaluate(() => {
+    window.dispatchEvent(
+      new CustomEvent("qsb-ask:e2e-qna-connection", {
+        detail: {
+          rawPayload: "Pending private realtime question",
+          state: "refresh-needed",
+        },
+      }),
+    );
+  });
+
+  await expect(
+    audiencePage.getByText("You are offline. Live updates will resume when the connection returns."),
+  ).toBeVisible();
+  await expect(
+    presenterPage.getByText("Live updates are not reconnecting. Refresh this view to continue."),
+  ).toBeVisible();
+  await expect(presenterPage.getByRole("button", { name: "Refresh view" })).toBeVisible();
+  await presenterPage.getByRole("button", { name: "Refresh view" }).focus();
+  await expect(presenterPage.getByRole("button", { name: "Refresh view" })).toBeFocused();
+
+  await expect(audiencePage.getByText("Pending private realtime question")).toHaveCount(0);
+  await expect(presenterPage.getByText("Pending private realtime question")).toHaveCount(0);
+});

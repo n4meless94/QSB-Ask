@@ -64,10 +64,20 @@ export function SurveyPresentationView({
         }
       }
 
+      function connectionFromFixture(event: Event) {
+        const detail = (event as CustomEvent<{ state?: SurveyConnectionState }>).detail;
+
+        if (detail?.state) {
+          setConnectionState(detail.state);
+        }
+      }
+
       window.addEventListener("qsb-ask:e2e-survey-results-refresh", refreshFromFixture);
+      window.addEventListener("qsb-ask:e2e-survey-connection", connectionFromFixture);
       document.body.dataset.surveyPresentationReady = "true";
       return () => {
         window.removeEventListener("qsb-ask:e2e-survey-results-refresh", refreshFromFixture);
+        window.removeEventListener("qsb-ask:e2e-survey-connection", connectionFromFixture);
         delete document.body.dataset.surveyPresentationReady;
       };
     }
@@ -83,7 +93,7 @@ export function SurveyPresentationView({
   return (
     <div className="grid gap-6 bg-slate-50 text-slate-900">
       <header className="grid gap-4 border-b border-slate-300 pb-5">
-        <ConnectionStatus state={connectionState} />
+        <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
         <div className="grid gap-2">
           <h1 className="break-words text-[28px] font-semibold leading-[1.2] text-slate-950">
             {eventName} survey presentation

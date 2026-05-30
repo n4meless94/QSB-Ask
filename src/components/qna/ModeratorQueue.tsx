@@ -167,8 +167,20 @@ export function ModeratorQueue({
         }
       }
 
+      function connectionFromFixture(event: Event) {
+        const detail = (event as CustomEvent<{ state?: QnaConnectionState }>).detail;
+
+        if (detail?.state) {
+          setConnectionState(detail.state);
+        }
+      }
+
       window.addEventListener("qsb-ask:e2e-moderation-refresh", refreshFromFixture);
-      return () => window.removeEventListener("qsb-ask:e2e-moderation-refresh", refreshFromFixture);
+      window.addEventListener("qsb-ask:e2e-qna-connection", connectionFromFixture);
+      return () => {
+        window.removeEventListener("qsb-ask:e2e-moderation-refresh", refreshFromFixture);
+        window.removeEventListener("qsb-ask:e2e-qna-connection", connectionFromFixture);
+      };
     }
 
     return subscribeToModeratorQuestions({
@@ -303,7 +315,7 @@ export function ModeratorQueue({
           <p className="text-sm leading-[1.4] text-slate-600">
             Review audience questions before they become visible to participants and speakers.
           </p>
-          <ConnectionStatus state={connectionState} />
+          <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
         </div>
 
         {message ? (
@@ -385,7 +397,7 @@ export function ModeratorQueue({
           ) : (
             visibleQuestions.map((question) => {
               const isEditing = editingId === question.id;
-              const busy = pendingActionId === question.id || isPending || connectionState !== "live";
+              const busy = pendingActionId === question.id || isPending || connectionState === "offline";
 
               return (
                 <article
@@ -521,7 +533,7 @@ export function ModeratorQueue({
             </Button>
           </div>
         ) : null}
-        {connectionState !== "live" ? (
+        {connectionState === "offline" ? (
           <p className="text-sm font-semibold leading-[1.4] text-amber-700" role="status">
             Reconnect to continue.
           </p>
