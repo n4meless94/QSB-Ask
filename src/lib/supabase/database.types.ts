@@ -630,6 +630,17 @@ export type Database = {
         }
         Returns: Database["public"]["Tables"]["questions"]["Row"][]
       }
+      submit_survey_response: {
+        Args: {
+          target_answers: Json
+          target_participant_session_id: string
+          target_survey_id: string
+        }
+        Returns: {
+          already_submitted: boolean
+          response_id: string | null
+        }[]
+      }
       upvote_question: {
         Args: {
           target_event_id: string

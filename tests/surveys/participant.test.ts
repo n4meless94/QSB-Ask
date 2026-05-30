@@ -257,6 +257,9 @@ describe("participant survey helpers", () => {
         participant_session_id: "attacker-controlled",
         surveyId: "survey-1",
         "answers.question-choice": "option-yes",
+        "answers.question-select": ["option-budget", "option-risks"],
+        "answers.question-rating.rating": "4",
+        "answers.question-text.text": "More detail on timeline.",
       }),
     );
 
