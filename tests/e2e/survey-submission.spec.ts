@@ -6,7 +6,7 @@ test("participant submits a published survey, sees hidden-results and duplicate 
 
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: "Pulse check" })).toBeVisible();
-  await expect(page.getByText("Results are hidden by the organiser.")).toBeVisible();
+  await expect(page.getByText("Results are hidden by the organiser.").first()).toBeVisible();
   await expect(page.getByText("Create survey")).toHaveCount(0);
   await expect(page.getByText("Publish survey")).toHaveCount(0);
   await expect(page.getByText("participant_session_id")).toHaveCount(0);
@@ -21,7 +21,7 @@ test("participant submits a published survey, sees hidden-results and duplicate 
   await page.getByRole("button", { name: "Submit survey" }).click();
 
   await expect(page.getByText("Survey submitted. Thank you. Your response has been recorded for this event.")).toBeVisible();
-  await expect(page.getByText("Results are hidden by the organiser.")).toBeVisible();
+  await expect(page.getByText("Results are hidden by the organiser.").first()).toBeVisible();
   await expect(page.getByRole("button", { name: "Submit survey" })).toHaveCount(0);
   await expect(page.getByText("You have already submitted this survey.")).toBeVisible();
 
@@ -31,7 +31,11 @@ test("participant submits a published survey, sees hidden-results and duplicate 
 
 test("draft and closed surveys never render enabled participant response controls", async ({ page }) => {
   await page.goto("/join/QSB2X9ZA/surveys?fixture=closed");
-  await expect(page.getByText("This survey is closed. New responses are no longer being accepted.")).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "This survey is closed. New responses are no longer being accepted.",
+    }),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: "Submit survey" })).toHaveCount(0);
 
   await page.goto("/join/QSB2X9ZA/surveys?fixture=draft");
