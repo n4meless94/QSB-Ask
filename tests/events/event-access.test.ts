@@ -13,6 +13,7 @@ import {
 const revalidatePathMock = vi.hoisted(() => vi.fn());
 const getUserMock = vi.hoisted(() => vi.fn());
 const fromMock = vi.hoisted(() => vi.fn());
+const adminFromMock = vi.hoisted(() => vi.fn());
 
 vi.mock("server-only", () => ({}));
 
@@ -37,6 +38,12 @@ vi.mock("@/lib/supabase/server", () => ({
       getUser: getUserMock,
     },
     from: fromMock,
+  })),
+}));
+
+vi.mock("@/lib/supabase/admin", () => ({
+  createSupabaseAdminClient: vi.fn(() => ({
+    from: adminFromMock,
   })),
 }));
 
@@ -186,6 +193,58 @@ function makeQueryFixtures({
   return { inserts, updates };
 }
 
+function makeAdminInvitationClaimFixture(invitation: MemberFixture | null, claimedMember: MemberFixture | null = invitation) {
+  const upserts: unknown[] = [];
+  const updates: unknown[] = [];
+
+  adminFromMock.mockImplementation((table: string) => {
+    if (table === "users") {
+      return {
+        upsert: vi.fn(async (payload: unknown) => {
+          upserts.push(payload);
+          return { data: null, error: null };
+        }),
+      };
+    }
+
+    if (table === "event_members") {
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              eq: vi.fn(() => ({
+                in: vi.fn(() => ({
+                  order: vi.fn(() => ({
+                    limit: vi.fn(() => ({
+                      maybeSingle: vi.fn(async () => ({ data: invitation, error: null })),
+                    })),
+                  })),
+                })),
+              })),
+            })),
+          })),
+        })),
+        update: vi.fn((payload: unknown) => {
+          updates.push(payload);
+          return {
+            eq: vi.fn(() => ({
+              eq: vi.fn(() => ({
+                select: vi.fn(() => ({
+                  maybeSingle: vi.fn(async () => ({ data: claimedMember, error: null })),
+                })),
+              })),
+            })),
+          };
+        }),
+      };
+    }
+
+    throw new Error(`Unexpected admin table: ${table}`);
+  });
+
+  return { updates, upserts };
+}
+
 describe("D-01/D-03 event access helpers", () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = "http://127.0.0.1:54321";
@@ -195,6 +254,7 @@ describe("D-01/D-03 event access helpers", () => {
     process.env.APP_JOIN_URL_BASE = "http://localhost:3000/join";
     process.env.APP_SESSION_IDLE_TIMEOUT_SECONDS = "28800";
     vi.clearAllMocks();
+    adminFromMock.mockReset();
     getUserMock.mockResolvedValue({
       data: { user: { id: "organiser-1", email: "organiser@qsb.com" } },
       error: null,
@@ -265,7 +325,97 @@ describe("D-01/D-03 event access helpers", () => {
     );
   });
 
-  it("D-03 creates invited moderator/speaker rows and action copy says manual onboarding, not email sent", async () => {
+  it("activates matching invited speaker access when the signed-in email matches", async () => {
+    const claimedSpeaker: MemberFixture = {
+      id: "member-speaker-invite",
+      event_id: eventFixture.id,
+      user_id: "speaker-1",
+      invited_email: null,
+      role: "speaker",
+      status: "active",
+    };
+    const invitedSpeaker: MemberFixture = {
+      ...claimedSpeaker,
+      user_id: null,
+      invited_email: "speaker@qsb.com",
+      status: "invited",
+    };
+    makeQueryFixtures({ actorMember: null });
+    const adminFixtures = makeAdminInvitationClaimFixture(invitedSpeaker, claimedSpeaker);
+    getUserMock.mockResolvedValue({
+      data: {
+        user: {
+          id: "speaker-1",
+          email: "Speaker@QSB.com",
+          user_metadata: { display_name: "Speaker Person" },
+        },
+      },
+      error: null,
+    });
+
+    await expect(getPresenterEventAccess("speaker-1", "event-1")).resolves.toMatchObject({
+      role: "speaker",
+      membership: expect.objectContaining({
+        id: "member-speaker-invite",
+        status: "active",
+        user_id: "speaker-1",
+      }),
+    });
+
+    expect(adminFixtures.upserts[0]).toEqual({
+      display_name: "Speaker Person",
+      email: "speaker@qsb.com",
+      id: "speaker-1",
+    });
+    expect(adminFixtures.updates[0]).toEqual({
+      invited_email: null,
+      status: "active",
+      user_id: "speaker-1",
+    });
+  });
+
+  it("activates one matching invitation deterministically when the email has multiple invited roles", async () => {
+    const invitedModerator: MemberFixture = {
+      id: "member-moderator-invite",
+      event_id: eventFixture.id,
+      user_id: null,
+      invited_email: "speaker@qsb.com",
+      role: "moderator",
+      status: "invited",
+    };
+    const claimedModerator: MemberFixture = {
+      ...invitedModerator,
+      user_id: "speaker-1",
+      invited_email: null,
+      status: "active",
+    };
+    makeQueryFixtures({ actorMember: null });
+    const adminFixtures = makeAdminInvitationClaimFixture(invitedModerator, claimedModerator);
+    getUserMock.mockResolvedValue({
+      data: {
+        user: {
+          id: "speaker-1",
+          email: "Speaker@QSB.com",
+          user_metadata: {},
+        },
+      },
+      error: null,
+    });
+
+    await expect(getPresenterEventAccess("speaker-1", "event-1")).resolves.toMatchObject({
+      role: "moderator",
+      membership: expect.objectContaining({
+        id: "member-moderator-invite",
+        status: "active",
+        user_id: "speaker-1",
+      }),
+    });
+
+    expect(adminFixtures.upserts).toHaveLength(1);
+    expect(adminFixtures.updates).toHaveLength(1);
+  });
+
+  it("D-03 creates invited moderator/speaker rows and action copy describes activation, not email sent", async () => {
     const organiserMember: MemberFixture = {
       id: "member-owner",
       event_id: eventFixture.id,
@@ -286,7 +436,7 @@ describe("D-01/D-03 event access helpers", () => {
       status: "invited",
     });
     expect(created).toMatchObject({ invited_email: "speaker@qsb.com", role: "speaker", status: "invited" });
-    expect(actionResult.message).toContain("manual account onboarding");
+    expect(actionResult.message).toContain("activate access");
     expect(actionResult.message).not.toMatch(/email sent|sent an email/i);
   });
 

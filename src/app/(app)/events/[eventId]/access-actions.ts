@@ -67,7 +67,7 @@ export async function inviteMemberAction(
     return {
       ok: true,
       message:
-        "Member access created. Invite email delivery is not active yet. This member record is ready for manual account onboarding.",
+        "Member access created. Invite email delivery is not active yet. Staff can sign in with that email to activate access.",
     };
   } catch (error) {
     return {

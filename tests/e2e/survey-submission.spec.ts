@@ -5,6 +5,10 @@ test("participant submits a published survey, sees hidden-results and duplicate 
   await page.goto("/join/QSB2X9ZA/surveys");
 
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Q&A" })).toHaveAttribute(
+    "href",
+    "/join/QSB2X9ZA/qna",
+  );
   await expect(page.getByRole("heading", { level: 2, name: "Pulse check" })).toBeVisible();
   await expect(page.getByText("Results are hidden by the organiser.").first()).toBeVisible();
   await expect(page.getByText("Create survey")).toHaveCount(0);

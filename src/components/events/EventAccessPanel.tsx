@@ -56,8 +56,8 @@ export function EventAccessPanel({ eventId, members, role }: EventAccessPanelPro
           Event access
         </h2>
         <p className="text-sm leading-[1.4] text-slate-600">
-          Invite email delivery is not active yet. This member record is ready for manual account
-          onboarding.
+          Invite email delivery is not active yet. Staff can sign in with that email to activate
+          assigned access automatically.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export function EventAccessPanel({ eventId, members, role }: EventAccessPanelPro
           <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px]">
             <Field
               autoComplete="email"
-              helperText="Use the staff email that will be matched during manual account onboarding."
+              helperText="Use the staff email they will use to sign in; matching invited access activates automatically."
               label="Invite email"
               name="email"
               type="email"

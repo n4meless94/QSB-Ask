@@ -9,6 +9,10 @@ test("participant submits a moderated question without rendering pending text pu
   await expect(
     page.locator("section[aria-labelledby='approved-questions-heading']").getByText("Connected"),
   ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Surveys" })).toHaveAttribute(
+    "href",
+    "/join/QSB2X9ZA/surveys",
+  );
   const questionInput = page.getByRole("textbox", { name: "Question" });
   await expect(questionInput).toBeVisible();
 

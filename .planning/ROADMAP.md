@@ -14,6 +14,7 @@ QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the pro
 | 2 | Live Event Q&A And Moderation | Complete 2026-05-26: moderated Q&A, audience voting, presenter view, and realtime refresh delivered. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-07, QNA-01 to QNA-15, LIVE-01 to LIVE-04 |
 | 3 | 5/5 | Complete   | 2026-05-30 |
 | 4 | Hardening, Deployment, And UAT | Prepare production deployment through Coolify, verify live behaviour, handle reconnect states, and complete UAT readiness. | LIVE-06, DEPL-02 to DEPL-04 |
+| 04.1 | Close v1 audit gaps: staff invite activation and survey discovery | Close the two lifecycle-audit blockers before v1 milestone acceptance. | AUTH-05 to AUTH-07, EVNT-03, EVNT-06, SURV-08, SURV-09 |
 
 ## Phase Details
 
@@ -125,3 +126,20 @@ Phase 2 Plans 01-08 are implemented. Continue with Phase 3 for surveys, results,
 
 ---
 *Roadmap created: 2026-05-22*
+
+### Phase 04.1: Close v1 audit gaps: staff invite activation and survey discovery (INSERTED)
+
+**Goal:** Close the v1 audit blockers by making invited staff access activate from matching signed-in email accounts and by making participant surveys discoverable from the normal participant Q&A path.
+**Requirements**: AUTH-05, AUTH-06, AUTH-07, EVNT-03, EVNT-06, SURV-08, SURV-09
+**Depends on:** Phase 4
+**Plans:** 1/1 plan complete
+
+**Success Criteria:**
+1. A signed-in staff user whose email matches an invited event member can activate that invitation into an active event member row and access the assigned staff surface.
+2. Invite UI and action copy describe the current activation path accurately without claiming email delivery.
+3. Participants who enter through the normal join/Q&A flow can discover and navigate to published surveys for the same event.
+4. Participant survey pages provide an obvious return path to Q&A.
+5. Focused unit, E2E, lint, and type checks cover both closure fixes.
+
+Plans:
+- [x] 04.1-01-PLAN.md - Staff invite activation and participant survey discovery closure.

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cookies } from "next/headers";
 
 import { AudienceQuestionList } from "@/components/qna/AudienceQuestionList";
@@ -111,6 +112,21 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
           <p className="text-base leading-6 text-slate-600">
             Submit a question for moderator review. Approved questions appear below.
           </p>
+          <nav aria-label="Participant event sections" className="flex min-w-0 flex-wrap gap-2 pt-2">
+            <Link
+              aria-current="page"
+              className="inline-flex min-h-11 items-center rounded-[6px] border border-teal-700 bg-white px-3 text-base font-semibold leading-6 text-teal-700 outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+              href={`/join/${joinCode}/qna`}
+            >
+              Q&A
+            </Link>
+            <Link
+              className="inline-flex min-h-11 items-center rounded-[6px] border border-slate-300 bg-white px-3 text-base font-semibold leading-6 text-slate-700 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+              href={`/join/${joinCode}/surveys`}
+            >
+              Surveys
+            </Link>
+          </nav>
         </header>
 
         <QuestionSubmitForm

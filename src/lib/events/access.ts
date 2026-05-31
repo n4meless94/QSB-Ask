@@ -1,6 +1,7 @@
 import "server-only";
 
 import { buildJoinLink, type EventSummary } from "@/lib/events/events";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   EVENT_MANAGEMENT_ROLES,
@@ -62,6 +63,83 @@ function displayNameFromEmail(email: string) {
   return localPart || email;
 }
 
+function displayNameFromAuthUser(user: { email?: string | null; user_metadata?: { display_name?: unknown; full_name?: unknown } }) {
+  const metadataName =
+    typeof user.user_metadata?.display_name === "string"
+      ? user.user_metadata.display_name
+      : typeof user.user_metadata?.full_name === "string"
+        ? user.user_metadata.full_name
+        : "";
+
+  return metadataName.trim() || displayNameFromEmail(user.email ?? "");
+}
+
+async function claimMatchingInvitation(
+  eventId: string,
+  userId: string,
+  allowedRoles: readonly EventRole[],
+) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user || user.id !== userId || !user.email) {
+    return null;
+  }
+
+  const invitedEmail = normaliseEmail(user.email);
+  const admin = createSupabaseAdminClient();
+
+  const { data: invitation, error: invitationError } = await admin
+    .from("event_members")
+    .select("id,event_id,user_id,invited_email,role,status,created_at")
+    .eq("event_id", eventId)
+    .eq("invited_email", invitedEmail)
+    .eq("status", "invited")
+    .in("role", [...allowedRoles])
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (invitationError) {
+    throw new Error("Invited access could not be activated. Ask the organiser to check your account.");
+  }
+
+  if (!invitation) {
+    return null;
+  }
+
+  const { error: profileError } = await admin.from("users").upsert({
+    display_name: displayNameFromAuthUser(user),
+    email: invitedEmail,
+    id: userId,
+  });
+
+  if (profileError) {
+    throw new Error("Invited access could not be activated. Ask the organiser to check your account.");
+  }
+
+  const { data, error: updateError } = await admin
+    .from("event_members")
+    .update({
+      invited_email: null,
+      status: "active",
+      user_id: userId,
+    })
+    .eq("id", invitation.id)
+    .eq("status", "invited")
+    .select("id,event_id,user_id,invited_email,role,status,created_at")
+    .maybeSingle();
+
+  if (updateError) {
+    throw new Error("Invited access could not be activated. Ask the organiser to check your account.");
+  }
+
+  return data;
+}
+
 export async function assertEventRole(
   userId: string,
   eventId: string,
@@ -87,9 +165,16 @@ export async function assertEventRole(
     throw new Error("Event access could not be verified. Refresh the page or try again.");
   }
 
-  const membership = (memberships ?? []).find(
+  let membership = (memberships ?? []).find(
     (member) => member.status === "active" && allowedRoles.includes(member.role),
   );
+
+  if (!membership) {
+    const claimedMembership = await claimMatchingInvitation(eventId, userId, allowedRoles);
+    if (claimedMembership && allowedRoles.includes(claimedMembership.role)) {
+      membership = claimedMembership;
+    }
+  }
 
   if (!membership) {
     throw new Error(accessDeniedMessage(allowedRoles));

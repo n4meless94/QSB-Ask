@@ -2,27 +2,27 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 03
-current_plan: 5
-status: verifying
-last_updated: "2026-05-30T04:23:08.395Z"
-last_activity: 2026-05-30
+current_phase: 04.1
+current_plan: 1
+status: complete
+last_updated: "2026-06-01T01:02:00+08:00"
+last_activity: 2026-06-01
 progress:
-  total_phases: 4
-  completed_phases: 3
-  total_plans: 17
-  completed_plans: 17
-  percent: 75
+  total_phases: 5
+  completed_phases: 5
+  total_plans: 21
+  completed_plans: 21
+  percent: 100
 ---
 
 # Project State: QSB Ask
 
 **Last updated:** 2026-05-26  
-**Current phase:** 03
-**Current Plan:** 5
-**Total Plans in Phase:** 5
-**Status:** Phase complete — ready for verification
-**Last Activity:** 2026-05-30
+**Current phase:** 04.1
+**Current Plan:** 1
+**Total Plans in Phase:** 1
+**Status:** Phase 04.1 complete — v1 audit blockers closed
+**Last Activity:** 2026-06-01
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
 
@@ -54,7 +54,8 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 | 1 | Complete | 9 | Foundation, auth, event dashboard, data security. Plans 01-04 complete. |
 | 2 | Complete | 27 | Plans 01-08 complete: workspace access, settings/lifecycle, participant join/session, submission, moderation, audience voting, presenter view, and realtime. |
 | 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
-| 4 | Pending | 4 | Deployment, reconnect handling, UAT readiness. |
+| 4 | Complete | 4 | Deployment, reconnect handling, UAT readiness. |
+| 04.1 | Complete | 7 | Staff invite activation and participant survey discovery closure. |
 
 ## Active Constraints
 
@@ -80,6 +81,7 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - 2026-05-26: Completed Phase 2 Plan 06 audience approved-question list, Popular/Recent sorting, and session-bound voting.
 - 2026-05-26: Completed Phase 2 Plan 07 Presenter View access and approved-only display surface.
 - 2026-05-26: Completed Phase 2 Plan 08 normal-condition Q&A realtime subscriptions and cross-surface integration verification.
+- 2026-06-01: Completed Phase 04.1 closure for staff invite activation and participant survey discovery; full unit, E2E, lint, typecheck, and build verification passed.
 
 ## Decisions
 
@@ -123,6 +125,8 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - [Phase 03]: CSV exports return 204 without Content-Disposition for empty event export categories.
 - [Phase 03]: Anonymous CSV export labels use Anonymous plus a stable session audit prefix while omitting raw tokens and token hashes.
 - [Phase 03]: Event Workspace export links render only for organiser-loaded nonzero export counts.
+- [Phase 04.1]: Invited staff access activates during server-side event access checks only when the signed-in Supabase Auth user email matches an invited membership for the event and allowed role.
+- [Phase 04.1]: Participant Q&A remains the join landing surface, with event-scoped navigation to Surveys and back to Q&A.
 
 ## Performance Metrics
 
@@ -142,6 +146,7 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 | Phase 02 P08 | 20min | 3 tasks | 12 files |
 | Phase 03 P04 | 11min | 3 tasks | 11 files |
 | Phase 03 P05 | 10min | 3 tasks | 6 files |
+| Phase 04.1 P01 | 16min | 4 tasks | 13 files |
 
 ## Last Session
 
@@ -151,4 +156,10 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 
 ## Next Recommended Command
 
-Phase 2 is complete. Continue with Phase 3 planning/execution for surveys, results, presentation, and CSV.
+Phase 04.1 is complete. The next recommended step is milestone closeout / ship workflow after any desired human UAT.
+
+## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 04.1 inserted after Phase 4: Close v1 audit gaps: staff invite activation and survey discovery (URGENT)

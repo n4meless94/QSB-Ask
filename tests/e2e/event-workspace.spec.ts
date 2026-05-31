@@ -44,7 +44,9 @@ test("D-01/D-03 event workspace renders tabs and organiser Access content with E
   await page.getByRole("tab", { name: "Access" }).click();
 
   await expect(page.getByRole("heading", { level: 2, name: "Event access" })).toBeVisible();
-  await expect(page.getByText("Invite email delivery is not active yet.")).toBeVisible();
+  await expect(
+    page.getByText("Staff can sign in with that email to activate assigned access automatically."),
+  ).toBeVisible();
   await expect(page.getByLabel("Invite email")).toBeVisible();
   await expect(
     page.getByLabel("Role").locator("option").evaluateAll((options) =>
