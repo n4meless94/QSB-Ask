@@ -23,9 +23,14 @@ slug: docker-webpack-build
 - GitHub Actions run `26830471429` completed successfully for commit `ddc20e2e86c125f128efa274d4fa36ab36d51e51`.
 - VPS pulled `ghcr.io/n4meless94/qsb-ask:latest` successfully with digest `sha256:b06c908f15c80a8f4cd8dd0b165f9ec89dc67f466ec80290be0579d4d10dcf14`.
 - Temporary VPS container smoke returned expected HTTP `503 configuration_missing` without production env vars.
+- GitHub Actions run `26833875249` completed successfully for commit `6137db373bf29610d17400151f89eaa8a296451a`.
+- Coolify project/app created for `QSB Ask`; app UUID `btstg1x4zzuqjc16yf4qluqv`, domain `https://ask.qsbportal.com.my`, image `ghcr.io/n4meless94/qsb-ask:latest`.
+- Coolify runtime env vars were configured without recording secret values.
+- VPS container `btstg1x4zzuqjc16yf4qluqv-163830306351` reached Docker `healthy`; forced-origin `/api/health` returned HTTP `200` with `ok=true`.
 
 ## Remaining Deployment Gate
 
-Coolify still needs production runtime environment variables before `/api/health` can pass:
-`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-`NEXT_PUBLIC_SITE_URL`, `APP_JOIN_URL_BASE`, and `APP_SESSION_IDLE_TIMEOUT_SECONDS`.
+Cloudflare still returns HTTP `526` because Traefik has only the default certificate for
+`ask.qsbportal.com.my`. Traefik ACME logs show Let's Encrypt challenge requests are hitting
+Cloudflare proxy addresses and returning `404`. Temporarily set the Cloudflare DNS record to
+DNS-only until Traefik obtains the certificate, then retest public `/api/health`.
