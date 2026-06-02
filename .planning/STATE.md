@@ -82,6 +82,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-01: Completed Phase 04.1 closure for staff invite activation and participant survey discovery; full unit, E2E, lint, typecheck, and build verification passed.
 - 2026-06-02: Started milestone v1.1 Integrated Slide Presenter with PDF-first scope, QR overlay, and moderator-controlled shown-question overlay.
 - 2026-06-02: Created Phase 5 context and Plan 01 for event-scoped PDF deck upload, validation, storage, and organiser management.
+- 2026-06-02: Published QSB Ask source to GitHub `n4meless94/QSB-Ask`, added GHCR image publishing, and verified the VPS can pull `ghcr.io/n4meless94/qsb-ask:latest`.
 
 ## Decisions
 
