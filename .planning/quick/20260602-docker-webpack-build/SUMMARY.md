@@ -10,6 +10,7 @@ slug: docker-webpack-build
 
 - Updated the Docker build stage to run `npm run build -- --webpack`.
 - Added `public/.gitkeep` so the standalone image can copy `/app/public`.
+- Added `curl` to the runtime image so Coolify Docker health checks can execute.
 - Added a GitHub Actions workflow that publishes `ghcr.io/n4meless94/qsb-ask`.
 - Ignored `.planning/**` changes for automatic image publishing.
 
