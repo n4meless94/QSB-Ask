@@ -13,7 +13,7 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV QSB_ASK_STANDALONE_OUTPUT=1
-RUN npm run build
+RUN npm run build -- --webpack
 
 FROM node:24.13.0-slim AS runner
 
