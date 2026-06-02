@@ -1,51 +1,42 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-current_phase: 04.1
+milestone: v1.1
+milestone_name: Integrated Slide Presenter
+current_phase: 5
 current_plan: 1
-status: complete
-last_updated: "2026-06-01T01:02:00+08:00"
-last_activity: 2026-06-01
+status: planning
+last_updated: "2026-06-02T14:45:42.786Z"
+last_activity: 2026-06-02
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 8
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State: QSB Ask
 
-**Last updated:** 2026-05-26  
-**Current phase:** 04.1
+**Last updated:** 2026-06-02
+**Current phase:** 5
 **Current Plan:** 1
-**Total Plans in Phase:** 1
-**Status:** Phase 04.1 complete — v1 audit blockers closed
-**Last Activity:** 2026-06-01
+**Total Plans in Phase:** 2
+**Status:** Phase 5 Plan 01 ready - PDF deck upload and storage
+**Last Activity:** 2026-06-02
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-05-22)
+See: `.planning/PROJECT.md` (updated 2026-06-02)
 
 **Core value:** No unapproved, sensitive, inappropriate, or confidential question should appear publicly before the organiser or moderator has control over it.
 
 ## Current Focus
 
-Phase 2 builds the live event Q&A and moderation workflow on top of the verified Phase 1 foundation. Plans 01-08 are complete and established:
+Milestone v1.1 builds the Integrated Slide Presenter. The chosen scope is PDF-first: presenters export PowerPoint or Canva decks to PDF, organisers upload the PDF into QSB Ask, and the app presents slides with web-native floating QR and approved-question overlays.
 
-- Server-side event role assertions for organiser, moderator, and speaker access.
-- Organiser member access management with pending moderator/speaker records.
-- Authenticated Event Workspace shell with Access and Settings panels.
-- Organiser-only event settings updates, close/archive lifecycle actions, and moderation-off warning acknowledgement.
-- Public join route, identity-mode-aware participant form, and event-scoped participant session cookies with hashed database tokens.
-- Participant question submission with pending-by-default moderation, rate/duplicate checks, and approved-only public reads.
-- Staff moderation queue with audited compare-and-set actions, edit version history, search, and sort.
-- Audience approved-question list with Popular/Recent sorting and one-vote behavior.
-- Presenter View for assigned speakers and staff with approved-only question display.
-- Normal-condition realtime refresh across moderator, audience, and presenter Q&A surfaces.
+Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and organiser management. Execute it before adding slide rendering, QR overlay, or question overlay behavior.
 
 ## Roadmap Status
 
@@ -53,9 +44,13 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 |-------|--------|--------------|-------|
 | 1 | Complete | 9 | Foundation, auth, event dashboard, data security. Plans 01-04 complete. |
 | 2 | Complete | 27 | Plans 01-08 complete: workspace access, settings/lifecycle, participant join/session, submission, moderation, audience voting, presenter view, and realtime. |
-| 3 | Pending | 19 | Surveys, results, presentation, CSV export. |
+| 3 | Complete | 19 | Surveys, results, presentation, CSV export. |
 | 4 | Complete | 4 | Deployment, reconnect handling, UAT readiness. |
 | 04.1 | Complete | 7 | Staff invite activation and participant survey discovery closure. |
+| 5 | In Progress | 5 | Plan 01 ready for PDF deck upload, validation, storage, replacement/removal, and organiser management. |
+| 6 | Planned | 10 | Browser slide presenter, fullscreen navigation, and saved QR overlay layout. |
+| 7 | Planned | 7 | Moderator-controlled show-on-screen question overlay separate from approval. |
+| 8 | Planned | 5 | Overlay realtime, reconnect state, permission safety, and UAT coverage. |
 
 ## Active Constraints
 
@@ -64,6 +59,9 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - Do not add Slido parity extras unless requirements are updated.
 - Deploy long-lived app services through Coolify on QSB VPS, not ad hoc Docker.
 - Use managed Supabase for v1 backend services.
+- v1.1 accepts PDF decks only; PowerPoint and Canva decks should be exported to PDF before upload.
+- Showing a question on the slide is a separate moderator action from approving it for public Q&A.
+- Presenter overlays must use safe public-approved question DTOs and must never expose pending or archived text.
 
 ## Recent Activity
 
@@ -82,6 +80,8 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - 2026-05-26: Completed Phase 2 Plan 07 Presenter View access and approved-only display surface.
 - 2026-05-26: Completed Phase 2 Plan 08 normal-condition Q&A realtime subscriptions and cross-surface integration verification.
 - 2026-06-01: Completed Phase 04.1 closure for staff invite activation and participant survey discovery; full unit, E2E, lint, typecheck, and build verification passed.
+- 2026-06-02: Started milestone v1.1 Integrated Slide Presenter with PDF-first scope, QR overlay, and moderator-controlled shown-question overlay.
+- 2026-06-02: Created Phase 5 context and Plan 01 for event-scoped PDF deck upload, validation, storage, and organiser management.
 
 ## Decisions
 
@@ -127,6 +127,8 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 - [Phase 03]: Event Workspace export links render only for organiser-loaded nonzero export counts.
 - [Phase 04.1]: Invited staff access activates during server-side event access checks only when the signed-in Supabase Auth user email matches an invited membership for the event and allowed role.
 - [Phase 04.1]: Participant Q&A remains the join landing surface, with event-scoped navigation to Surveys and back to Q&A.
+- [Milestone v1.1]: Integrated Slide Presenter is PDF-first. Native PowerPoint/Canva overlay and `.pptx` conversion are deferred.
+- [Milestone v1.1]: Q&A approval and slide display are separate controls; moderators approve for public visibility, then explicitly show or hide a selected approved question on the presenter.
 
 ## Performance Metrics
 
@@ -156,10 +158,17 @@ Phase 2 builds the live event Q&A and moderation workflow on top of the verified
 
 ## Next Recommended Command
 
-Phase 04.1 is complete. The next recommended step is milestone closeout / ship workflow after any desired human UAT.
+Execute `.planning/phases/05-pdf-deck-upload-and-storage/05-01-PLAN.md`.
 
 ## Accumulated Context
 
 ### Roadmap Evolution
 
 - Phase 04.1 inserted after Phase 4: Close v1 audit gaps: staff invite activation and survey discovery (URGENT)
+
+## Current Position
+
+Phase: 5 - PDF Deck Upload And Storage
+Plan: 01 - Event-scoped PDF deck upload, validation, storage, and organiser management
+Status: Plan ready
+Last activity: 2026-06-02 - Phase 5 Plan 01 created

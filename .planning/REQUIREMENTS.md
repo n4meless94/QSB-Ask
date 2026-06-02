@@ -84,6 +84,50 @@
 - [ ] **DEPL-04**: Production public URL is prepared for `https://ask.qsbportal.com.my`.
 - [x] **DEPL-05**: Supabase Row Level Security policies enforce role and visibility rules at the database layer.
 
+## v1.1 Requirements
+
+### Slide Deck Management
+
+- [ ] **SLID-01**: Organiser can upload one PDF slide deck for an event from the Event Workspace.
+- [ ] **SLID-02**: Uploaded decks are stored event-scoped and can be replaced or removed by organisers only.
+- [ ] **SLID-03**: The system validates deck uploads as PDF files and enforces documented file size and page count limits.
+- [ ] **SLID-04**: Speaker, moderator, and organiser roles with presenter access can open the event's integrated slide presenter.
+- [ ] **SLID-05**: The presenter can render PDF pages in the browser without exposing organiser-only controls.
+
+### Slide Presentation
+
+- [ ] **PRES-01**: Presenter can navigate slides forward and backward with on-screen controls and keyboard shortcuts.
+- [ ] **PRES-02**: Presenter can enter a fullscreen/projector-safe presentation mode.
+- [ ] **PRES-03**: Presenter view shows the current slide number and handles first/last slide boundaries clearly.
+- [ ] **PRES-04**: Presenter view has a usable empty state when no deck is uploaded.
+- [ ] **PRES-05**: The slide presenter remains usable on common projector aspect ratios and desktop browser sizes.
+
+### QR Overlay
+
+- [ ] **OVLY-01**: Presenter view shows an event join QR overlay above the slide deck.
+- [ ] **OVLY-02**: Organiser can drag and resize the QR overlay in layout edit mode.
+- [ ] **OVLY-03**: QR overlay position and size are saved per event and reused when the presenter reopens the deck.
+- [ ] **OVLY-04**: QR overlay can be hidden and shown without changing the event join link.
+- [ ] **OVLY-05**: QR overlay remains readable against light and dark slide content.
+
+### Question Overlay
+
+- [ ] **QOVR-01**: Moderator can select an approved live question and show it on the slide presenter.
+- [ ] **QOVR-02**: Showing a question on screen is separate from approving a question for public Q&A.
+- [ ] **QOVR-03**: Moderator can hide the currently shown question without changing its moderation status.
+- [ ] **QOVR-04**: Moderator can mark the shown question as answered from the overlay control flow.
+- [ ] **QOVR-05**: Presenter overlay never shows pending, archived, or unapproved question text.
+- [ ] **QOVR-06**: Question overlay supports a calm lower-third or bubble-style animation suitable for formal QSB briefings.
+- [ ] **QOVR-07**: Long questions are clamped or scaled so overlay text does not overflow or block the whole slide.
+
+### Live Synchronisation And Safety
+
+- [ ] **SYNC-01**: Slide presenter receives QR layout, visibility, and shown-question changes within 2 seconds in normal conditions.
+- [ ] **SYNC-02**: Presenter view shows connection/reconnect state when overlay updates are interrupted.
+- [ ] **SYNC-03**: Overlay update permissions are enforced server-side by event role.
+- [ ] **SYNC-04**: Presenter overlay data is loaded through safe DTOs that expose only public-approved question fields.
+- [ ] **SYNC-05**: Tests cover upload validation, presenter access, approved-only question overlay, and overlay state persistence.
+
 ## v2 Requirements
 
 ### Q&A Enhancements
@@ -115,6 +159,10 @@
 | Payment plans or subscription management | Internal QSB product. |
 | Advanced cross-event analytics | Defer until event-level workflows are validated. |
 | Fully automated moderation | Human moderation remains the v1 safeguard. |
+| Native desktop overlay above PowerPoint, Canva, or external PDF apps | v1.1 presents uploaded PDFs inside QSB Ask; desktop overlay can be revisited after the integrated presenter is validated. |
+| Direct Canva import | Canva decks should be exported to PDF for this milestone. |
+| PowerPoint `.pptx` conversion | Deferred because server-side conversion can alter fonts, layout, animations, and embedded media. |
+| Slide animations and embedded video playback | Static PDF slide presentation is the reliable first slice. |
 
 ## Traceability
 
@@ -180,12 +228,40 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEPL-03 | Phase 4 | Pending |
 | DEPL-04 | Phase 4 | Pending |
 | DEPL-05 | Phase 1 | Complete |
+| SLID-01 | Phase 5 | Pending |
+| SLID-02 | Phase 5 | Pending |
+| SLID-03 | Phase 5 | Pending |
+| SLID-04 | Phase 5 | Pending |
+| SLID-05 | Phase 5 | Pending |
+| PRES-01 | Phase 6 | Pending |
+| PRES-02 | Phase 6 | Pending |
+| PRES-03 | Phase 6 | Pending |
+| PRES-04 | Phase 6 | Pending |
+| PRES-05 | Phase 6 | Pending |
+| OVLY-01 | Phase 6 | Pending |
+| OVLY-02 | Phase 6 | Pending |
+| OVLY-03 | Phase 6 | Pending |
+| OVLY-04 | Phase 6 | Pending |
+| OVLY-05 | Phase 6 | Pending |
+| QOVR-01 | Phase 7 | Pending |
+| QOVR-02 | Phase 7 | Pending |
+| QOVR-03 | Phase 7 | Pending |
+| QOVR-04 | Phase 7 | Pending |
+| QOVR-05 | Phase 7 | Pending |
+| QOVR-06 | Phase 7 | Pending |
+| QOVR-07 | Phase 7 | Pending |
+| SYNC-01 | Phase 8 | Pending |
+| SYNC-02 | Phase 8 | Pending |
+| SYNC-03 | Phase 8 | Pending |
+| SYNC-04 | Phase 8 | Pending |
+| SYNC-05 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 59 total
-- Mapped to phases: 59
+- v1.1 requirements: 27 total
+- Mapped to phases: 86
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-22*
-*Last updated: 2026-05-22 after roadmap creation*
+*Last updated: 2026-06-02 after starting milestone v1.1 Integrated Slide Presenter*

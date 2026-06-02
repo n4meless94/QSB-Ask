@@ -6,15 +6,19 @@
 
 ## Overview
 
-QSB Ask will be delivered in four vertical MVP phases. Each phase leaves the product in a more usable state while preserving the approved scope: moderated Q&A first, then surveys/results/export, then deployment and launch readiness.
+QSB Ask v1 was delivered in four vertical MVP phases plus a closure phase. Milestone v1.1 continues with an integrated PDF-first slide presenter so QSB speakers can present static decks from QSB Ask while QR and approved-question overlays stay inside the same controlled web surface.
 
 | Phase | Name | Goal | Requirements |
 |-------|------|------|--------------|
 | 1 | Foundation, Auth, And Data | Establish the app shell, local development, authentication baseline, event dashboard, and Supabase data/security foundation. Complete 2026-05-22. | AUTH-01 to AUTH-04, EVNT-01 to EVNT-03, DEPL-01, DEPL-05 |
 | 2 | Live Event Q&A And Moderation | Complete 2026-05-26: moderated Q&A, audience voting, presenter view, and realtime refresh delivered. | AUTH-05 to AUTH-07, EVNT-04 to EVNT-07, QNA-01 to QNA-15, LIVE-01 to LIVE-04 |
-| 3 | 5/5 | Complete   | 2026-05-30 |
+| 3 | Surveys, Results, Presentation, And CSV | Complete 2026-05-30: survey authoring, participant submission, results views, presentation charts, and CSV export delivered. | LIVE-05, SURV-01 to SURV-13, EXPT-01 to EXPT-05 |
 | 4 | Hardening, Deployment, And UAT | Prepare production deployment through Coolify, verify live behaviour, handle reconnect states, and complete UAT readiness. | LIVE-06, DEPL-02 to DEPL-04 |
 | 04.1 | Close v1 audit gaps: staff invite activation and survey discovery | Close the two lifecycle-audit blockers before v1 milestone acceptance. | AUTH-05 to AUTH-07, EVNT-03, EVNT-06, SURV-08, SURV-09 |
+| 5 | PDF Deck Upload And Storage | Add event-scoped PDF deck upload, validation, replacement, removal, and presenter access loading. | SLID-01 to SLID-05 |
+| 6 | Integrated Slide Presenter And QR Overlay | Render uploaded PDF slides in a fullscreen browser presenter with keyboard navigation and saved QR overlay layout. | PRES-01 to PRES-05, OVLY-01 to OVLY-05 |
+| 7 | Moderator Question Overlay Controls | Add moderator "Show on screen" controls and safe animated question overlays separate from approval. | QOVR-01 to QOVR-07 |
+| 8 | Overlay Realtime, Safety, And UAT | Wire live overlay synchronisation, reconnect states, permission checks, tests, and presenter-room smoke coverage. | SYNC-01 to SYNC-05 |
 
 ## Phase Details
 
@@ -114,18 +118,107 @@ Plans:
 
 **UI hint:** yes
 
+### Phase 5: PDF Deck Upload And Storage
+
+**Goal:** As an organiser, I want to upload and manage a PDF slide deck for an event, so that assigned presenters can present from QSB Ask instead of external PowerPoint, Canva, or PDF apps.
+**Mode:** mvp
+
+**Requirements:** SLID-01, SLID-02, SLID-03, SLID-04, SLID-05
+
+**Success Criteria:**
+1. Organisers can upload, replace, and remove one event-scoped PDF deck from the Event Workspace.
+2. Upload validation rejects non-PDF files and files beyond documented limits.
+3. Deck metadata is persisted with event ownership and organiser-only mutation permissions.
+4. Organiser, moderator, and speaker presenter roles can load the deck into a safe presenter entry point.
+5. Empty and failed-upload states are clear and do not expose private event data to participants.
+
+**UI hint:** yes
+
+**Plans:** 0/2 plans complete
+
+Plans:
+- [ ] 05-01-PLAN.md - Event-scoped PDF deck schema, storage, validation, and organiser management.
+- [ ] 05-02-PLAN.md - Presenter-safe deck loading, access checks, and empty states.
+
+### Phase 6: Integrated Slide Presenter And QR Overlay
+
+**Goal:** As a presenter, I want to navigate uploaded slides fullscreen with a configurable QR overlay, so that participants can join Q&A without leaving the presentation experience.
+**Mode:** mvp
+
+**Requirements:** PRES-01, PRES-02, PRES-03, PRES-04, PRES-05, OVLY-01, OVLY-02, OVLY-03, OVLY-04, OVLY-05
+
+**Success Criteria:**
+1. PDF pages render reliably in browser presentation mode with forward/back controls and keyboard navigation.
+2. Fullscreen/projector mode is usable on common desktop and projector aspect ratios.
+3. The presenter sees slide number and boundary states without organiser management chrome.
+4. QR overlay renders above slides, can be hidden/shown, and remains readable.
+5. Organisers can drag/resize QR layout in edit mode and reuse the saved layout.
+
+**UI hint:** yes
+
+**Plans:** 0/2 plans complete
+
+Plans:
+- [ ] 06-01-PLAN.md - Browser PDF slide rendering, navigation, fullscreen mode, and projector layout.
+- [ ] 06-02-PLAN.md - QR overlay rendering, edit mode, persistence, and readability checks.
+
+### Phase 7: Moderator Question Overlay Controls
+
+**Goal:** As a moderator, I want to choose which approved question appears over the slide deck, so that live Q&A can be presented intentionally without surprising the speaker.
+**Mode:** mvp
+
+**Requirements:** QOVR-01, QOVR-02, QOVR-03, QOVR-04, QOVR-05, QOVR-06, QOVR-07
+
+**Success Criteria:**
+1. Moderators can show, hide, and mark answered for the currently displayed approved live question.
+2. Show-on-screen state is separate from the normal approve/archive/answered moderation lifecycle.
+3. Pending, archived, dismissed, and otherwise unapproved questions cannot appear in the slide overlay.
+4. Question overlay animation feels calm enough for formal briefings and supports long-question constraints.
+5. Presenter and moderator surfaces update consistently when the shown question changes.
+
+**UI hint:** yes
+
+**Plans:** 0/2 plans complete
+
+Plans:
+- [ ] 07-01-PLAN.md - Show-on-screen state model, moderator controls, and approved-only server actions.
+- [ ] 07-02-PLAN.md - Presentation question overlay UI, animation, layout constraints, and mark-answered integration.
+
+### Phase 8: Overlay Realtime, Safety, And UAT
+
+**Goal:** Make the integrated presenter production-credible through realtime overlay updates, reconnect handling, permission tests, and room-style UAT checks.
+**Mode:** mvp
+
+**Requirements:** SYNC-01, SYNC-02, SYNC-03, SYNC-04, SYNC-05
+
+**Success Criteria:**
+1. Overlay QR and shown-question changes arrive within 2 seconds in normal conditions.
+2. Presenter view reports reconnect and refresh-needed states when live updates are interrupted.
+3. Server-side permissions protect deck and overlay mutations by event role.
+4. Safe DTO boundaries expose only approved public question fields to presentation overlays.
+5. Unit, E2E, accessibility, and projector/screen-share smoke checks cover the new presenter flow.
+
+**UI hint:** yes
+
+**Plans:** 0/2 plans complete
+
+Plans:
+- [ ] 08-01-PLAN.md - Realtime overlay subscriptions, reconnect state, and safe DTO integration.
+- [ ] 08-02-PLAN.md - Verification sweep, presenter-room smoke checklist, and UAT readiness.
+
 ## Coverage
 
 - v1 requirements: 59 total
-- Requirements mapped: 59
+- v1.1 requirements: 27 total
+- Requirements mapped: 86
 - Unmapped requirements: 0
 
 ## Next Step
 
-Phase 2 Plans 01-08 are implemented. Continue with Phase 3 for surveys, results, presentation, and CSV.
+Start Phase 5 Plan 01 for event-scoped PDF deck upload, storage, validation, and organiser management.
 
 ---
-*Roadmap created: 2026-05-22*
+*Roadmap created: 2026-05-22; last updated 2026-06-02 for milestone v1.1 Integrated Slide Presenter*
 
 ### Phase 04.1: Close v1 audit gaps: staff invite activation and survey discovery (INSERTED)
 
