@@ -19,7 +19,9 @@ slug: docker-webpack-build
 - VPS Docker build completed successfully for commit `153c4688dc00`.
 - Direct VPS GHCR push was blocked by registry token scope.
 - GitHub Actions run `26830166818` completed successfully for commit `3cf8a2085838d8e43e1d598426109bffeb743690`.
-- VPS pulled `ghcr.io/n4meless94/qsb-ask:latest` successfully with digest `sha256:c2f183010e8950676b1f940d5efa49f87a341dbf61b87ea6064d3df3b2be1e54`.
+- GitHub Actions run `26830471429` completed successfully for commit `ddc20e2e86c125f128efa274d4fa36ab36d51e51`.
+- VPS pulled `ghcr.io/n4meless94/qsb-ask:latest` successfully with digest `sha256:b06c908f15c80a8f4cd8dd0b165f9ec89dc67f466ec80290be0579d4d10dcf14`.
+- Temporary VPS container smoke returned expected HTTP `503 configuration_missing` without production env vars.
 
 ## Remaining Deployment Gate
 
