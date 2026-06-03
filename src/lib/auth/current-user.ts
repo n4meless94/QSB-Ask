@@ -3,7 +3,7 @@ import "server-only";
 import { Buffer } from "node:buffer";
 
 import type { User } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { getRuntimeEnv } from "@/lib/env";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -45,6 +45,41 @@ function combineCookieChunks(
   return chunks.length > 0 ? chunks.join("") : null;
 }
 
+function parseCookieHeader(cookieHeader: string | null) {
+  if (!cookieHeader) return [];
+
+  return cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const separatorIndex = part.indexOf("=");
+
+      if (separatorIndex === -1) {
+        return { name: part, value: "" };
+      }
+
+      return {
+        name: part.slice(0, separatorIndex),
+        value: decodeURIComponent(part.slice(separatorIndex + 1)),
+      };
+    });
+}
+
+async function getRequestCookies() {
+  const cookieStore = await cookies();
+  const allCookies = cookieStore.getAll();
+  const authName = authCookieName();
+
+  if (allCookies.some((cookie) => cookie.name === authName || cookie.name.startsWith(`${authName}.`))) {
+    return allCookies;
+  }
+
+  const headerStore = await headers();
+
+  return parseCookieHeader(headerStore.get("cookie"));
+}
+
 function parseAccessToken(cookieValue: string | null) {
   if (!cookieValue) return null;
 
@@ -63,9 +98,9 @@ function parseAccessToken(cookieValue: string | null) {
 
 async function getUserFromAuthCookie() {
   try {
-    const cookieStore = await cookies();
+    const allCookies = await getRequestCookies();
     const accessToken = parseAccessToken(
-      combineCookieChunks(cookieStore.getAll(), authCookieName()),
+      combineCookieChunks(allCookies, authCookieName()),
     );
 
     if (!accessToken) return null;
