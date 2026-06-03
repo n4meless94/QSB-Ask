@@ -17,21 +17,26 @@ export function ModerationHistoryPanel({ history }: ModerationHistoryPanelProps)
       aria-labelledby="moderation-history-heading"
       className="grid gap-3 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6"
     >
-      <div className="grid gap-1">
-        <h3
-          className="text-[20px] font-semibold leading-[1.25] text-slate-900"
-          id="moderation-history-heading"
-        >
-          Moderation history
-        </h3>
-        <p className="text-sm leading-[1.4] text-slate-600">
-          Staff-only audit trail for recent question actions and edits.
+      <div className="grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+        <div className="grid gap-1">
+          <h3
+            className="text-[20px] font-semibold leading-[1.25] text-slate-900"
+            id="moderation-history-heading"
+          >
+            Moderation history
+          </h3>
+          <p className="text-sm leading-[1.4] text-slate-600">
+            Staff-only audit trail for recent question actions and edits.
+          </p>
+        </div>
+        <p className="rounded-[6px] border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-semibold leading-[1.4] text-slate-700">
+          {history.length} recorded
         </p>
       </div>
 
       {history.length === 0 ? (
-        <p className="rounded-[6px] border border-slate-300 bg-white p-3 text-sm leading-[1.4] text-slate-600">
-          No moderation actions recorded yet.
+        <p className="rounded-[6px] border border-slate-300 bg-slate-50 p-3 text-sm leading-[1.4] text-slate-600">
+          No actions recorded yet. Approvals, edits, dismissals, and archive actions will appear here.
         </p>
       ) : (
         <ul className="grid gap-2" aria-label="Moderation action history">

@@ -65,11 +65,21 @@ const actionToServer: Record<ActionVerb, (eventId: string, formData: FormData) =
 
 function tabClasses(active: boolean) {
   return [
-    "min-h-11 rounded-[6px] border px-3 text-base font-semibold leading-6 outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10",
+    "min-h-11 rounded-[6px] border px-3 text-base font-semibold leading-6 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10",
     active
-      ? "border-teal-700 bg-white text-teal-700"
-      : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100",
+      ? "border-teal-700 bg-teal-700 text-white shadow-sm"
+      : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50",
   ].join(" ");
+}
+
+function safetyMetricClasses(tone: "neutral" | "safe" | "warning") {
+  const tones = {
+    neutral: "border-slate-300 bg-white text-slate-900",
+    safe: "border-teal-700 bg-teal-50 text-teal-900",
+    warning: "border-amber-700 bg-amber-50 text-amber-900",
+  };
+
+  return `grid gap-1 rounded-[6px] border p-3 ${tones[tone]}`;
 }
 
 function statusBadgeClasses(status: QuestionStatus) {
@@ -203,6 +213,9 @@ export function ModeratorQueue({
     [items],
   );
 
+  const publicVisibleCount = counts.live + counts.answered;
+  const hiddenFromAudienceCount = counts.pending + counts.archived;
+
   const visibleQuestions = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
@@ -304,19 +317,36 @@ export function ModeratorQueue({
     <div className="grid gap-4">
       <section
         aria-labelledby="moderation-queue-heading"
-        className="grid gap-4 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6"
+        className="grid gap-5 rounded-[6px] border border-slate-300 bg-white p-4 shadow-[var(--shadow-panel)] sm:p-6"
       >
-        <div className="grid gap-1">
-          <h2
-            className="text-[20px] font-semibold leading-[1.25] text-slate-900"
-            id="moderation-queue-heading"
-          >
-            Moderation queue
-          </h2>
-          <p className="text-sm leading-[1.4] text-slate-600">
-            Review audience questions before they become visible to participants and speakers.
-          </p>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+          <div className="grid gap-2">
+            <h2
+              className="text-[24px] font-semibold leading-[1.15] text-slate-950"
+              id="moderation-queue-heading"
+            >
+              Moderation queue
+            </h2>
+            <p className="max-w-3xl text-sm leading-[1.5] text-slate-600">
+              Control room for reviewing questions before anything appears in public Q&A or presenter views.
+            </p>
+          </div>
           <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-3" aria-label="Moderation safety summary">
+          <div className={safetyMetricClasses(counts.pending > 0 ? "warning" : "safe")}>
+            <p className="text-sm font-semibold leading-[1.4]">Waiting for review</p>
+            <p className="font-mono text-[28px] font-semibold leading-none tracking-normal">{counts.pending}</p>
+          </div>
+          <div className={safetyMetricClasses("neutral")}>
+            <p className="text-sm font-semibold leading-[1.4]">Visible to audience</p>
+            <p className="font-mono text-[28px] font-semibold leading-none tracking-normal">{publicVisibleCount}</p>
+          </div>
+          <div className={safetyMetricClasses("safe")}>
+            <p className="text-sm font-semibold leading-[1.4]">Hidden from audience</p>
+            <p className="font-mono text-[28px] font-semibold leading-none tracking-normal">{hiddenFromAudienceCount}</p>
+          </div>
         </div>
 
         {message ? (
@@ -334,7 +364,7 @@ export function ModeratorQueue({
 
         <div
           aria-label="Moderation queue statuses"
-          className="grid grid-cols-2 gap-2 md:flex md:flex-wrap"
+          className="grid grid-cols-2 gap-2 rounded-[6px] border border-slate-300 bg-slate-50 p-2 md:flex md:flex-wrap"
           role="tablist"
         >
           {tabs.map((tab) => (
@@ -362,6 +392,7 @@ export function ModeratorQueue({
               className="min-h-11 rounded-[6px] border border-slate-300 bg-white px-3 text-base leading-6 text-slate-900 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-700 focus:ring-offset-2 sm:min-h-10"
               id="qna-search"
               onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by question text"
               type="search"
               value={search}
             />
@@ -385,13 +416,17 @@ export function ModeratorQueue({
 
         <div aria-labelledby={`${activeTab}-queue-tab`} className="grid gap-3" id={`${activeTab}-questions`} role="tabpanel">
           {visibleQuestions.length === 0 ? (
-            <div className="rounded-[6px] border border-slate-300 bg-white p-4">
-              <h3 className="text-[20px] font-semibold leading-[1.25] text-slate-900">
-                {search ? "No questions match your search." : `No ${activeTab} questions`}
+            <div className="rounded-[6px] border border-slate-300 bg-slate-50 p-5">
+              <h3 className="text-[20px] font-semibold leading-[1.25] text-slate-950">
+                {search
+                  ? "No questions match your search."
+                  : activeTab === "pending"
+                    ? "No questions waiting for review"
+                    : `No ${activeTab} questions`}
               </h3>
-              <p className="mt-1 text-sm leading-[1.4] text-slate-600">
+              <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-slate-600">
                 {activeTab === "pending"
-                  ? "New audience questions will appear here for review."
+                  ? "New audience questions will appear here first. Pending questions remain hidden from participants until approved."
                   : "Question records for this state will appear here."}
               </p>
             </div>

@@ -22,8 +22,8 @@ export function AppShell({
         Skip to main content
       </a>
 
-      <header className="border-b border-[var(--color-rule)] bg-[var(--color-surface)]/90 backdrop-blur">
-        <div className="mx-auto flex min-h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:min-h-16 sm:px-6 lg:px-10">
+      <header className="border-b border-[var(--color-rule)] bg-[var(--color-surface)]/95 backdrop-blur">
+        <div className="mx-auto flex min-h-14 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:min-h-16 sm:px-6 lg:px-8">
           <div className="min-w-0">
             <p className="text-base font-semibold leading-6 text-[var(--color-ink)]">QSB Ask</p>
             <p className="text-sm leading-[1.4] text-[var(--color-ink-muted)]">
@@ -37,7 +37,7 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-10" id="main-content">
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8" id="main-content">
         {children}
       </main>
     </div>

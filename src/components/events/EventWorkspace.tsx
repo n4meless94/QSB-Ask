@@ -39,10 +39,10 @@ const roleLabels: Record<EventRole, string> = {
 
 function tabClasses(isActive: boolean) {
   return [
-    "min-h-11 rounded-[6px] border px-4 text-base font-semibold leading-6 outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10",
+    "min-h-11 rounded-[6px] border px-4 text-base font-semibold leading-6 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10",
     isActive
-      ? "border-teal-700 bg-white text-teal-700"
-      : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100",
+      ? "border-teal-700 bg-teal-700 text-white shadow-sm"
+      : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50",
   ].join(" ");
 }
 
@@ -69,38 +69,46 @@ export function EventWorkspace({
   const { event, role } = access;
 
   return (
-    <div className="grid w-full max-w-6xl gap-6">
-      <header className="grid gap-4 rounded-[6px] border border-slate-300 bg-white p-4 sm:p-6">
-        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+    <div className="grid w-full gap-5">
+      <header className="grid gap-5 rounded-[6px] border border-slate-300 bg-white p-4 shadow-[var(--shadow-panel)] sm:p-6">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-stretch">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="break-words text-[28px] font-semibold leading-[1.2] text-slate-900">
-                {event.name}
-              </h1>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
               <Badge tone={event.status}>{event.status}</Badge>
-              <span className="rounded-[6px] border border-slate-300 px-2 py-1 text-sm font-semibold leading-[1.4] text-slate-700">
+              <span className="rounded-[6px] border border-slate-300 bg-slate-50 px-2 py-1 text-sm font-semibold leading-[1.4] text-slate-700">
                 {roleLabels[role]}
               </span>
             </div>
-            <dl className="mt-3 grid gap-2 text-sm leading-[1.4] text-slate-600 sm:grid-cols-2">
+            <h1 className="break-words text-[30px] font-semibold leading-[1.1] text-slate-950 sm:text-[36px]">
+              {event.name}
+            </h1>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-[1.5] text-slate-600">
+              Audience questions stay hidden until a moderator approves them.
+            </p>
+          </div>
+
+          <div className="grid gap-3 rounded-[6px] border border-slate-300 bg-slate-50 p-3">
+            <dl className="grid gap-3 text-sm leading-[1.4] text-slate-600">
               <div>
                 <dt className="font-semibold text-slate-900">Join code</dt>
-                <dd className="break-words font-semibold text-slate-900">{event.join_code}</dd>
+                <dd className="mt-1 w-fit rounded-[6px] border border-slate-300 bg-white px-3 py-2 font-mono text-[22px] font-semibold leading-none tracking-normal text-slate-950">
+                  {event.join_code}
+                </dd>
               </div>
               <div>
                 <dt className="font-semibold text-slate-900">Join link</dt>
-                <dd className="break-all">{event.joinLink}</dd>
+                <dd className="mt-1 break-all rounded-[6px] border border-slate-200 bg-white px-3 py-2 font-mono text-xs leading-[1.45] text-slate-700">
+                  {event.joinLink}
+                </dd>
               </div>
             </dl>
-          </div>
-          <div className="grid gap-3 sm:justify-items-end">
             <CopyJoinLinkButton
               eventName={event.name}
               joinCode={event.join_code}
               joinLink={event.joinLink}
             />
             <Link
-              className="inline-flex min-h-11 items-center justify-center rounded-[6px] border border-slate-300 bg-white px-4 text-base font-semibold leading-6 text-slate-900 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+              className="inline-flex min-h-11 items-center justify-center rounded-[6px] border border-slate-300 bg-white px-4 text-base font-semibold leading-6 text-slate-900 outline-none transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
               href={`/events/${event.id}/presenter`}
               target="_blank"
             >
@@ -110,7 +118,7 @@ export function EventWorkspace({
         </div>
       </header>
 
-      <nav aria-label="Event workspace sections">
+      <nav aria-label="Event workspace sections" className="rounded-[6px] border border-slate-300 bg-white p-2">
         <div
           aria-label="Event workspace sections"
           className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,11 +18,13 @@ function publicRuntimeConfigScript() {
   return `window.__QSB_ASK_PUBLIC_CONFIG__=${serializedConfig};`;
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await connection();
+
   return (
     <html lang="en">
       <head>

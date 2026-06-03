@@ -21,14 +21,14 @@ export function CopyJoinLinkButton({ eventName, joinCode, joinLink }: CopyJoinLi
   }
 
   return (
-    <div className="grid justify-items-start gap-2 sm:justify-items-end">
+    <div className="grid justify-items-stretch gap-2 sm:justify-items-end">
       <button
         aria-label={`Copy join link for ${eventName}`}
-        className="min-h-11 rounded-[6px] border border-slate-300 bg-white px-3 text-sm font-semibold leading-[1.4] text-slate-900 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+        className="min-h-11 rounded-[6px] border border-teal-700 bg-white px-4 text-sm font-semibold leading-[1.4] text-teal-800 outline-none transition-colors hover:bg-teal-50 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
         onClick={copyJoinDetails}
         type="button"
       >
-        Copy join link
+        Copy join details
       </button>
       <p aria-live="polite" className="min-h-5 text-sm leading-[1.4] text-teal-700">
         {message}

@@ -159,6 +159,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | Date | Quick ID | Task | Verification |
 |------|----------|------|--------------|
 | 2026-06-03 | 260603-wib | Participant-first QSB Ask homepage and admin setup split | `npm run lint`, `npm run build`, `npx playwright test tests/e2e/foundation.spec.ts` passed |
+| 2026-06-04 | 260604-1jv | Hallmark presenter view and event workspace audience/operator UI redesign | `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, focused Playwright E2E passed |
 
 ## Last Session
 
