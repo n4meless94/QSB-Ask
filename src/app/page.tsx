@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Field } from "@/components/ui/Field";
 import { getRuntimeEnvStatus } from "@/lib/env";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   const envStatus = getRuntimeEnvStatus();
 
