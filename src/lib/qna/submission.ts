@@ -1,7 +1,7 @@
 import "server-only";
 
 import { validateParticipantSession } from "@/lib/participants/session";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type EventQuestionRules = {
   duplicate_block_enabled: boolean;
@@ -29,7 +29,7 @@ function duplicateKey(text: string) {
 export async function submitParticipantQuestion(eventId: string, rawToken: string, text: string) {
   const participantSession = await validateParticipantSession(eventId, rawToken);
   const questionText = normaliseQuestionText(text);
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
   const { data: event, error: eventError } = await supabase
     .from("events")
     .select(

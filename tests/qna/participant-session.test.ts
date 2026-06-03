@@ -38,6 +38,12 @@ vi.mock("@/lib/supabase/server", () => ({
   })),
 }));
 
+vi.mock("@/lib/supabase/admin", () => ({
+  createSupabaseAdminClient: vi.fn(() => ({
+    from: fromMock,
+  })),
+}));
+
 type EventFixture = {
   id: string;
   identity_mode: "anonymous" | "name_required" | "name_email_required";

@@ -46,6 +46,12 @@ vi.mock("@/lib/supabase/server", () => ({
   })),
 }));
 
+vi.mock("@/lib/supabase/admin", () => ({
+  createSupabaseAdminClient: vi.fn(() => ({
+    from: fromMock,
+  })),
+}));
+
 const eventFixture = {
   duplicate_block_enabled: true,
   id: "event-1",
