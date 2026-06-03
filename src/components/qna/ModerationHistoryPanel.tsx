@@ -48,6 +48,7 @@ export function ModerationHistoryPanel({ history }: ModerationHistoryPanelProps)
                 {new Date(entry.created_at).toLocaleString("en-MY", {
                   dateStyle: "medium",
                   timeStyle: "short",
+                  timeZone: "Asia/Kuala_Lumpur",
                 })}
               </time>
             </li>

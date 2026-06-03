@@ -73,6 +73,7 @@ export function PresenterView({ eventId, eventName, fixtureMode = false, questio
       eventId,
       onConnectionChange: setConnectionState,
       onRefresh: () => router.refresh(),
+      refreshIntervalMs: 2000,
     });
   }, [eventId, fixtureMode, router]);
 

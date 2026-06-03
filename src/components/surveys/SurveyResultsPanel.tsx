@@ -119,7 +119,14 @@ export function SurveyResultsPanel({ eventId, results, selectedResultId }: Surve
                   {responseCopy(selected.responseCount)}
                 </p>
                 <p className="text-sm leading-[1.4] text-slate-600">
-                  Last updated <time dateTime={selected.lastUpdated}>{new Date(selected.lastUpdated).toLocaleString()}</time>
+                  Last updated{" "}
+                  <time dateTime={selected.lastUpdated}>
+                    {new Date(selected.lastUpdated).toLocaleString("en-MY", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                      timeZone: "Asia/Kuala_Lumpur",
+                    })}
+                  </time>
                 </p>
               </div>
               <Link

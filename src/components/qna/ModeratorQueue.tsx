@@ -187,6 +187,7 @@ export function ModeratorQueue({
       eventId,
       onConnectionChange: setConnectionState,
       onRefresh: () => router.refresh(),
+      refreshIntervalMs: 2000,
     });
   }, [eventId, fixtureMode, router]);
 
@@ -417,6 +418,7 @@ export function ModeratorQueue({
                       {new Date(question.submitted_at).toLocaleString("en-MY", {
                         dateStyle: "medium",
                         timeStyle: "short",
+                        timeZone: "Asia/Kuala_Lumpur",
                       })}
                     </time>
                   </header>

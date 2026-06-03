@@ -146,18 +146,24 @@ describe("qna realtime subscriptions", () => {
 
   it("cleans up timers, event listeners, and the realtime channel", () => {
     const onConnectionChange = vi.fn();
+    const onRefresh = vi.fn();
 
     const unsubscribe = subscribeToPublicQuestions({
       eventId: "event-1",
       onConnectionChange,
-      onRefresh: vi.fn(),
+      onRefresh,
+      refreshIntervalMs: 500,
       reconnectTimeoutMs: 1000,
     });
+
+    vi.advanceTimersByTime(500);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
 
     subscribeCallback?.("CLOSED");
     unsubscribe();
     vi.advanceTimersByTime(1000);
 
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     expect(onConnectionChange).not.toHaveBeenCalledWith("refresh-needed");
     expect(removeEventListenerMock).toHaveBeenCalledWith("offline", expect.any(Function));
     expect(removeEventListenerMock).toHaveBeenCalledWith("online", expect.any(Function));

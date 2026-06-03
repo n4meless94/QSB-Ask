@@ -8,6 +8,7 @@ type SubscriptionOptions = {
   eventId: string;
   onConnectionChange?: (state: QnaConnectionState) => void;
   onRefresh: () => void;
+  refreshIntervalMs?: number;
   reconnectTimeoutMs?: number;
 };
 
@@ -102,10 +103,15 @@ function subscribeToQuestionChanges({
   includeModerationHistory,
   onConnectionChange,
   onRefresh,
+  refreshIntervalMs,
   reconnectTimeoutMs = DEFAULT_RECONNECT_TIMEOUT_MS,
 }: SubscriptionOptions & { includeModerationHistory: boolean }) {
   const supabase = createSupabaseBrowserClient();
   const connection = createConnectionMonitor(onConnectionChange, reconnectTimeoutMs);
+  const interval =
+    refreshIntervalMs && refreshIntervalMs > 0
+      ? globalThis.setInterval(onRefresh, refreshIntervalMs)
+      : undefined;
   const channel = supabase
     .channel(`qsb-ask-qna-${includeModerationHistory ? "staff" : "public"}-${eventId}`)
     .on(
@@ -136,6 +142,9 @@ function subscribeToQuestionChanges({
 
   return () => {
     connection.cleanup();
+    if (interval !== undefined) {
+      globalThis.clearInterval(interval);
+    }
     void supabase.removeChannel(channel);
   };
 }

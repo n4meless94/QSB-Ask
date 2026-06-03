@@ -27,7 +27,13 @@ export function OpenTextResponseList({ responses, title }: OpenTextResponseListP
             >
               <div className="flex flex-wrap items-center gap-2 text-sm leading-[1.4] text-slate-600">
                 <span className="font-semibold text-slate-900">{response.label}</span>
-                <time dateTime={response.submittedAt}>{new Date(response.submittedAt).toLocaleString()}</time>
+                <time dateTime={response.submittedAt}>
+                  {new Date(response.submittedAt).toLocaleString("en-MY", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                    timeZone: "Asia/Kuala_Lumpur",
+                  })}
+                </time>
               </div>
               <p className="break-words text-base leading-6 text-slate-900">{response.text}</p>
             </li>

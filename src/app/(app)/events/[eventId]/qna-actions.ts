@@ -86,6 +86,7 @@ async function runAction(
     }
 
     revalidatePath(`/events/${eventId}`);
+    revalidatePath(`/events/${eventId}/presenter`);
     return { ok: true, message: successMessages[verb] };
   } catch (error) {
     return {
