@@ -27,10 +27,10 @@ slug: docker-webpack-build
 - Coolify project/app created for `QSB Ask`; app UUID `btstg1x4zzuqjc16yf4qluqv`, domain `https://ask.qsbportal.com.my`, image `ghcr.io/n4meless94/qsb-ask:latest`.
 - Coolify runtime env vars were configured without recording secret values.
 - VPS container `btstg1x4zzuqjc16yf4qluqv-163830306351` reached Docker `healthy`; forced-origin `/api/health` returned HTTP `200` with `ok=true`.
+- Home page now renders dynamically so it reads runtime env after deployment instead of build-time GitHub Actions env.
+- Coolify env var duplicates were removed; each required variable now has one row.
+- Public `https://ask.qsbportal.com.my/api/health` returns HTTP `200` with a valid Let's Encrypt certificate.
 
 ## Remaining Deployment Gate
 
-Cloudflare still returns HTTP `526` because Traefik has only the default certificate for
-`ask.qsbportal.com.my`. Traefik ACME logs show Let's Encrypt challenge requests are hitting
-Cloudflare proxy addresses and returning `404`. Temporarily set the Cloudflare DNS record to
-DNS-only until Traefik obtains the certificate, then retest public `/api/health`.
+None for the initial Coolify smoke. Continue with normal Supabase schema/auth setup and organiser UAT.

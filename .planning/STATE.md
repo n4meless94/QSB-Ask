@@ -84,6 +84,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-02: Created Phase 5 context and Plan 01 for event-scoped PDF deck upload, validation, storage, and organiser management.
 - 2026-06-02: Published QSB Ask source to GitHub `n4meless94/QSB-Ask`, added GHCR image publishing, and verified the VPS can pull `ghcr.io/n4meless94/qsb-ask:latest`.
 - 2026-06-03: Created Supabase project `QSB Ask`, configured Coolify app `btstg1x4zzuqjc16yf4qluqv`, deployed `ghcr.io/n4meless94/qsb-ask:latest`, and verified forced-origin `/api/health` returns `ok=true`; public Cloudflare access still needs origin certificate issuance.
+- 2026-06-03: Fixed home page runtime env rendering, removed duplicate Coolify env rows, restarted the app, and verified public `https://ask.qsbportal.com.my` plus `/api/health` return configured/healthy over valid TLS.
 
 ## Decisions
 
@@ -173,4 +174,4 @@ Execute `.planning/phases/05-pdf-deck-upload-and-storage/05-01-PLAN.md`.
 Phase: 5 - PDF Deck Upload And Storage
 Plan: 01 - Event-scoped PDF deck upload, validation, storage, and organiser management
 Status: Plan ready
-Last activity: 2026-06-03 - Coolify app deployed healthy behind Traefik; Cloudflare certificate gate remains
+Last activity: 2026-06-03 - Coolify app public TLS and runtime env smoke passed
