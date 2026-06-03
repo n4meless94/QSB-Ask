@@ -1,10 +1,13 @@
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R5 V4 */
+/* Hallmark · macrostructure: Product Preview Landing · tone: corporate SaaS event platform · anchor hue: qsb-teal */
+@import "../../tokens.css";
 @import "tailwindcss";
 
 :root {
   color-scheme: light;
-  background: #f8fafc;
-  color: #0f172a;
-  font-family: Inter, Arial, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
 }
 
 * {
@@ -19,11 +22,147 @@ body {
 }
 
 body {
-  background: #f8fafc;
+  background:
+    linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(180deg, var(--color-grid-line) 1px, transparent 1px),
+    var(--color-paper);
+  background-size: 28px 28px;
 }
 
 a {
   color: inherit;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
+}
+
+.hallmark-display-heading {
+  overflow-wrap: anywhere;
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 0.96;
+}
+
+.foundation-action {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border-width: var(--rule-thin);
+  border-style: solid;
+  padding-inline: 1.25rem;
+  font-size: var(--text-base);
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+  outline: none;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+
+.foundation-action:hover {
+  transform: translateY(-2px);
+}
+
+.foundation-action:active {
+  transform: translateY(0);
+}
+
+.foundation-action:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.foundation-action-primary {
+  border-color: var(--color-accent-strong);
+  background: var(--color-accent-strong);
+  color: var(--color-surface-raised);
+}
+
+.foundation-action-primary:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-surface-raised);
+}
+
+.homepage-nav-link {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  padding-inline: 0.25rem;
+  color: var(--color-ink-muted);
+  text-decoration: none;
+  outline: none;
+}
+
+.homepage-nav-link:hover {
+  color: var(--color-ink);
+}
+
+.homepage-nav-link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.homepage-nav-button {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: var(--rule-thin) solid var(--color-accent-strong);
+  background: var(--color-accent-strong);
+  color: var(--color-surface-raised);
+  padding-inline: 0.875rem;
+  text-decoration: none;
+  outline: none;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+
+.homepage-nav-button:hover {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  transform: translateY(-1px);
+}
+
+.homepage-nav-button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.foundation-utility-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border-bottom: var(--rule-thin) solid currentColor;
+  color: var(--color-accent-strong);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+  outline: none;
+}
+
+.foundation-utility-link:hover {
+  color: var(--color-ink);
+}
+
+.foundation-utility-link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+@media (min-width: 40rem) {
+  .foundation-action {
+    min-height: 2.5rem;
+  }
 }

@@ -1,0 +1,60 @@
+/* Hallmark · tokens: qsb-ask-foundation · tone: boardroom ledger · anchor hue: qsb-teal */
+:root {
+  --color-paper: oklch(97.3% 0.014 87);
+  --color-paper-soft: oklch(94.6% 0.016 87);
+  --color-surface: oklch(99.2% 0.006 85);
+  --color-surface-raised: oklch(100% 0 0);
+  --color-ink: oklch(20.8% 0.043 253);
+  --color-ink-muted: oklch(44.4% 0.052 248);
+  --color-ink-soft: oklch(59.7% 0.041 245);
+  --color-rule: oklch(82.6% 0.026 236);
+  --color-rule-strong: oklch(66.8% 0.048 238);
+  --color-accent: oklch(52.3% 0.121 186);
+  --color-accent-strong: oklch(43.8% 0.115 188);
+  --color-accent-soft: oklch(88.8% 0.073 184);
+  --color-warning: oklch(58.8% 0.12 62);
+  --color-warning-soft: oklch(92.1% 0.057 72);
+  --color-danger: oklch(51.4% 0.171 28);
+  --color-danger-soft: oklch(91.9% 0.043 27);
+  --color-success: oklch(50.7% 0.123 156);
+  --color-success-soft: oklch(91.8% 0.07 154);
+  --color-grid-line: oklch(89.8% 0.018 236 / 0.58);
+  --color-focus: oklch(43.8% 0.115 188);
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-body: "Aptos", "Segoe UI", sans-serif;
+  --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-display: 2.35rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 260ms;
+  --rule-thin: 1px;
+  --rule-thick: 2px;
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --shadow-panel: 0 18px 60px oklch(20.8% 0.043 253 / 0.08);
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --text-display: 3.6rem;
+  }
+}

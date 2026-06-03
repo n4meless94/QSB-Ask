@@ -39,7 +39,7 @@ function redirectWithClearedSession(request: NextRequest) {
   return redirectResponse;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (!isProtectedPath(pathname) && !isAuthPath(pathname)) {

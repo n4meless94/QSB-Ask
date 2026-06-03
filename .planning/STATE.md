@@ -85,18 +85,19 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-02: Published QSB Ask source to GitHub `n4meless94/QSB-Ask`, added GHCR image publishing, and verified the VPS can pull `ghcr.io/n4meless94/qsb-ask:latest`.
 - 2026-06-03: Created Supabase project `QSB Ask`, configured Coolify app `btstg1x4zzuqjc16yf4qluqv`, deployed `ghcr.io/n4meless94/qsb-ask:latest`, and verified forced-origin `/api/health` returns `ok=true`; public Cloudflare access still needs origin certificate issuance.
 - 2026-06-03: Fixed home page runtime env rendering, removed duplicate Coolify env rows, restarted the app, and verified public `https://ask.qsbportal.com.my` plus `/api/health` return configured/healthy over valid TLS.
+- 2026-06-03: Quick task `260603-wib` replaced the public setup console with a participant-first QSB Ask homepage and moved runtime diagnostics to `/admin/setup` plus `/admin/health`.
 
 ## Decisions
 
 - Phase 1 Plan 01 used Tailwind CSS v4 PostCSS setup with `@import "tailwindcss"` in `globals.css`.
 - Health route reports missing environment variable names but never serializes secret values.
-- Root screen is an operational setup shell with auth and health links, not a landing page.
+- Root screen is a participant-first landing page with event-code join, product preview, QSB use cases, and governance copy. Runtime setup diagnostics live under `/admin/setup`; `/api/health` remains the deployment health JSON.
 - Participant/public question reads are guarded by participant-session context and restricted to live or answered statuses only.
 - Service-role Supabase access is isolated in a server-only admin helper with session persistence and token refresh disabled.
 - Database types are generated from the local Supabase schema after a successful local database reset.
 - [Phase 01]: Auth copy constants live in src/lib/auth/messages.ts because Next.js server-action modules can only export async functions.
 - [Phase 01]: Lockout state is derived from login_attempts rather than a separate lockout table, using five failures in a 15-minute window and a 30-minute lockout from the latest triggering failure.
-- [Phase 01]: The app inactivity marker is a secure same-site HTTP-only cookie refreshed by middleware on protected route access.
+- [Phase 01]: The app inactivity marker is a secure same-site HTTP-only cookie refreshed by the Next.js proxy on protected route access.
 - [Phase 01]: Event creation upserts the organiser profile before inserting the event because events.created_by references public.users and no auth-user profile trigger exists yet.
 - [Phase 01]: Playwright uses QSB_ASK_E2E_AUTH=1 as an env-gated fixture for protected-route UI tests without weakening production auth.
 - [Phase 02]: Plan 01 invite flow creates pending event_members rows only; UI and action copy explicitly say manual account onboarding, not email delivery.
@@ -152,6 +153,12 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | Phase 03 P04 | 11min | 3 tasks | 11 files |
 | Phase 03 P05 | 10min | 3 tasks | 6 files |
 | Phase 04.1 P01 | 16min | 4 tasks | 13 files |
+
+## Quick Tasks Completed
+
+| Date | Quick ID | Task | Verification |
+|------|----------|------|--------------|
+| 2026-06-03 | 260603-wib | Participant-first QSB Ask homepage and admin setup split | `npm run lint`, `npm run build`, `npx playwright test tests/e2e/foundation.spec.ts` passed |
 
 ## Last Session
 
