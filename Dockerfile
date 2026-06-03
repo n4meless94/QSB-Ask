@@ -24,7 +24,7 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends curl \
+  && apt-get install -y --no-install-recommends curl wget \
   && rm -rf /var/lib/apt/lists/* \
   && addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
