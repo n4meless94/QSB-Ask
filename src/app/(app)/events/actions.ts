@@ -4,10 +4,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { createEventForOrganiser } from "@/lib/events/events";
 import type { CreateEventFieldErrors } from "@/lib/events/validation";
 import { createEventSchema } from "@/lib/events/validation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type CreateEventActionResult =
   | { ok: true }
@@ -50,13 +50,9 @@ export async function createEventAction(
     );
   }
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
-  if (error || !user) {
+  if (!user) {
     redirect("/login");
   }
 
