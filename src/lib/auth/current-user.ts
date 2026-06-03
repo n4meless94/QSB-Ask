@@ -67,17 +67,17 @@ function parseCookieHeader(cookieHeader: string | null) {
 }
 
 async function getRequestCookies() {
-  const cookieStore = await cookies();
-  const allCookies = cookieStore.getAll();
   const authName = authCookieName();
+  const headerStore = await headers();
+  const headerCookies = parseCookieHeader(headerStore.get("cookie"));
 
-  if (allCookies.some((cookie) => cookie.name === authName || cookie.name.startsWith(`${authName}.`))) {
-    return allCookies;
+  if (headerCookies.some((cookie) => cookie.name === authName || cookie.name.startsWith(`${authName}.`))) {
+    return headerCookies;
   }
 
-  const headerStore = await headers();
+  const cookieStore = await cookies();
 
-  return parseCookieHeader(headerStore.get("cookie"));
+  return cookieStore.getAll();
 }
 
 function parseAccessToken(cookieValue: string | null) {
@@ -119,6 +119,10 @@ async function getUserFromAuthCookie() {
 }
 
 export async function getCurrentUser(): Promise<User | null> {
+  const cookieUser = await getUserFromAuthCookie();
+
+  if (cookieUser) return cookieUser;
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
