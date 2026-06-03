@@ -73,17 +73,21 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
     process.env.QSB_ASK_E2E_AUTH === "1"
       ? e2eEvent(joinCode)
       : await getJoinableEventByCode(joinCode);
-  const questions =
-    process.env.QSB_ASK_E2E_AUTH === "1" || !event ? e2eQuestions() : await listPublicQuestions(event.id);
-  let votedQuestionIds: string[] = [];
+  let rawToken: string | undefined;
 
   if (event && process.env.QSB_ASK_E2E_AUTH !== "1") {
     const cookieStore = await cookies();
-    const rawToken = cookieStore.get(getParticipantCookieName(event.id))?.value;
+    rawToken = cookieStore.get(getParticipantCookieName(event.id))?.value;
+  }
 
-    if (rawToken) {
-      votedQuestionIds = await listParticipantVoteQuestionIds(event.id, rawToken);
-    }
+  const questions =
+    process.env.QSB_ASK_E2E_AUTH === "1" || !event
+      ? e2eQuestions()
+      : await listPublicQuestions(event.id, { participantToken: rawToken });
+  let votedQuestionIds: string[] = [];
+
+  if (event && process.env.QSB_ASK_E2E_AUTH !== "1" && rawToken) {
+    votedQuestionIds = await listParticipantVoteQuestionIds(event.id, rawToken);
   }
 
   if (!event) {

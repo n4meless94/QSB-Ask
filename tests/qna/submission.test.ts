@@ -199,6 +199,24 @@ describe("participant question submission", () => {
     });
   });
 
+  it("loads approved public questions after validating the participant session", async () => {
+    const queries = makeQueries();
+
+    await expect(listPublicQuestions("event-1", { participantToken: "raw-token" })).resolves.toEqual([
+      expect.objectContaining({
+        current_text: "Approved question",
+        id: "question-live",
+        status: "live",
+      }),
+    ]);
+
+    expect(validateParticipantSessionMock).toHaveBeenCalledWith("event-1", "raw-token");
+    expect(queries.publicStatusFilters[0]).toEqual({
+      column: "status",
+      values: PUBLIC_QUESTION_STATUSES,
+    });
+  });
+
   it("uses live status only when moderation is disabled", async () => {
     const queries = makeQueries({ event: { ...eventFixture, moderation_enabled: false } });
 

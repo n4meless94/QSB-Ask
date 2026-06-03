@@ -1,6 +1,8 @@
 import "server-only";
 
+import { validateParticipantSession } from "@/lib/participants/session";
 import { PUBLIC_QUESTION_STATUSES } from "@/lib/supabase/rls";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type PublicQuestion = {
@@ -16,6 +18,7 @@ export type PublicQuestion = {
 export type PublicQuestionSort = "popular" | "recent";
 
 type ListPublicQuestionsOptions = {
+  participantToken?: string;
   sort?: PublicQuestionSort;
 };
 
@@ -40,7 +43,14 @@ export async function listPublicQuestions(
   eventId: string,
   options: ListPublicQuestionsOptions = {},
 ): Promise<PublicQuestion[]> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = options.participantToken
+    ? createSupabaseAdminClient()
+    : await createSupabaseServerClient();
+
+  if (options.participantToken) {
+    await validateParticipantSession(eventId, options.participantToken);
+  }
+
   const query = supabase
     .from("questions")
     .select("id,current_text,status,vote_count,is_edited,submitted_at,updated_at")
