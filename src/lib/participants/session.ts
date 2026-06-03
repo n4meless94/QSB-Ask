@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHash, randomBytes, timingSafeEqual } from "crypto";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Tables } from "@/lib/supabase/database.types";
 import type { EventStatus, IdentityMode } from "@/types/app";
 
@@ -52,7 +52,7 @@ export async function getJoinableEventByCode(joinCode: string): Promise<Joinable
 
   if (!code) return null;
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
     .from("events")
     .select(JOINABLE_EVENT_SELECT)
@@ -76,7 +76,7 @@ export async function joinParticipantEvent(
     throw new Error("Enter the event code shared by the organiser.");
   }
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
   const { data: event, error: eventError } = await supabase
     .from("events")
     .select(JOINABLE_EVENT_SELECT)
@@ -118,7 +118,7 @@ export async function joinParticipantEvent(
 
 export async function validateParticipantSession(eventId: string, rawToken: string) {
   const tokenHash = hashParticipantToken(rawToken);
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
     .from("participant_sessions")
     .select("id,event_id,display_name,email,session_token_hash,created_at")
