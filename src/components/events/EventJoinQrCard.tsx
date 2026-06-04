@@ -20,6 +20,14 @@ function fileSafe(value: string) {
     .slice(0, 48);
 }
 
+function displayJoinHost(joinLink: string) {
+  try {
+    return new URL(joinLink).host;
+  } catch {
+    return joinLink.replace(/^https?:\/\//, "").split("/")[0] || joinLink;
+  }
+}
+
 export function EventJoinQrCard({
   eventName,
   joinCode,
@@ -31,8 +39,9 @@ export function EventJoinQrCard({
   const titleId = useId();
   const [message, setMessage] = useState("");
   const isPresenter = variant === "presenter";
-  const qrSize = isPresenter ? 180 : 132;
+  const qrSize = isPresenter ? 220 : 132;
   const title = isPresenter ? "Scan to ask a question" : "Audience QR";
+  const joinLinkDisplay = isPresenter ? displayJoinHost(joinLink) : joinLink;
 
   function downloadQr() {
     const canvas = canvasRef.current;
@@ -55,10 +64,10 @@ export function EventJoinQrCard({
       aria-labelledby={titleId}
       className={[
         "grid gap-3 rounded-[6px] border bg-white",
-        isPresenter ? "border-slate-300 p-4 shadow-[var(--shadow-panel)]" : "border-slate-300 p-3",
+        isPresenter ? "border-slate-300 p-5 shadow-[var(--shadow-panel)]" : "border-slate-300 p-3",
       ].join(" ")}
     >
-      <div className={isPresenter ? "grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center" : "grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center"}>
+      <div className={isPresenter ? "grid gap-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center" : "grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center"}>
         <div className="w-fit rounded-[6px] border border-slate-300 bg-white p-2">
           <QRCodeCanvas
             bgColor="#ffffff"
@@ -75,7 +84,7 @@ export function EventJoinQrCard({
           <h2
             className={
               isPresenter
-                ? "text-[24px] font-semibold leading-[1.15] text-slate-950 sm:text-[30px]"
+                ? "max-w-[12ch] text-[25px] font-semibold leading-[1.08] text-slate-950 sm:text-[32px]"
                 : "text-base font-semibold leading-[1.35] text-slate-950"
             }
             id={titleId}
@@ -85,7 +94,7 @@ export function EventJoinQrCard({
           <p
             className={
               isPresenter
-                ? "mt-2 text-base font-semibold leading-[1.45] text-slate-700"
+                ? "mt-2 max-w-[18ch] text-base font-semibold leading-[1.35] text-slate-700"
                 : "mt-1 text-sm font-semibold leading-[1.4] text-slate-700"
             }
           >
@@ -95,7 +104,7 @@ export function EventJoinQrCard({
             aria-label="Join code"
             className={
               isPresenter
-                ? "mt-3 w-fit rounded-[6px] border border-slate-300 bg-slate-50 px-4 py-3 font-mono text-[32px] font-semibold leading-none tracking-normal text-slate-950"
+                ? "mt-3 w-fit rounded-[6px] border border-slate-300 bg-slate-50 px-4 py-3 font-mono text-[34px] font-semibold leading-none tracking-normal text-slate-950"
                 : "mt-2 w-fit rounded-[6px] border border-slate-300 bg-slate-50 px-3 py-2 font-mono text-[20px] font-semibold leading-none tracking-normal text-slate-950"
             }
           >
@@ -105,11 +114,11 @@ export function EventJoinQrCard({
             aria-label="Join link"
             className={
               isPresenter
-                ? "mt-3 break-all font-mono text-sm leading-[1.45] text-slate-700"
+                ? "mt-3 break-words font-mono text-base font-semibold leading-[1.35] text-slate-700"
                 : "mt-2 break-all font-mono text-xs leading-[1.45] text-slate-600"
             }
           >
-            {joinLink}
+            {joinLinkDisplay}
           </p>
         </div>
       </div>

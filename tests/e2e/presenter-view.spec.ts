@@ -17,14 +17,13 @@ test("presenter view shows approved questions only without management controls",
 
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing Presenter View" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: "Scan to ask a question" })).toBeVisible();
-  await expect(page.getByText("QSB2X9ZA", { exact: true })).toBeVisible();
-  await expect(page.getByText("http://127.0.0.1:3000/join/QSB2X9ZA")).toBeVisible();
+  await expect(page.getByText("Q S B 2 X 9 Z A", { exact: true })).toBeVisible();
   await expect(page.getByText("Connected")).toBeVisible();
+  await expect(page.getByText("Active question")).toBeVisible();
+  await expect(page.getByText("Jameson Sterling")).toBeVisible();
   await expect(page.getByText("How will follow-up actions be shared?")).toBeVisible();
-  await expect(page.getByText("Who owns the next briefing?")).toBeVisible();
   await expect(page.getByText("8 votes")).toBeVisible();
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
-  await expect(page.getByText("Answered", { exact: true })).toBeVisible();
 
   await expect(page.getByText("Will slides be shared?")).toHaveCount(0);
   await expect(page.getByText("Archived duplicate question")).toHaveCount(0);

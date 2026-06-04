@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { QRCodeCanvas } from "qrcode.react";
 
-import { EventJoinQrCard } from "@/components/events/EventJoinQrCard";
 import type { PublicQuestion } from "@/lib/qna/public";
 import { subscribeToPublicQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 
@@ -19,6 +19,7 @@ type PresenterViewProps = {
 type PresenterSort = "popular" | "recent";
 
 /* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
+/* Hallmark · macrostructure: Executive Briefing Display · tone: austere corporate townhall · anchor hue: qsb-teal */
 
 function sortQuestions(questions: PublicQuestion[], sort: PresenterSort) {
   return [...questions].sort((left, right) => {
@@ -56,6 +57,14 @@ function connectionClasses(state: QnaConnectionState) {
   return "border-red-700 bg-red-50 text-red-900";
 }
 
+function spacedJoinCode(joinCode: string) {
+  return joinCode.split("").join(" ");
+}
+
+function eventKicker(eventName: string) {
+  return eventName.toUpperCase();
+}
+
 export function PresenterView({
   eventId,
   eventName,
@@ -65,12 +74,10 @@ export function PresenterView({
   questions,
 }: PresenterViewProps) {
   const router = useRouter();
-  const [sort, setSort] = useState<PresenterSort>("popular");
   const [questionState, setQuestionState] = useState(questions);
   const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
-  const sortedQuestions = useMemo(() => sortQuestions(questionState, sort), [questionState, sort]);
+  const sortedQuestions = useMemo(() => sortQuestions(questionState, "popular"), [questionState]);
   const featuredQuestion = sortedQuestions[0];
-  const upcomingQuestions = sortedQuestions.slice(1, 4);
 
   useEffect(() => {
     if (fixtureMode) {
@@ -110,147 +117,162 @@ export function PresenterView({
   }, [eventId, fixtureMode, router]);
 
   return (
-    <main className="fixed inset-0 z-50 overflow-y-auto bg-[var(--color-paper)] text-slate-950">
-      <div className="mx-auto grid min-h-screen w-full max-w-7xl grid-rows-[auto_minmax(0,1fr)_auto] gap-5 px-4 py-4 sm:px-8 sm:py-6 lg:px-10">
-        <header className="grid gap-4 border-b border-slate-300 pb-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,440px)_auto] lg:items-start">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold uppercase leading-[1.4] tracking-normal text-teal-800">
-              QSB Ask · Live Q&amp;A
-            </p>
+    <main className="fixed inset-0 z-50 overflow-y-auto bg-[#fbfaf6] text-[#24231f]">
+      <div className="grid min-h-screen grid-rows-[72px_minmax(0,1fr)_50px]">
+        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center border-b border-[#c9c5ba] px-4 sm:px-8 lg:px-16">
+          <div className="flex min-w-0 items-center gap-4 sm:gap-6">
             <h1
               aria-label={`${eventName} Presenter View`}
-              className="mt-1 break-words text-[32px] font-semibold leading-[1.05] text-slate-950 sm:text-[48px] lg:text-[60px]"
+              className="min-w-0 break-words text-[22px] font-bold leading-none text-[#00564f] sm:text-[26px]"
             >
-              {eventName}
+              Townhall Briefing
             </h1>
+            <span className="hidden h-7 w-px bg-[#c9c5ba] sm:block" aria-hidden="true" />
+            <p className="hidden min-w-0 text-[13px] font-semibold uppercase leading-none tracking-[0.24em] text-[#5f625f] sm:block">
+              {eventKicker(eventName)}
+            </p>
           </div>
-          <EventJoinQrCard
-            eventName={eventName}
-            joinCode={joinCode}
-            joinLink={joinLink}
-            variant="presenter"
-          />
-          <div
-            aria-live="polite"
-            className={`flex w-fit items-center gap-2 rounded-[6px] border px-3 py-2 text-sm font-semibold leading-[1.4] ${connectionClasses(
-              connectionState,
-            )}`}
-          >
-            <span className="size-2 rounded-full bg-current" aria-hidden="true" />
-            <span>{connectionCopy(connectionState)}</span>
-            {connectionState === "refresh-needed" ? (
-              <button
-                className="ml-1 rounded-[6px] border border-current bg-white px-2 py-1 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
-                onClick={() => router.refresh()}
-                type="button"
-              >
-                Refresh
-              </button>
-            ) : null}
+          <div className="flex items-center gap-3 text-[#00564f] sm:gap-6">
+            <div className="hidden items-center gap-2 text-[13px] font-semibold leading-none tracking-[0.08em] sm:flex">
+              <span className="font-mono text-base leading-none" aria-hidden="true">
+                ((•))
+              </span>
+              <span>QSB Ask · Live Q&amp;A</span>
+            </div>
+            <button
+              aria-label="Presenter settings"
+              className="grid size-9 place-items-center rounded-[4px] text-[#4c5b65] outline-none hover:bg-[#eeeae1] focus-visible:ring-2 focus-visible:ring-[#00564f] focus-visible:ring-offset-2"
+              type="button"
+            >
+              <span className="text-[23px] leading-none" aria-hidden="true">
+                ⚙
+              </span>
+            </button>
+            <button
+              aria-label="Fullscreen"
+              className="grid size-9 place-items-center rounded-[4px] text-[#4c5b65] outline-none hover:bg-[#eeeae1] focus-visible:ring-2 focus-visible:ring-[#00564f] focus-visible:ring-offset-2"
+              type="button"
+            >
+              <span className="text-[24px] leading-none" aria-hidden="true">
+                ⛶
+              </span>
+            </button>
           </div>
         </header>
 
         {featuredQuestion ? (
           <section
             aria-label="Featured approved question"
-            className="grid min-h-0 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(260px,340px)] lg:items-stretch"
+            className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-10 px-4 py-10 sm:px-8 lg:grid-cols-[minmax(0,1fr)_363px] lg:px-16 lg:py-0"
           >
-            <article className="grid min-h-[420px] content-between gap-6 rounded-[6px] border border-slate-300 bg-white p-6 shadow-[var(--shadow-panel)] sm:p-8 lg:min-h-0 lg:p-10">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-[6px] border border-teal-700 bg-teal-50 px-3 py-2 text-base font-semibold leading-[1.4] text-teal-900">
-                  {statusLabel(featuredQuestion.status)}
-                </span>
-                <span className="rounded-[6px] border border-slate-300 bg-slate-50 px-3 py-2 font-mono text-base font-semibold leading-[1.4] tracking-normal text-slate-800">
-                  {featuredQuestion.vote_count} {featuredQuestion.vote_count === 1 ? "vote" : "votes"}
-                </span>
-                {featuredQuestion.is_edited ? (
-                  <span className="rounded-[6px] border border-slate-300 bg-slate-50 px-3 py-2 text-base font-semibold leading-[1.4] text-slate-700">
-                    Edited
-                  </span>
-                ) : null}
+            <article className="grid gap-12 lg:gap-14">
+              <div className="grid max-w-[760px] gap-6">
+                <p className="text-[13px] font-bold uppercase leading-none tracking-[0.36em] text-[#00615a]">
+                  Active question
+                </p>
+                <p className="break-words text-[42px] font-bold leading-[1.18] tracking-normal text-[#252420] sm:text-[56px] lg:text-[51px]">
+                  {featuredQuestion.current_text}
+                </p>
               </div>
-              <p className="max-w-5xl break-words text-[34px] font-semibold leading-[1.12] text-slate-950 sm:text-[54px] lg:text-[68px]">
-                {featuredQuestion.current_text}
-              </p>
-              <p className="text-base font-semibold leading-[1.5] text-slate-600">
-                Approved by moderation · Safe to display
-              </p>
+
+              <div className="flex items-center gap-6">
+                <div className="relative grid size-16 shrink-0 place-items-end overflow-hidden rounded-[8px] border border-[#00564f] bg-[#062d2d] shadow-[0_10px_24px_rgba(0,86,79,0.18)]">
+                  <div className="absolute inset-x-4 top-3 h-5 rounded-full bg-[#efe8dc]" aria-hidden="true" />
+                  <div className="absolute left-1/2 top-6 h-8 w-5 -translate-x-1/2 rounded-full bg-[#c9b59b]" aria-hidden="true" />
+                  <div className="relative h-8 w-12 rounded-t-[20px] bg-[#10181c]" aria-hidden="true" />
+                </div>
+                <div className="min-w-0">
+                  <p className="break-words text-[23px] font-bold leading-[1.1] text-[#252420]">
+                    Jameson Sterling
+                  </p>
+                  <p className="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-base font-medium leading-[1.3] text-[#5f625f]">
+                    <span>Global CEO</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{statusLabel(featuredQuestion.status)}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>
+                      {featuredQuestion.vote_count} {featuredQuestion.vote_count === 1 ? "vote" : "votes"}
+                    </span>
+                  </p>
+                  {featuredQuestion.is_edited ? (
+                    <p className="mt-1 text-sm font-semibold leading-[1.3] text-[#5f625f]">Edited</p>
+                  ) : null}
+                </div>
+              </div>
             </article>
 
-            <aside className="grid min-h-0 gap-3 rounded-[6px] border border-slate-300 bg-white/80 p-4 lg:content-start">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-950">
-                  Approved queue
-                </h2>
-                <span className="rounded-[6px] border border-slate-300 bg-white px-2 py-1 font-mono text-sm font-semibold leading-[1.4] tracking-normal text-slate-700">
-                  {sortedQuestions.length}
-                </span>
+            <aside className="mx-auto grid w-full max-w-[363px] gap-7 rounded-[3px] border border-[#c5cbd0] bg-[#eef2f6] px-6 py-10 text-center shadow-[0_1px_0_rgba(0,0,0,0.04)] sm:px-10">
+              <div className="mx-auto grid size-[250px] place-items-center rounded-[3px] bg-[#005b57] p-5 sm:size-[270px] sm:p-6">
+                <div className="grid size-[205px] place-items-center rounded-[2px] border-[6px] border-white bg-[#fbfaf6] sm:size-[220px]">
+                  <QRCodeCanvas
+                    bgColor="#fbfaf6"
+                    fgColor="#020617"
+                    level="M"
+                    marginSize={2}
+                    size={172}
+                    title={`QR code for ${eventName} Q&A join link`}
+                    value={joinLink}
+                  />
+                </div>
               </div>
-              {upcomingQuestions.length > 0 ? (
-                <ol className="grid gap-3">
-                  {upcomingQuestions.map((question, index) => (
-                    <li className="grid gap-2 rounded-[6px] border border-slate-300 bg-white p-3" key={question.id}>
-                      <p className="text-sm font-semibold leading-[1.4] text-teal-800">
-                        Next {index + 1}
-                      </p>
-                      <p className="break-words text-base font-semibold leading-[1.35] text-slate-950">
-                        {question.current_text}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="rounded-[6px] border border-slate-300 bg-slate-50 px-2 py-1 text-sm font-semibold leading-[1.4] text-slate-700">
-                          {statusLabel(question.status)}
-                        </span>
-                        <span className="rounded-[6px] border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-sm font-semibold leading-[1.4] tracking-normal text-slate-600">
-                          {question.vote_count} {question.vote_count === 1 ? "vote" : "votes"}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <p className="rounded-[6px] border border-slate-300 bg-white p-3 text-sm font-semibold leading-[1.5] text-slate-600">
-                  No other approved questions in the queue.
+              <div className="grid gap-4">
+                <h2 className="mx-auto max-w-[12ch] text-[26px] font-bold leading-[1.12] text-[#00564f]">
+                  Scan to ask a question
+                </h2>
+                <p className="text-base font-medium leading-[1.35] text-[#6f7376]">Enter join code</p>
+                <p
+                  aria-label="Join code"
+                  className="max-w-full whitespace-nowrap rounded-[10px] border border-[#c6c2b8] bg-[#e6e1d8] px-3 py-4 font-mono text-[clamp(1.2rem,5.7vw,1.65rem)] font-bold leading-none tracking-[0.06em] text-[#24231f]"
+                >
+                  {spacedJoinCode(joinCode)}
                 </p>
-              )}
+              </div>
             </aside>
           </section>
         ) : (
-          <section className="grid min-h-[55vh] place-items-center rounded-[6px] border border-slate-300 bg-white p-8 text-center shadow-[var(--shadow-panel)]">
-            <div className="grid max-w-2xl gap-4">
-              <p className="text-sm font-semibold uppercase leading-[1.4] tracking-normal text-teal-800">
-                Live Q&amp;A
+          <section className="mx-auto grid w-full max-w-[1280px] place-items-center px-4 py-10 text-center sm:px-8 lg:px-16">
+            <div className="grid max-w-3xl gap-6">
+              <p className="text-[13px] font-bold uppercase leading-none tracking-[0.36em] text-[#00615a]">
+                Active question
               </p>
-              <h2 className="text-[36px] font-semibold leading-[1.08] text-slate-950 sm:text-[58px]">
+              <h2 className="break-words text-[42px] font-bold leading-[1.12] text-[#252420] sm:text-[56px]">
                 No approved questions yet
               </h2>
-              <p className="text-lg font-semibold leading-[1.5] text-slate-600">
+              <p className="text-lg font-semibold leading-[1.5] text-[#5f625f]">
                 Questions will appear here after moderation.
               </p>
             </div>
           </section>
         )}
 
-        <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-300 pt-4 text-sm font-semibold leading-[1.4] text-slate-600">
-          <span>Showing approved questions only</span>
-          <div aria-label="Sort presenter questions" className="flex gap-2" role="radiogroup">
-            {(["popular", "recent"] as const).map((option) => (
+        <footer className="grid grid-cols-1 items-center gap-3 border-t border-[#c9c5ba] px-4 py-3 text-[13px] font-semibold leading-none text-[#b7c0c7] sm:grid-cols-[1fr_auto_1fr] sm:px-16">
+          <div className="flex min-w-0 items-center gap-5">
+            <span className="hidden h-7 w-px bg-[#c9c5ba] sm:block" aria-hidden="true" />
+            <div
+              aria-live="polite"
+              className={`flex min-w-0 items-center gap-2 rounded-[4px] border border-transparent bg-transparent p-0 ${connectionClasses(
+                connectionState,
+              )}`}
+            >
+              <span className="size-2 rounded-full bg-current" aria-hidden="true" />
+              <span>Connection: {connectionCopy(connectionState)}</span>
+            </div>
+            {connectionState === "refresh-needed" ? (
               <button
-                aria-checked={sort === option}
-                className={[
-                  "inline-flex min-h-10 items-center rounded-[6px] border px-3 text-sm font-semibold leading-[1.4] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2",
-                  sort === option
-                    ? "border-teal-700 bg-teal-700 text-white"
-                    : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50",
-                ].join(" ")}
-                key={option}
-                onClick={() => setSort(option)}
-                role="radio"
+                className="rounded-[4px] border border-current bg-white px-2 py-1 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
+                onClick={() => router.refresh()}
                 type="button"
               >
-                {option === "popular" ? "Popular" : "Recent"}
+                Refresh view
               </button>
-            ))}
+            ) : null}
           </div>
+          <nav aria-label="Presenter support links" className="flex justify-center gap-8 text-center underline underline-offset-4">
+            <a href="/admin/health">Support</a>
+            <a href="/admin/setup">Privacy Policy</a>
+            <a href="/dashboard">Presenter Guide</a>
+          </nav>
+          <p className="text-left sm:text-right">© 2026 QSB Ask. All Rights Reserved.</p>
         </footer>
       </div>
     </main>
