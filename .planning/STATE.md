@@ -179,6 +179,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | 2026-06-04 | 260604-qmd | Presenter View question metadata, topbar actions, and Q&A QR target | `npm run lint`, `npx tsc --noEmit`, `npm test -- tests/qna/presenter.test.ts`, focused Playwright E2E, `npm run build` passed |
 | 2026-06-04 | 260604-rpl | Casual public-friendly landing page wording | `npm run lint` passed |
 | 2026-06-04 | 260604-kvn | Moderation-first landing page redesign | `npm run lint`, Playwright desktop/mobile screenshots, `npm run build` passed |
+| 2026-06-04 | 260604-ept | Light QSB Event Portal landing with real event data | `npm run lint`, `npx tsc --noEmit`, `npm test -- tests/events/landing.test.ts`, Playwright desktop/mobile screenshots, `npm run build` passed |
 
 ## Last Session
 

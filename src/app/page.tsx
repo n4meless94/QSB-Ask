@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import {
+  listLandingEventsForUser,
+  splitLandingEvents,
+  type LandingEvent,
+  type LandingEventStatus,
+} from "@/lib/events/landing";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
 async function joinEventAction(formData: FormData) {
   "use server";
 
@@ -14,289 +22,266 @@ async function joinEventAction(formData: FormData) {
   redirect(`/join/${encodeURIComponent(code)}`);
 }
 
-const queueItems = [
-  {
-    status: "Pending review",
-    tone: "accent",
-    text: "Can we get the slides after the session?",
-    meta: "New question",
-  },
-  {
-    status: "Approved",
-    tone: "success",
-    text: "What is the next phase of the project?",
-    meta: "Ready for presenter",
-  },
-  {
-    status: "Hidden",
-    tone: "muted",
-    text: "Duplicate question from earlier.",
-    meta: "Kept out of public view",
-  },
-];
+type LandingEventData = {
+  activeUpcoming: LandingEvent[];
+  error?: string;
+  isSignedIn: boolean;
+  recent: LandingEvent[];
+};
 
-const workflowSteps = [
-  {
-    title: "Audience joins",
-    body: "Participants use a simple code or QR link. No app download needed.",
-  },
-  {
-    title: "Questions come in",
-    body: "People can ask from their phone while the session keeps moving.",
-  },
-  {
-    title: "Organisers review",
-    body: "Approve, hide, or archive questions before they reach the screen.",
-  },
-  {
-    title: "Presenter shares",
-    body: "Approved questions and poll results stay clear for the live room.",
-  },
-];
+const statusLabels: Record<LandingEventStatus, string> = {
+  completed: "Completed",
+  live: "Live",
+  "starting-soon": "Starting soon",
+  upcoming: "Upcoming",
+};
 
-const useCases = [
-  "Townhalls",
-  "CEO sessions",
-  "Training",
-  "Subsidiary briefings",
-  "Internal surveys",
-  "Post-session feedback",
-  "Anonymous audience questions",
-];
+async function loadLandingEventData(): Promise<LandingEventData> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-const pollOptions = [
-  { label: "Very useful", value: "64%" },
-  { label: "Useful", value: "28%" },
-  { label: "Need more detail", value: "8%" },
-];
+  if (authError || !user) {
+    return { activeUpcoming: [], isSignedIn: false, recent: [] };
+  }
 
-export default function Home() {
+  try {
+    const events = await listLandingEventsForUser(user.id);
+    return { ...splitLandingEvents(events), isSignedIn: true };
+  } catch (loadError) {
+    return {
+      activeUpcoming: [],
+      error: loadError instanceof Error ? loadError.message : "Events could not be loaded.",
+      isSignedIn: true,
+      recent: [],
+    };
+  }
+}
+
+function formatEventDate(event: LandingEvent) {
+  return new Intl.DateTimeFormat("en-MY", {
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    month: "short",
+    timeZone: event.time_zone,
+    weekday: "short",
+  }).format(event.startsAt);
+}
+
+export default async function Home() {
+  const eventData = await loadLandingEventData();
+
   return (
-    <main className="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)]">
-      <header className="border-b border-[var(--color-rule)] bg-[var(--color-surface)]/95">
-        <nav
-          aria-label="Main navigation"
-          className="mx-auto grid w-full max-w-6xl gap-3 px-4 py-4 sm:px-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:px-10"
-        >
-          <Link
-            className="w-fit text-lg font-semibold leading-6 text-[var(--color-ink)] no-underline outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] focus-visible:ring-offset-2"
-            href="/"
-          >
-            QSB Ask
-          </Link>
-          <div className="homepage-room-note">
-            <span aria-hidden="true" className="homepage-room-dot" />
-            Built for live QSB sessions
-          </div>
-          <div className="flex flex-wrap items-center gap-2 text-sm font-semibold leading-[1.4] text-[var(--color-ink-muted)] sm:gap-4">
-            <a className="homepage-nav-link" href="#how-it-works">
-              How it works
-            </a>
-            <a className="homepage-nav-link" href="#sessions">
-              Sessions
-            </a>
-            <Link className="homepage-nav-link" href="/login">
-              Log in
-            </Link>
-            <Link className="homepage-nav-button" href="/events/new">
-              Create session
-            </Link>
-          </div>
-        </nav>
-      </header>
-
-      <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(24rem,1fr)] lg:items-center lg:px-10">
-        <div className="min-w-0">
-          <p className="homepage-kicker">Live room control</p>
-          <h1 className="hallmark-display-heading mt-4 max-w-3xl text-[var(--color-ink)]">
-            Run QSB sessions with every question under control.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-[var(--color-ink-muted)]">
-            Collect questions, run quick polls, and gather feedback during your session.
-            Organisers can review questions before they appear on screen.
-          </p>
-
-          <form
-            action={joinEventAction}
-            className="homepage-join-panel mt-8"
-          >
-            <div className="min-w-0">
-              <label
-                className="text-sm font-semibold leading-[1.4] text-[var(--color-ink)]"
-                htmlFor="event-code"
-              >
-                Joining a session?
-              </label>
-              <input
-                autoComplete="off"
-                className="mt-2 min-h-12 w-full rounded-[var(--radius-sm)] border border-[var(--color-rule-strong)] bg-[var(--color-surface)] px-4 text-base font-semibold uppercase leading-6 text-[var(--color-ink)] outline-none transition-colors placeholder:normal-case placeholder:text-[var(--color-ink-soft)] focus:border-[var(--color-focus)] focus:ring-2 focus:ring-[var(--color-focus)] focus:ring-offset-2"
-                id="event-code"
-                name="event_code"
-                placeholder="Enter session code"
-                type="text"
-              />
-            </div>
-            <button className="foundation-action foundation-action-primary min-h-12" type="submit">
-              Join now
-            </button>
-          </form>
-
-          <div className="mt-5 flex flex-col gap-3 text-sm leading-[1.4] text-[var(--color-ink-muted)] sm:flex-row sm:items-center">
-            <Link className="foundation-utility-link" href="/events/new">
-              Create a session
-            </Link>
-            <span>No login or app download needed for participants.</span>
-          </div>
-        </div>
-
-        <ModerationConsole />
+    <main className="homepage-portal min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)]">
+      <PortalNavbar isSignedIn={eventData.isSignedIn} />
+      <HeroSection />
+      <section className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-10 sm:px-6 lg:grid-cols-2 lg:px-10">
+        <JoinEventCard />
+        <HostEventCard />
       </section>
-
-      <section
-        aria-labelledby="how-it-works"
-        className="border-y border-[var(--color-rule)] bg-[var(--color-surface)]/75"
-      >
-        <div className="mx-auto grid w-full max-w-6xl gap-7 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1fr)] lg:px-10">
-          <div>
-            <h2 id="how-it-works" className="text-3xl font-semibold leading-tight">
-              From audience question to presenter screen.
-            </h2>
-            <p className="mt-4 text-base leading-7 text-[var(--color-ink-muted)]">
-              The flow stays simple for participants, while organisers get the checks
-              they need before anything is shared with the room.
-            </p>
-          </div>
-          <ol className="homepage-workflow">
-            {workflowSteps.map((step, index) => (
-              <li className="homepage-workflow-step" key={step.title}>
-                <span className="homepage-step-number">{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3 className="text-base font-semibold leading-6">{step.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-[var(--color-ink-muted)]">
-                    {step.body}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section
-        aria-labelledby="sessions"
-        className="mx-auto grid w-full max-w-6xl gap-7 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:px-10"
-      >
-        <div>
-          <h2 id="sessions" className="text-3xl font-semibold leading-tight">
-            Made for the sessions QSB already runs.
-          </h2>
-          <p className="mt-4 text-base leading-7 text-[var(--color-ink-muted)]">
-            Use it for formal briefings, training, surveys, and open Q&A moments
-            where the room needs to stay focused.
-          </p>
-        </div>
-        <div className="homepage-session-list">
-          {useCases.map((useCase) => (
-            <div className="homepage-session-item" key={useCase}>
-              {useCase}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section
-        aria-labelledby="help"
-        className="homepage-control-band"
-      >
-        <div className="mx-auto grid w-full max-w-6xl gap-7 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:items-center lg:px-10">
-          <div>
-            <p className="homepage-dark-kicker">Simple and controlled</p>
-            <h2 id="help" className="mt-3 text-3xl font-semibold leading-tight">
-              Only approved questions appear on screen.
-            </h2>
-          </div>
-          <div className="grid gap-4">
-            <p className="text-base leading-7 text-[var(--color-accent-soft)]">
-              QSB Ask helps organisers keep the live room clear and focused. Questions can
-              be reviewed, approved, hidden, or archived before they are shared.
-            </p>
-            <div className="homepage-control-list" aria-label="Moderation controls">
-              <span>Review</span>
-              <span>Approve</span>
-              <span>Hide</span>
-              <span>Archive</span>
-              <span>Export</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ActiveUpcomingEvents events={eventData.activeUpcoming} error={eventData.error} />
+      <RecentEventsTable events={eventData.recent} error={eventData.error} />
+      <PortalFooter />
     </main>
   );
 }
 
-function ModerationConsole() {
+function PortalNavbar({ isSignedIn }: { isSignedIn: boolean }) {
   return (
-    <aside aria-label="Moderation queue preview" className="homepage-console">
-      <div className="flex items-start justify-between gap-4 border-b border-[var(--color-rule)] pb-4">
-        <div>
-          <p className="text-sm font-semibold leading-[1.4] text-[var(--color-accent-strong)]">
-            Moderation queue
-          </p>
-          <h2 className="mt-1 text-2xl font-semibold leading-tight">Today&apos;s live room</h2>
+    <header className="homepage-portal-nav">
+      <nav
+        aria-label="Main navigation"
+        className="mx-auto grid w-full max-w-6xl gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:px-10"
+      >
+        <Link className="homepage-brand" href="/">
+          <span className="homepage-brand-mark" aria-hidden="true">•••</span>
+          <span>QSB <strong>Ask</strong></span>
+        </Link>
+        <div className="homepage-portal-links">
+          <Link href="/dashboard">My Events</Link>
+          <a href="#knowledge">Knowledge Base</a>
+          <a href="#support">Support</a>
         </div>
-        <span className="homepage-live-pill">Live</span>
-      </div>
+        <Link className="homepage-login-link" href={isSignedIn ? "/dashboard" : "/login"}>
+          {isSignedIn ? "Dashboard" : "Log in"}
+        </Link>
+      </nav>
+    </header>
+  );
+}
 
-      <div className="grid gap-3">
-        {queueItems.map((item) => (
-          <article className="homepage-queue-row" data-tone={item.tone} key={item.text}>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="homepage-status-chip">{item.status}</span>
-                <span className="text-xs font-semibold leading-5 text-[var(--color-ink-soft)]">
-                  {item.meta}
-                </span>
+function HeroSection() {
+  return (
+    <section className="mx-auto w-full max-w-6xl px-4 py-12 text-center sm:px-6 sm:py-16 lg:px-10">
+      <h1 className="homepage-portal-title">QSB Event Portal</h1>
+      <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[var(--color-ink-muted)] sm:text-xl">
+        Access current live sessions or create a new interactive event.
+      </p>
+    </section>
+  );
+}
+
+function JoinEventCard() {
+  return (
+    <section aria-labelledby="join-event-title" className="homepage-portal-card">
+      <div className="text-center">
+        <h2 id="join-event-title" className="text-xl font-semibold leading-7">
+          Join an Event
+        </h2>
+        <p className="mt-3 text-base leading-7 text-[var(--color-ink-muted)]">
+          Enter the code provided by the organizer.
+        </p>
+      </div>
+      <form action={joinEventAction} className="mt-6 grid gap-4">
+        <label className="sr-only" htmlFor="event-code">
+          Event code
+        </label>
+        <input
+          autoComplete="off"
+          className="homepage-portal-input"
+          id="event-code"
+          name="event_code"
+          placeholder="Enter event code"
+          type="text"
+        />
+        <button className="foundation-action foundation-action-primary min-h-12" type="submit">
+          Join Event
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function HostEventCard() {
+  return (
+    <section aria-labelledby="host-event-title" className="homepage-portal-card">
+      <div className="text-center">
+        <h2 id="host-event-title" className="text-xl font-semibold leading-7">
+          Host an Event
+        </h2>
+        <p className="mx-auto mt-3 max-w-md text-base leading-7 text-[var(--color-ink-muted)]">
+          Create a new session for Q&A, polls, or feedback.
+        </p>
+      </div>
+      <Link className="foundation-action homepage-host-action mt-6 min-h-12" href="/events/new">
+        Create Event
+      </Link>
+    </section>
+  );
+}
+
+function ActiveUpcomingEvents({ events, error }: { events: LandingEvent[]; error?: string }) {
+  return (
+    <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-10" aria-labelledby="active-events">
+      <h2 id="active-events" className="text-3xl font-semibold leading-tight">
+        Active & Upcoming QSB Events
+      </h2>
+      {error ? <AlertText>{error}</AlertText> : null}
+      {events.length > 0 ? (
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {events.map((event) => (
+            <article className="homepage-event-card" key={event.id}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <EventStatusBadge status={event.portalStatus} />
+                <time className="text-sm font-semibold leading-6 text-[var(--color-ink-muted)]" dateTime={event.starts_at}>
+                  {formatEventDate(event)}
+                </time>
               </div>
-              <p className="mt-2 text-sm leading-6 text-[var(--color-ink)]">
-                &ldquo;{item.text}&rdquo;
+              <h3 className="mt-4 text-xl font-semibold leading-7">{event.name}</h3>
+              <p className="mt-2 font-mono text-sm font-semibold leading-6 text-[var(--color-ink-muted)]">
+                Join code {event.join_code}
               </p>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <section aria-labelledby="preview-poll" className="homepage-poll-panel">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <div>
-            <h3 id="preview-poll" className="text-base font-semibold leading-6">
-              Quick poll
-            </h3>
-            <p className="text-xs font-semibold leading-5 text-[var(--color-ink-soft)]">
-              Example response split
-            </p>
-          </div>
-          <span className="text-sm font-semibold leading-6 text-[var(--color-accent-strong)]">
-            3 choices
-          </span>
-        </div>
-        <div className="mt-4 grid gap-3">
-          {pollOptions.map((option) => (
-            <div className="grid gap-1" key={option.label}>
-              <div className="flex items-center justify-between gap-3 text-sm font-semibold leading-[1.4]">
-                <span>{option.label}</span>
-                <span>{option.value}</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-[var(--color-paper-soft)]">
-                <div
-                  aria-hidden="true"
-                  className="h-full rounded-full bg-[var(--color-accent-strong)]"
-                  style={{ width: option.value }}
-                />
-              </div>
-            </div>
+            </article>
           ))}
         </div>
-      </section>
-    </aside>
+      ) : (
+        <EmptyState>No active or upcoming events at the moment.</EmptyState>
+      )}
+    </section>
+  );
+}
+
+function RecentEventsTable({ events, error }: { events: LandingEvent[]; error?: string }) {
+  return (
+    <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-10" aria-labelledby="recent-events">
+      <h2 id="recent-events" className="text-3xl font-semibold leading-tight">
+        Recent Events
+      </h2>
+      {error ? <AlertText>{error}</AlertText> : null}
+      {events.length > 0 ? (
+        <div className="mt-6 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-rule)] bg-[var(--color-surface-raised)]">
+          <div className="hidden grid-cols-[minmax(0,1.5fr)_minmax(10rem,0.7fr)_auto] gap-4 border-b border-[var(--color-rule)] bg-[var(--color-paper-soft)] px-5 py-4 text-sm font-semibold leading-6 text-[var(--color-ink)] sm:grid">
+            <span>Event Name</span>
+            <span>Date</span>
+            <span className="text-right">Action</span>
+          </div>
+          <div className="divide-y divide-[var(--color-rule)]">
+            {events.map((event) => (
+              <article className="homepage-recent-row" key={event.id}>
+                <h3 className="font-semibold leading-6">{event.name}</h3>
+                <time className="text-sm leading-6 text-[var(--color-ink-muted)]" dateTime={event.starts_at}>
+                  {formatEventDate(event)}
+                </time>
+                <Link className="homepage-summary-link" href={`/events/${event.id}`}>
+                  View Event
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <EmptyState>No recent events yet.</EmptyState>
+      )}
+    </section>
+  );
+}
+
+function EventStatusBadge({ status }: { status: LandingEventStatus }) {
+  return (
+    <span className="homepage-event-badge" data-status={status}>
+      {statusLabels[status]}
+    </span>
+  );
+}
+
+function EmptyState({ children }: { children: string }) {
+  return (
+    <div className="mt-6 rounded-[var(--radius-md)] border border-dashed border-[var(--color-rule)] bg-[var(--color-surface-raised)] px-5 py-6 text-base leading-7 text-[var(--color-ink-muted)]">
+      {children}
+    </div>
+  );
+}
+
+function AlertText({ children }: { children: string }) {
+  return (
+    <p className="mt-4 rounded-[var(--radius-sm)] border border-[var(--color-warning)] bg-[var(--color-warning-soft)] px-4 py-3 text-sm font-semibold leading-6 text-[var(--color-ink)]">
+      {children}
+    </p>
+  );
+}
+
+function PortalFooter() {
+  const year = new Date().getFullYear();
+
+  return (
+    <footer className="mt-12 border-t border-[var(--color-rule)] bg-[var(--color-surface)]" id="support">
+      <div className="mx-auto grid w-full max-w-6xl gap-4 px-4 py-8 sm:px-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:px-10">
+        <Link className="homepage-brand" href="/">
+          <span className="homepage-brand-mark" aria-hidden="true">•••</span>
+          <span>QSB <strong>Ask</strong></span>
+        </Link>
+        <div className="homepage-portal-links" id="knowledge">
+          <Link href="/dashboard">My Events</Link>
+          <a href="#knowledge">Knowledge Base</a>
+          <a href="#support">Support</a>
+        </div>
+        <p className="text-sm leading-6 text-[var(--color-ink-soft)]">
+          © {year} QSB Internal Portal.
+        </p>
+      </div>
+    </footer>
   );
 }

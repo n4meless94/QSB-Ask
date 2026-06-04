@@ -1,6 +1,13 @@
 [
   {
     "date": "2026-06-04",
+    "macrostructure": "Light Event Portal",
+    "theme": "Boardroom Ledger",
+    "enrichment": "real event cards and recent-events table",
+    "brief": "Light-mode QSB Event Portal landing page using real accessible event data"
+  },
+  {
+    "date": "2026-06-04",
     "macrostructure": "Moderation Console Landing",
     "theme": "Boardroom Ledger",
     "enrichment": "moderation queue and workflow preview",
