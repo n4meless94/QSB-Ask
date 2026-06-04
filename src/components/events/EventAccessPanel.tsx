@@ -56,8 +56,8 @@ export function EventAccessPanel({ eventId, members, role }: EventAccessPanelPro
           Event access
         </h2>
         <p className="text-sm leading-[1.4] text-slate-600">
-          Invite email delivery is not active yet. Staff can sign in with that email to activate
-          assigned access automatically.
+          Invite emails are not sent yet. Add the staff email here; access activates automatically
+          when that person signs in with the same email.
         </p>
       </div>
 
@@ -149,26 +149,33 @@ export function EventAccessPanel({ eventId, members, role }: EventAccessPanelPro
                 </div>
 
                 {canManageAccess ? (
-                  <form action={removeAction} className="grid gap-2 sm:justify-items-end">
-                    <input name="memberId" type="hidden" value={member.id} />
-                    <Button
-                      aria-label={`Remove access for ${member.email || member.displayName}`}
-                      disabled={member.isOriginalOrganiser || isRemoved}
-                      type="submit"
-                      variant="destructive"
-                    >
-                      Remove access
-                    </Button>
-                    {member.isOriginalOrganiser ? (
-                      <p className="max-w-56 text-sm leading-[1.4] text-slate-600">
+                  member.isOriginalOrganiser ? (
+                    <div className="rounded-[6px] border border-slate-300 bg-slate-50 p-3 sm:max-w-64">
+                      <p className="text-sm font-semibold leading-[1.4] text-slate-900">
+                        Protected organiser
+                      </p>
+                      <p className="mt-1 text-sm leading-[1.4] text-slate-600">
                         Original organiser access is protected.
                       </p>
-                    ) : (
-                      <p className="max-w-56 text-sm leading-[1.4] text-slate-600">
-                        Remove access? This person will no longer be able to open this event.
+                    </div>
+                  ) : (
+                    <form action={removeAction} className="grid gap-2 sm:justify-items-end">
+                      <input name="memberId" type="hidden" value={member.id} />
+                      <Button
+                        aria-label={`Remove access for ${member.email || member.displayName}`}
+                        disabled={isRemoved}
+                        type="submit"
+                        variant={isRemoved ? "secondary" : "destructive"}
+                      >
+                        {isRemoved ? "Access removed" : "Remove access"}
+                      </Button>
+                      <p className="max-w-64 text-sm leading-[1.4] text-slate-600">
+                        {isRemoved
+                          ? "This member can no longer open this event."
+                          : "This person will no longer be able to open this event."}
                       </p>
-                    )}
-                  </form>
+                    </form>
+                  )
                 ) : null}
               </div>
             );

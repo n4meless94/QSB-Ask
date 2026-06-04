@@ -29,7 +29,11 @@ function statusClasses(status: SurveyResult["status"]) {
 }
 
 function visibilityClasses(visible: boolean) {
-  return visible ? "border-teal-700 text-teal-700" : "border-amber-700 text-amber-700";
+  return visible ? "border-teal-700 bg-teal-50 text-teal-800" : "border-amber-700 bg-amber-50 text-amber-800";
+}
+
+function visibilityCopy(visible: boolean) {
+  return visible ? "Participants can view results" : "Visible only to organisers";
 }
 
 function ChartOrText({ question }: { question: SurveyQuestionResult }) {
@@ -93,7 +97,7 @@ export function SurveyResultsPanel({ eventId, results, selectedResultId }: Surve
             </div>
           </div>
 
-          <div className="grid gap-3 rounded-[6px] border border-slate-300 bg-white p-4">
+          <div className="grid gap-4 rounded-[6px] border border-slate-300 bg-white p-4">
             <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
@@ -112,12 +116,9 @@ export function SurveyResultsPanel({ eventId, results, selectedResultId }: Surve
                       selected.resultsVisibleToParticipants,
                     )}`}
                   >
-                    {selected.resultsVisibleToParticipants ? "Results visible" : "Results hidden"}
+                    {visibilityCopy(selected.resultsVisibleToParticipants)}
                   </span>
                 </div>
-                <p className="mt-2 text-base font-semibold leading-6 text-slate-900">
-                  {responseCopy(selected.responseCount)}
-                </p>
                 <p className="text-sm leading-[1.4] text-slate-600">
                   Last updated{" "}
                   <time dateTime={selected.lastUpdated}>
@@ -138,6 +139,34 @@ export function SurveyResultsPanel({ eventId, results, selectedResultId }: Surve
               </Link>
             </div>
 
+            <div className="grid gap-3 md:grid-cols-3" aria-label="Survey result summary">
+              <div className="rounded-[6px] border border-slate-300 bg-slate-50 p-3">
+                <p className="text-sm font-semibold leading-[1.4] text-slate-600">Responses</p>
+                <p className="font-mono text-[28px] font-semibold leading-none tracking-normal text-slate-950">
+                  {selected.responseCount}
+                </p>
+              </div>
+              <div className="rounded-[6px] border border-slate-300 bg-slate-50 p-3">
+                <p className="text-sm font-semibold leading-[1.4] text-slate-600">Questions</p>
+                <p className="font-mono text-[28px] font-semibold leading-none tracking-normal text-slate-950">
+                  {selected.questions.length}
+                </p>
+              </div>
+              <div
+                className={[
+                  "rounded-[6px] border p-3",
+                  selected.resultsVisibleToParticipants
+                    ? "border-teal-700 bg-teal-50"
+                    : "border-amber-700 bg-amber-50",
+                ].join(" ")}
+              >
+                <p className="text-sm font-semibold leading-[1.4] text-slate-700">Participant view</p>
+                <p className="text-base font-semibold leading-6 text-slate-950">
+                  {selected.resultsVisibleToParticipants ? "Visible" : "Hidden"}
+                </p>
+              </div>
+            </div>
+
             <form
               action={saveSurveyVisibilityFormAction.bind(null, eventId, selected.id)}
               className="grid gap-3 border-t border-slate-200 pt-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
@@ -149,8 +178,8 @@ export function SurveyResultsPanel({ eventId, results, selectedResultId }: Surve
                   defaultValue={selected.resultsVisibleToParticipants ? "true" : "false"}
                   name="results_visible_to_participants"
                 >
-                  <option value="false">Results hidden</option>
-                  <option value="true">Results visible</option>
+                  <option value="false">Visible only to organisers</option>
+                  <option value="true">Visible to participants</option>
                 </select>
               </label>
               <Button type="submit" variant="secondary">

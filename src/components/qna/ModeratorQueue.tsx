@@ -67,7 +67,7 @@ function tabClasses(active: boolean) {
   return [
     "min-h-11 rounded-[6px] border px-3 text-base font-semibold leading-6 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10",
     active
-      ? "border-teal-700 bg-teal-700 text-white shadow-sm"
+      ? "border-slate-900 bg-slate-900 text-white shadow-sm"
       : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50",
   ].join(" ");
 }
@@ -334,17 +334,22 @@ export function ModeratorQueue({
           <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
         </div>
 
+        <div className="rounded-[6px] border border-teal-700 bg-teal-50 p-3 text-sm leading-[1.5] text-teal-950">
+          <p className="font-semibold">Safety rule: pending questions are hidden from audience screens.</p>
+          <p>Approve only the questions that are safe to show publicly or in Presenter View.</p>
+        </div>
+
         <div className="grid gap-3 md:grid-cols-3" aria-label="Moderation safety summary">
           <div className={safetyMetricClasses(counts.pending > 0 ? "warning" : "safe")}>
-            <p className="text-sm font-semibold leading-[1.4]">Waiting for review</p>
+            <p className="text-sm font-semibold leading-[1.4]">Waiting</p>
             <p className="font-mono text-[28px] font-semibold leading-none tracking-normal">{counts.pending}</p>
           </div>
           <div className={safetyMetricClasses("neutral")}>
-            <p className="text-sm font-semibold leading-[1.4]">Visible to audience</p>
+            <p className="text-sm font-semibold leading-[1.4]">Visible</p>
             <p className="font-mono text-[28px] font-semibold leading-none tracking-normal">{publicVisibleCount}</p>
           </div>
           <div className={safetyMetricClasses("safe")}>
-            <p className="text-sm font-semibold leading-[1.4]">Hidden from audience</p>
+            <p className="text-sm font-semibold leading-[1.4]">Hidden</p>
             <p className="font-mono text-[28px] font-semibold leading-none tracking-normal">{hiddenFromAudienceCount}</p>
           </div>
         </div>

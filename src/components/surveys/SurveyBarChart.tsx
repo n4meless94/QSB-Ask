@@ -29,9 +29,11 @@ function labelCopy(datum: SurveyChartDatum) {
 export function SurveyBarChart({ data, title }: SurveyBarChartProps) {
   const total = data.reduce((sum, datum) => sum + datum.count, 0);
   const hasResponses = total > 0;
+  const maxCount = Math.max(1, ...data.map((datum) => datum.count));
+  const chartHeight = Math.min(260, Math.max(156, data.length * 54));
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-3">
       <div className="grid gap-1">
         <h3 className="break-words text-[20px] font-semibold leading-[1.25] text-slate-900">
           {title}
@@ -44,16 +46,22 @@ export function SurveyBarChart({ data, title }: SurveyBarChartProps) {
         ) : null}
       </div>
 
-      <div aria-label={`${title} chart`} className="min-h-[240px] w-full" role="img">
-        <ResponsiveContainer height={240} width="100%">
+      <div aria-label={`${title} chart`} className="w-full" role="img">
+        <ResponsiveContainer height={chartHeight} width="100%">
           <BarChart
             data={data}
             layout="vertical"
-            margin={{ bottom: 8, left: 8, right: 72, top: 8 }}
+            margin={{ bottom: 8, left: 8, right: 112, top: 8 }}
           >
             <CartesianGrid stroke="#CBD5E1" strokeDasharray="3 3" />
-            <XAxis allowDecimals={false} dataKey="count" type="number" />
-            <YAxis dataKey="label" type="category" width={96} />
+            <XAxis
+              allowDecimals={false}
+              dataKey="count"
+              domain={[0, maxCount]}
+              tick={{ fill: "#334155", fontSize: 13 }}
+              type="number"
+            />
+            <YAxis dataKey="label" tick={{ fill: "#334155", fontSize: 13 }} type="category" width={112} />
             <Tooltip
               formatter={(value, _name, item) => {
                 const datum = item.payload as SurveyChartDatum;

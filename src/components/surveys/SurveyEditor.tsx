@@ -61,9 +61,21 @@ function newQuestion(index: number): EditableQuestion {
 }
 
 function statusClasses(status: SurveySummary["status"]) {
-  if (status === "published") return "border-teal-700 text-teal-700";
+  if (status === "published") return "border-teal-700 bg-teal-50 text-teal-800";
   if (status === "closed") return "border-slate-500 bg-slate-100 text-slate-700";
   return "border-slate-300 text-slate-700";
+}
+
+function lifecycleCopy(survey: SurveySummary) {
+  if (survey.status === "published") {
+    return "Published and accepting responses.";
+  }
+
+  if (survey.status === "closed") {
+    return "Closed. Participants can no longer submit responses.";
+  }
+
+  return "Draft. Participants cannot answer until this survey is published.";
 }
 
 function updateQuestion(
@@ -165,7 +177,7 @@ export function SurveyEditor({ eventId, survey }: SurveyEditorProps) {
             </span>
           </div>
           <p className="text-sm leading-[1.4] text-slate-600">
-            Publish only after every question is complete.
+            {lifecycleCopy(survey)}
           </p>
         </div>
 
@@ -179,6 +191,27 @@ export function SurveyEditor({ eventId, survey }: SurveyEditorProps) {
             Close survey
           </Button>
         </form>
+      </div>
+
+      <div
+        className={[
+          "rounded-[6px] border p-3 text-sm leading-[1.5]",
+          survey.status === "published"
+            ? "border-teal-700 bg-teal-50 text-teal-950"
+            : survey.status === "closed"
+              ? "border-slate-400 bg-slate-50 text-slate-800"
+              : "border-amber-700 bg-amber-50 text-amber-950",
+        ].join(" ")}
+        role="status"
+      >
+        <p className="font-semibold">{lifecycleCopy(survey)}</p>
+        <p>
+          Participant results are{" "}
+          <span className="font-semibold">
+            {survey.results_visible_to_participants ? "visible" : "hidden"}
+          </span>
+          .
+        </p>
       </div>
 
       {actionState?.message ? (
@@ -201,7 +234,10 @@ export function SurveyEditor({ eventId, survey }: SurveyEditorProps) {
         </Alert>
       ) : null}
 
-      <form action={visibilityFormAction} className="grid gap-3 border-b border-slate-200 pb-4">
+      <form
+        action={visibilityFormAction}
+        className="grid gap-3 rounded-[6px] border border-slate-300 bg-slate-50 p-3"
+      >
         <label className="flex items-start gap-3 text-sm font-semibold leading-[1.4] text-slate-900">
           <input
             className="mt-1 size-5 rounded border-slate-300 text-teal-700 focus:ring-2 focus:ring-teal-700"
@@ -211,9 +247,9 @@ export function SurveyEditor({ eventId, survey }: SurveyEditorProps) {
             value="true"
           />
           <span>
-            Show results to participants
+            Participant results: {survey.results_visible_to_participants ? "Visible" : "Hidden"}
             <span className="block pt-1 text-sm font-normal leading-[1.4] text-slate-600">
-              Results are hidden from participants by default.
+              Keep hidden until organisers are ready for participants to see the live result view.
             </span>
           </span>
         </label>
@@ -237,8 +273,11 @@ export function SurveyEditor({ eventId, survey }: SurveyEditorProps) {
 
         <div className="grid gap-4">
           {questions.map((question, index) => (
-            <fieldset className="grid gap-4 border-t border-slate-200 pt-4" key={question.key}>
-              <legend className="text-base font-semibold leading-6 text-slate-900">
+            <fieldset
+              className="grid gap-4 rounded-[6px] border border-slate-300 bg-slate-50 p-4"
+              key={question.key}
+            >
+              <legend className="rounded-[6px] bg-white px-2 text-base font-semibold leading-6 text-slate-900">
                 Question {index + 1}
               </legend>
               <input name={`questions.${index}.id`} type="hidden" value={question.id ?? ""} />
@@ -357,11 +396,11 @@ export function SurveyEditor({ eventId, survey }: SurveyEditorProps) {
               Save draft
             </Button>
             <Button
-              disabled={!validation.ok || isPublishing}
+              disabled={!validation.ok || isPublishing || survey.status === "closed"}
               formAction={publishFormAction}
               type="submit"
             >
-              Publish survey
+              {survey.status === "published" ? "Update published survey" : "Publish survey"}
             </Button>
           </div>
         </div>

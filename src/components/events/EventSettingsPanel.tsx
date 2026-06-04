@@ -78,7 +78,7 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
           Event settings
         </h2>
         <p className="text-sm leading-[1.4] text-slate-600">
-          Manage event details, audience identity rules, moderation defaults, and lifecycle state.
+          Manage event details, audience identity rules, and moderation defaults.
         </p>
       </div>
 
@@ -158,20 +158,21 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
           />
         </div>
 
-        <div className="grid gap-4 border-t border-slate-200 pt-4">
-          <label className="flex items-start gap-3 text-sm font-semibold leading-[1.4] text-slate-900">
+        <div className="grid gap-3 border-t border-slate-200 pt-4">
+          <p className="text-base font-semibold leading-6 text-slate-900">Safety controls</p>
+          <label className="flex items-start gap-3 rounded-[6px] border border-slate-300 bg-slate-50 p-3 text-sm font-semibold leading-[1.4] text-slate-900">
             <input
               checked={moderationEnabled}
-              className="mt-1 size-5 rounded border-slate-300 text-teal-700 focus:ring-2 focus:ring-teal-700"
+              className="mt-1 size-5 rounded border-slate-300 accent-teal-700 focus:ring-2 focus:ring-teal-700"
               name="moderation_enabled"
               onChange={(input) => requestModerationChange(input.target.checked)}
               type="checkbox"
               value="true"
             />
             <span>
-              Moderation enabled
+              Moderation required before public display
               <span className="block pt-1 text-sm font-normal leading-[1.4] text-slate-600">
-                Recommended. Audience questions stay private until reviewed.
+                Recommended. Audience questions stay private until a moderator reviews them.
               </span>
             </span>
           </label>
@@ -181,17 +182,17 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
             </p>
           ) : null}
 
-          <label className="flex items-start gap-3 text-sm font-semibold leading-[1.4] text-slate-900">
+          <label className="flex items-start gap-3 rounded-[6px] border border-slate-300 bg-slate-50 p-3 text-sm font-semibold leading-[1.4] text-slate-900">
             <input
               checked={duplicateBlockEnabled}
-              className="mt-1 size-5 rounded border-slate-300 text-teal-700 focus:ring-2 focus:ring-teal-700"
+              className="mt-1 size-5 rounded border-slate-300 accent-teal-700 focus:ring-2 focus:ring-teal-700"
               name="duplicate_block_enabled"
               onChange={(input) => setDuplicateBlockEnabled(input.target.checked)}
               type="checkbox"
               value="true"
             />
             <span>
-              Duplicate question block
+              Block repeated questions before review
               <span className="block pt-1 text-sm font-normal leading-[1.4] text-slate-600">
                 Helps reduce repeated submissions before moderator review.
               </span>
@@ -199,20 +200,29 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
           </label>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:justify-between">
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button onClick={() => setDialog("close")} type="button" variant="secondary">
-              Close event
-            </Button>
-            <Button onClick={() => setDialog("archive")} type="button" variant="destructive">
-              Archive event
-            </Button>
-          </div>
+        <div className="flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end">
           <Button loading={isPending} type="submit">
             Save settings
           </Button>
         </div>
       </form>
+
+      <div className="grid gap-3 rounded-[6px] border border-amber-700 bg-amber-50 p-4">
+        <div className="grid gap-1">
+          <h3 className="text-base font-semibold leading-6 text-slate-950">Lifecycle controls</h3>
+          <p className="text-sm leading-[1.4] text-slate-700">
+            These actions affect participant access and active event workflows.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button onClick={() => setDialog("close")} type="button" variant="secondary">
+            Close event
+          </Button>
+          <Button onClick={() => setDialog("archive")} type="button" variant="destructive">
+            Archive event
+          </Button>
+        </div>
+      </div>
 
       {dialog === "moderation" ? (
         <div

@@ -5,8 +5,8 @@ milestone_name: Integrated Slide Presenter
 current_phase: 5
 current_plan: 1
 status: planning
-last_updated: "2026-06-02T14:45:42.786Z"
-last_activity: 2026-06-02
+last_updated: "2026-06-04T02:41:00.000Z"
+last_activity: 2026-06-04
 progress:
   total_phases: 4
   completed_phases: 0
@@ -17,12 +17,12 @@ progress:
 
 # Project State: QSB Ask
 
-**Last updated:** 2026-06-02
+**Last updated:** 2026-06-04
 **Current phase:** 5
 **Current Plan:** 1
 **Total Plans in Phase:** 2
 **Status:** Phase 5 Plan 01 ready - PDF deck upload and storage
-**Last Activity:** 2026-06-02
+**Last Activity:** 2026-06-04
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
 
@@ -86,6 +86,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-03: Created Supabase project `QSB Ask`, configured Coolify app `btstg1x4zzuqjc16yf4qluqv`, deployed `ghcr.io/n4meless94/qsb-ask:latest`, and verified forced-origin `/api/health` returns `ok=true`; public Cloudflare access still needs origin certificate issuance.
 - 2026-06-03: Fixed home page runtime env rendering, removed duplicate Coolify env rows, restarted the app, and verified public `https://ask.qsbportal.com.my` plus `/api/health` return configured/healthy over valid TLS.
 - 2026-06-03: Quick task `260603-wib` replaced the public setup console with a participant-first QSB Ask homepage and moved runtime diagnostics to `/admin/setup` plus `/admin/health`.
+- 2026-06-04: Quick task `260604-egr` fixed event dashboard UI review findings across the workspace shell, Q&A moderation, surveys, results, exports, access, and settings.
 
 ## Decisions
 
@@ -160,6 +161,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 |------|----------|------|--------------|
 | 2026-06-03 | 260603-wib | Participant-first QSB Ask homepage and admin setup split | `npm run lint`, `npm run build`, `npx playwright test tests/e2e/foundation.spec.ts` passed |
 | 2026-06-04 | 260604-1jv | Hallmark presenter view and event workspace audience/operator UI redesign | `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, focused Playwright E2E passed |
+| 2026-06-04 | 260604-egr | Event dashboard UI review fixes across Q&A, surveys, results, exports, access, and settings | `npm run lint`, `npm test`, `npm run build`, desktop/mobile Playwright fixture sweep passed |
 
 ## Last Session
 
@@ -182,4 +184,4 @@ Execute `.planning/phases/05-pdf-deck-upload-and-storage/05-01-PLAN.md`.
 Phase: 5 - PDF Deck Upload And Storage
 Plan: 01 - Event-scoped PDF deck upload, validation, storage, and organiser management
 Status: Plan ready
-Last activity: 2026-06-03 - Coolify app public TLS and runtime env smoke passed
+Last activity: 2026-06-04 - Quick task 260604-egr event dashboard UI review fixes verified
