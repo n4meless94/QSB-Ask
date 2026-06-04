@@ -94,6 +94,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-04: Quick task `260604-hpe` redesigned the Presenter View to match the supplied executive briefing reference.
 - 2026-06-04: Quick task `260604-i0x` tuned the Presenter View QR panel and typography after reference redesign feedback.
 - 2026-06-04: Quick task `260604-qmd` replaced fake Presenter View speaker identity with question metadata, fixed topbar settings/fullscreen actions, and pointed presenter QR scans straight to participant Q&A.
+- 2026-06-04: Quick task `260604-s2b` fixed the Event Workspace "Open Presenter View" action wrapping and added an E2E layout regression check.
 
 ## Decisions
 

@@ -38,10 +38,18 @@ test("D-01/D-03 event workspace renders tabs and organiser Access content with E
   await expect(page.getByText("http://127.0.0.1:3000/join/QSB2X9ZA")).toHaveCount(1);
   await expect(page.getByRole("button", { name: "Download QR PNG" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy join link for Quarterly Briefing" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open Presenter View" })).toHaveAttribute(
-    "href",
-    "/events/event-1/presenter",
-  );
+  const copyJoinButton = page.getByRole("button", { name: "Copy join link for Quarterly Briefing" });
+  const presenterLink = page.getByRole("link", { name: "Open Presenter View" });
+  await expect(presenterLink).toHaveAttribute("href", "/events/event-1/presenter");
+  await expect(presenterLink).toHaveCSS("white-space", "nowrap");
+  await expect(async () => {
+    const [copyBox, presenterBox] = await Promise.all([
+      copyJoinButton.boundingBox(),
+      presenterLink.boundingBox(),
+    ]);
+    expect(copyBox?.height).toBeGreaterThan(0);
+    expect(presenterBox?.height).toBe(copyBox?.height);
+  }).toPass();
 
   const tabs = page.getByRole("tablist", { name: "Event workspace sections" });
   await expect(tabs.getByRole("tab", { name: "Q&A" })).toBeVisible();

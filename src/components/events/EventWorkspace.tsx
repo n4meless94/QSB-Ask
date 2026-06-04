@@ -144,11 +144,11 @@ export function EventWorkspace({
                 joinLink={event.joinLink}
               />
               <Link
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[6px] border border-slate-300 bg-white px-4 text-base font-semibold leading-6 text-slate-900 outline-none transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+                className="inline-flex min-h-11 min-w-0 items-center justify-center gap-2 whitespace-nowrap rounded-[6px] border border-slate-300 bg-white px-3 text-sm font-semibold leading-[1.4] text-slate-900 outline-none transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
                 href={`/events/${event.id}/presenter`}
                 target="_blank"
               >
-                <ExternalLink aria-hidden="true" focusable="false" size={17} strokeWidth={2.2} />
+                <ExternalLink aria-hidden="true" className="shrink-0" focusable="false" size={17} strokeWidth={2.2} />
                 Open Presenter View
               </Link>
             </div>
