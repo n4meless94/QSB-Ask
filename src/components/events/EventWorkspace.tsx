@@ -74,11 +74,19 @@ export function EventWorkspace({
       <header className="grid gap-4 rounded-[6px] border border-slate-300 bg-white p-4 shadow-[var(--shadow-panel)] sm:p-5">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start">
           <div className="min-w-0 self-center">
-            <div className="mb-2 flex flex-wrap items-center gap-2">
-              <Badge tone={event.status}>{event.status}</Badge>
-              <span className="rounded-[6px] border border-slate-300 bg-slate-50 px-2 py-1 text-sm font-semibold leading-[1.4] text-slate-700">
-                {roleLabels[role]}
-              </span>
+            <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge tone={event.status}>{event.status}</Badge>
+                <span className="rounded-[6px] border border-slate-300 bg-slate-50 px-2 py-1 text-sm font-semibold leading-[1.4] text-slate-700">
+                  {roleLabels[role]}
+                </span>
+              </div>
+              <Link
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] border border-slate-300 bg-white px-4 text-base font-semibold leading-6 text-slate-900 outline-none transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10 sm:w-auto"
+                href="/dashboard"
+              >
+                Back to Event Dashboard
+              </Link>
             </div>
             <h1 className="break-words text-[28px] font-semibold leading-[1.1] text-slate-950 sm:text-[32px]">
               {event.name}

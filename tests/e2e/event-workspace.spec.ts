@@ -28,6 +28,10 @@ test("D-01/D-03 event workspace renders tabs and organiser Access content with E
   await page.goto("/events/event-1");
 
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Back to Event Dashboard" })).toHaveAttribute(
+    "href",
+    "/dashboard",
+  );
   await expect(page.getByRole("heading", { level: 2, name: "Audience QR" })).toBeVisible();
   await expect(page.getByText("QSB2X9ZA", { exact: true })).toHaveCount(2);
   await expect(page.getByText("http://127.0.0.1:3000/join/QSB2X9ZA")).toHaveCount(2);
