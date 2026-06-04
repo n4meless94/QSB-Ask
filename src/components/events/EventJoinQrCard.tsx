@@ -135,7 +135,7 @@ export function EventJoinQrCard({
             <Download aria-hidden="true" focusable="false" size={17} strokeWidth={2.2} />
             Download QR PNG
           </button>
-          <p aria-live="polite" className="min-h-5 text-sm leading-[1.4] text-teal-700">
+          <p aria-live="polite" className={message ? "text-sm leading-[1.4] text-teal-700" : "sr-only"}>
             {message}
           </p>
         </div>

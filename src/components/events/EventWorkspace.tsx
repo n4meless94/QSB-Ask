@@ -138,6 +138,7 @@ export function EventWorkspace({
             />
             <div className="grid items-start gap-2 xl:grid-cols-2">
               <CopyJoinLinkButton
+                align="stretch"
                 eventName={event.name}
                 joinCode={event.join_code}
                 joinLink={event.joinLink}
