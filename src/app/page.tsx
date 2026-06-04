@@ -17,11 +17,11 @@ async function joinEventAction(formData: FormData) {
 const featureCards = [
   {
     title: "Live Q&A",
-    body: "Participants submit questions from phone or laptop.",
+    body: "Let participants send in questions from their phone or laptop.",
   },
   {
-    title: "Moderation",
-    body: "Organisers approve questions before they appear publicly.",
+    title: "Question review",
+    body: "Check questions first before sharing them with the room.",
   },
   {
     title: "Live Polls",
@@ -32,12 +32,12 @@ const featureCards = [
     body: "Gather structured feedback before, during, or after an event.",
   },
   {
-    title: "Analytics",
-    body: "Export questions, responses, and engagement summaries after the session.",
+    title: "Reports",
+    body: "Download questions, responses, and summaries after the session.",
   },
   {
-    title: "QR / Join Code",
-    body: "Participants can join using an event code or QR link.",
+    title: "Join code / QR",
+    body: "Participants can join with a simple code or QR link.",
   },
 ];
 
@@ -47,8 +47,8 @@ const useCases = [
   "Training sessions",
   "Subsidiary briefings",
   "Internal surveys",
-  "Post-event feedback",
-  "Anonymous staff questions",
+  "Post-session feedback",
+  "Anonymous audience questions",
 ];
 
 const qnaItems = [
@@ -103,11 +103,11 @@ export default function Home() {
             Live Q&A and surveys for QSB
           </p>
           <h1 className="hallmark-display-heading mt-4 max-w-3xl text-[var(--color-ink)]">
-            Make every QSB event interactive.
+            Make QSB sessions easier to join, ask, and respond to.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-[var(--color-ink-muted)]">
-            Collect live questions, run polls, and gather feedback from participants in real
-            time with organiser moderation before anything appears on screen.
+            Collect questions, run quick polls, and gather feedback during your session.
+            Organisers can review questions before they appear on screen.
           </p>
 
           <form
@@ -119,7 +119,7 @@ export default function Home() {
                 className="text-sm font-semibold leading-[1.4] text-[var(--color-ink)]"
                 htmlFor="event-code"
               >
-                Joining an event?
+                Joining a session?
               </label>
               <input
                 autoComplete="off"
@@ -137,7 +137,7 @@ export default function Home() {
 
           <div className="mt-5 flex flex-col gap-3 text-sm leading-[1.4] text-[var(--color-ink-muted)] sm:flex-row sm:items-center">
             <Link className="foundation-utility-link" href="/events/new">
-              Create an event
+              Create a session
             </Link>
             <span>No login or app download needed.</span>
           </div>
@@ -156,7 +156,7 @@ export default function Home() {
               Product
             </p>
             <h2 id="product" className="mt-3 text-3xl font-semibold leading-tight">
-              Built around the live room.
+              Everything you need for a live session.
             </h2>
           </div>
           {featureCards.map((feature) => (
@@ -182,11 +182,11 @@ export default function Home() {
             Use Cases
           </p>
           <h2 id="use-cases" className="mt-3 text-3xl font-semibold leading-tight">
-            Built for QSB events and internal sessions.
+            Made for QSB sessions.
           </h2>
           <p className="mt-4 text-base leading-7 text-[var(--color-ink-muted)]">
-            The homepage stays simple for participants, while organisers get the controls
-            they need for corporate event flow.
+            Keep the session simple for participants, while organisers get the controls
+            they need.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -208,16 +208,15 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:items-center lg:px-10">
           <div>
             <p className="text-sm font-semibold uppercase leading-[1.4] tracking-[0] text-[var(--color-accent-soft)]">
-              Controlled by design
+              Simple and controlled
             </p>
             <h2 id="help" className="mt-3 text-3xl font-semibold leading-tight">
-              Nothing unapproved reaches a public screen.
+              Only approved questions appear on screen.
             </h2>
           </div>
           <p className="text-base leading-7 text-[var(--color-accent-soft)]">
-            QSB Ask gives organisers control over what appears on screen. Questions can
-            be reviewed, approved, hidden, or archived before being displayed publicly,
-            which is especially important for corporate internal events.
+            QSB Ask helps organisers keep the live room clear and focused. Questions can
+            be reviewed, approved, hidden, or archived before they are shared.
           </p>
         </div>
       </section>

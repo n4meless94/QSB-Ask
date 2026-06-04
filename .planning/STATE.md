@@ -177,6 +177,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | 2026-06-04 | 260604-hpe | Presenter View executive briefing reference redesign | `npm run lint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/presenter-view.spec.ts`, `npm run build`, six-width Playwright sweep passed |
 | 2026-06-04 | 260604-i0x | Presenter View QR panel and typography tuning | `npm run lint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/presenter-view.spec.ts`, `npm run build`, six-width Playwright sweep passed |
 | 2026-06-04 | 260604-qmd | Presenter View question metadata, topbar actions, and Q&A QR target | `npm run lint`, `npx tsc --noEmit`, `npm test -- tests/qna/presenter.test.ts`, focused Playwright E2E, `npm run build` passed |
+| 2026-06-04 | 260604-rpl | Casual public-friendly landing page wording | `npm run lint` passed |
 
 ## Last Session
 
