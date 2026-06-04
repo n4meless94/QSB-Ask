@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/Badge";
 import { CopyJoinLinkButton } from "@/components/events/CopyJoinLinkButton";
+import { EventJoinQrCard } from "@/components/events/EventJoinQrCard";
 import type { EventAccessContext } from "@/lib/events/access";
 import type { EventRole } from "@/types/app";
 
@@ -88,6 +89,12 @@ export function EventWorkspace({
           </div>
 
           <div className="grid gap-3 rounded-[6px] border border-slate-300 bg-slate-50 p-3">
+            <EventJoinQrCard
+              eventName={event.name}
+              joinCode={event.join_code}
+              joinLink={event.joinLink}
+              showDownload
+            />
             <dl className="grid gap-3 text-sm leading-[1.4] text-slate-600 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start">
               <div className="min-w-32">
                 <dt className="font-semibold text-slate-900">Join code</dt>
@@ -113,7 +120,7 @@ export function EventWorkspace({
                 href={`/events/${event.id}/presenter`}
                 target="_blank"
               >
-                Presenter View
+                Open Presenter View
               </Link>
             </div>
           </div>

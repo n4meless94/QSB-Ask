@@ -87,6 +87,9 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-03: Fixed home page runtime env rendering, removed duplicate Coolify env rows, restarted the app, and verified public `https://ask.qsbportal.com.my` plus `/api/health` return configured/healthy over valid TLS.
 - 2026-06-03: Quick task `260603-wib` replaced the public setup console with a participant-first QSB Ask homepage and moved runtime diagnostics to `/admin/setup` plus `/admin/health`.
 - 2026-06-04: Quick task `260604-egr` fixed event dashboard UI review findings across the workspace shell, Q&A moderation, surveys, results, exports, access, and settings.
+- 2026-06-04: Quick task `260604-gcd` documented the repeatable GHCR-to-Coolify deployment playbook, including branch, image, DNS-origin, Coolify queue, and revision-label verification steps.
+- 2026-06-04: Quick task `260604-kqr` added event sharing QR and Presenter View QR display slices using the public join link.
+- 2026-06-04: Quick task `260604-vul` fixed the npm audit PostCSS finding by overriding the vulnerable nested dependency to patched `postcss@8.5.15`.
 
 ## Decisions
 
@@ -162,6 +165,9 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | 2026-06-03 | 260603-wib | Participant-first QSB Ask homepage and admin setup split | `npm run lint`, `npm run build`, `npx playwright test tests/e2e/foundation.spec.ts` passed |
 | 2026-06-04 | 260604-1jv | Hallmark presenter view and event workspace audience/operator UI redesign | `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, focused Playwright E2E passed |
 | 2026-06-04 | 260604-egr | Event dashboard UI review fixes across Q&A, surveys, results, exports, access, and settings | `npm run lint`, `npm test`, `npm run build`, desktop/mobile Playwright fixture sweep passed |
+| 2026-06-04 | 260604-gcd | Repeatable GHCR-to-Coolify deployment playbook | `rg` link/identifier check and `git diff --check` passed |
+| 2026-06-04 | 260604-kqr | Event sharing QR and Presenter View QR display slices | `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, focused Playwright E2E passed |
+| 2026-06-04 | 260604-vul | PostCSS npm audit override | `npm audit`, `npm ls postcss`, `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, focused Playwright E2E passed |
 
 ## Last Session
 

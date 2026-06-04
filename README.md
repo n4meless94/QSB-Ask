@@ -51,7 +51,9 @@ In production, `/api/health` returns a non-OK HTTP status when required runtime 
 
 QSB Ask v1 is intended to run as a Coolify-managed Next.js application on QSB VPS, with managed Supabase retained for Auth, Postgres, Realtime, and data storage.
 
-Deployment readiness lives in `.planning/deployment/coolify-runbook.md`. The production public URL target is:
+Deployment readiness lives in `.planning/deployment/coolify-runbook.md`. The repeatable day-2 deploy procedure lives in `.planning/deployment/ghcr-coolify-deploy-playbook.md`.
+
+The production public URL target is:
 
 ```text
 https://ask.qsbportal.com.my

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { EventJoinQrCard } from "@/components/events/EventJoinQrCard";
 import type { PublicQuestion } from "@/lib/qna/public";
 import { subscribeToPublicQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 
@@ -10,6 +11,8 @@ type PresenterViewProps = {
   eventId: string;
   eventName: string;
   fixtureMode?: boolean;
+  joinCode: string;
+  joinLink: string;
   questions: PublicQuestion[];
 };
 
@@ -53,7 +56,14 @@ function connectionClasses(state: QnaConnectionState) {
   return "border-red-700 bg-red-50 text-red-900";
 }
 
-export function PresenterView({ eventId, eventName, fixtureMode = false, questions }: PresenterViewProps) {
+export function PresenterView({
+  eventId,
+  eventName,
+  fixtureMode = false,
+  joinCode,
+  joinLink,
+  questions,
+}: PresenterViewProps) {
   const router = useRouter();
   const [sort, setSort] = useState<PresenterSort>("popular");
   const [questionState, setQuestionState] = useState(questions);
@@ -102,7 +112,7 @@ export function PresenterView({ eventId, eventName, fixtureMode = false, questio
   return (
     <main className="fixed inset-0 z-50 overflow-y-auto bg-[var(--color-paper)] text-slate-950">
       <div className="mx-auto grid min-h-screen w-full max-w-7xl grid-rows-[auto_minmax(0,1fr)_auto] gap-5 px-4 py-4 sm:px-8 sm:py-6 lg:px-10">
-        <header className="grid gap-4 border-b border-slate-300 pb-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+        <header className="grid gap-4 border-b border-slate-300 pb-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,440px)_auto] lg:items-start">
           <div className="min-w-0">
             <p className="text-sm font-semibold uppercase leading-[1.4] tracking-normal text-teal-800">
               QSB Ask · Live Q&amp;A
@@ -114,6 +124,12 @@ export function PresenterView({ eventId, eventName, fixtureMode = false, questio
               {eventName}
             </h1>
           </div>
+          <EventJoinQrCard
+            eventName={eventName}
+            joinCode={joinCode}
+            joinLink={joinLink}
+            variant="presenter"
+          />
           <div
             aria-live="polite"
             className={`flex w-fit items-center gap-2 rounded-[6px] border px-3 py-2 text-sm font-semibold leading-[1.4] ${connectionClasses(

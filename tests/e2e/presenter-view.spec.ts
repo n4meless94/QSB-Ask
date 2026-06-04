@@ -16,6 +16,9 @@ test("presenter view shows approved questions only without management controls",
   await page.goto("/events/event-1/presenter");
 
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing Presenter View" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Scan to ask a question" })).toBeVisible();
+  await expect(page.getByText("QSB2X9ZA", { exact: true })).toBeVisible();
+  await expect(page.getByText("http://127.0.0.1:3000/join/QSB2X9ZA")).toBeVisible();
   await expect(page.getByText("Connected")).toBeVisible();
   await expect(page.getByText("How will follow-up actions be shared?")).toBeVisible();
   await expect(page.getByText("Who owns the next briefing?")).toBeVisible();

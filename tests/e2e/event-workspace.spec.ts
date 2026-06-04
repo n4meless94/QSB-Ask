@@ -28,7 +28,10 @@ test("D-01/D-03 event workspace renders tabs and organiser Access content with E
   await page.goto("/events/event-1");
 
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing" })).toBeVisible();
-  await expect(page.getByText("QSB2X9ZA", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Audience QR" })).toBeVisible();
+  await expect(page.getByText("QSB2X9ZA", { exact: true })).toHaveCount(2);
+  await expect(page.getByText("http://127.0.0.1:3000/join/QSB2X9ZA")).toHaveCount(2);
+  await expect(page.getByRole("button", { name: "Download QR PNG" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy join link for Quarterly Briefing" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open Presenter View" })).toHaveAttribute(
     "href",
@@ -45,7 +48,7 @@ test("D-01/D-03 event workspace renders tabs and organiser Access content with E
 
   await expect(page.getByRole("heading", { level: 2, name: "Event access" })).toBeVisible();
   await expect(
-    page.getByText("Staff can sign in with that email to activate assigned access automatically."),
+    page.getByText("Invite emails are not sent yet. Add the staff email here; access activates automatically"),
   ).toBeVisible();
   await expect(page.getByLabel("Invite email")).toBeVisible();
   await expect(

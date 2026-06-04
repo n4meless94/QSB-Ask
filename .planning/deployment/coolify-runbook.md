@@ -4,6 +4,8 @@
 **Target URL:** `https://ask.qsbportal.com.my`
 **Health path:** `/api/health`
 
+For the repeatable GHCR publish plus Coolify redeploy procedure, use `.planning/deployment/ghcr-coolify-deploy-playbook.md`. This file covers initial setup and production boundaries; the playbook covers day-2 deployment commands and verification.
+
 ## Deployment Boundary
 
 QSB Ask must run as a Coolify-managed Next.js application resource on QSB VPS. Do not create an unmanaged long-lived Docker Compose service or ad hoc VPS process for v1.
