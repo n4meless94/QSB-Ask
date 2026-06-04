@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { joinParticipantAction } from "@/app/join/actions";
+import { autoJoinAnonymousParticipantAction, joinParticipantAction } from "@/app/join/actions";
 import {
   getParticipantCookieName,
   joinParticipantEvent,
@@ -219,6 +219,24 @@ describe("join participant action", () => {
       expect.any(String),
       expect.objectContaining({
         httpOnly: true,
+        sameSite: "lax",
+      }),
+    );
+  });
+
+  it("auto-joins anonymous events and redirects shared links to event Q&A", async () => {
+    makeQueries({ ...activeEvent, identity_mode: "anonymous" });
+
+    await expect(autoJoinAnonymousParticipantAction(form({ join_code: "QSB2X9ZA" }))).rejects.toThrow(
+      "REDIRECT:/join/QSB2X9ZA/qna",
+    );
+
+    expect(cookiesSetMock).toHaveBeenCalledWith(
+      "qsb_ask_participant_event-1",
+      expect.any(String),
+      expect.objectContaining({
+        httpOnly: true,
+        path: "/join/QSB2X9ZA",
         sameSite: "lax",
       }),
     );

@@ -25,6 +25,42 @@ function fieldErrorFor(message: string): JoinParticipantActionResult["fieldError
   return {};
 }
 
+function participantCookieOptions(joinCode: string) {
+  return {
+    httpOnly: true,
+    maxAge: 60 * 60 * 8,
+    path: `/join/${joinCode}`,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+  };
+}
+
+export async function autoJoinAnonymousParticipantAction(formData: FormData) {
+  const joinCode = String(formData.get("join_code") ?? "");
+
+  try {
+    const joined = await joinParticipantEvent(joinCode, {});
+    const cookieStore = await cookies();
+
+    cookieStore.set(
+      getParticipantCookieName(joined.event.id),
+      joined.rawToken,
+      participantCookieOptions(joined.event.join_code),
+    );
+
+    redirect(`/join/${joined.event.join_code}/qna`);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.message.startsWith("NEXT_REDIRECT") || error.message.startsWith("REDIRECT:"))
+    ) {
+      throw error;
+    }
+
+    redirect(`/join/${encodeURIComponent(joinCode)}?join=manual`);
+  }
+}
+
 export async function joinParticipantAction(
   previousStateOrFormData: JoinParticipantActionResult | FormData,
   maybeFormData?: FormData,
@@ -47,13 +83,11 @@ export async function joinParticipantAction(
     });
     const cookieStore = await cookies();
 
-    cookieStore.set(getParticipantCookieName(joined.event.id), joined.rawToken, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 8,
-      path: `/join/${joined.event.join_code}`,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
+    cookieStore.set(
+      getParticipantCookieName(joined.event.id),
+      joined.rawToken,
+      participantCookieOptions(joined.event.join_code),
+    );
 
     redirect(`/join/${joined.event.join_code}/qna`);
   } catch (error) {
