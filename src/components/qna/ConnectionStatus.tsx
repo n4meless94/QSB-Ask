@@ -6,14 +6,14 @@ type ConnectionStatusProps = {
 };
 
 const copy: Record<QnaConnectionState, string> = {
-  live: "Live updates active",
+  live: "Connected",
   reconnecting: "Reconnecting. Live updates may be delayed.",
   offline: "You are offline. Live updates will resume when the connection returns.",
   "refresh-needed": "Live updates are not reconnecting. Refresh this view to continue.",
 };
 
 const detail: Record<QnaConnectionState, string> = {
-  live: "Checking for queue changes every 2 seconds.",
+  live: "",
   reconnecting: "Keep this screen open while the connection recovers.",
   offline: "Moderation actions are paused until the connection returns.",
   "refresh-needed": "Refresh before continuing live moderation.",
@@ -30,7 +30,7 @@ export function ConnectionStatus({ onRefresh, state }: ConnectionStatusProps) {
   return (
     <div className={`grid max-w-full gap-1 rounded-[6px] border bg-white px-3 py-2 text-sm leading-[1.4] ${tone}`}>
       <p aria-live="polite" className="font-semibold">{copy[state]}</p>
-      <p className="text-slate-600">{detail[state]}</p>
+      {detail[state] ? <p className="text-slate-600">{detail[state]}</p> : null}
       {state === "refresh-needed" && onRefresh ? (
         <button
           className="min-h-10 rounded-[6px] border border-current bg-white px-3 text-sm font-semibold leading-[1.4] outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"

@@ -27,7 +27,7 @@ export default async function PresenterPage({ params }: PresenterPageProps) {
         eventName="Quarterly Briefing"
         fixtureMode
         joinCode="QSB2X9ZA"
-        joinLink="http://127.0.0.1:3000/join/QSB2X9ZA"
+        joinLink="http://127.0.0.1:3000/join/QSB2X9ZA/qna"
         key={e2ePresenterQuestions().map((question) => `${question.id}:${question.updated_at}:${question.vote_count}`).join("|")}
         questions={e2ePresenterQuestions()}
       />
@@ -57,7 +57,7 @@ export default async function PresenterPage({ params }: PresenterPageProps) {
       eventId={eventId}
       eventName={result.access.event.name}
       joinCode={result.access.event.join_code}
-      joinLink={result.access.event.joinLink}
+      joinLink={`${result.access.event.joinLink.replace(/\/+$/, "")}/qna`}
       key={result.questions.map((question) => `${question.id}:${question.updated_at}:${question.vote_count}`).join("|")}
       questions={result.questions}
     />

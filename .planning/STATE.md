@@ -93,6 +93,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-04: Quick task `260604-h68` polished the Presenter View stage layout from the Hallmark screenshot review.
 - 2026-06-04: Quick task `260604-hpe` redesigned the Presenter View to match the supplied executive briefing reference.
 - 2026-06-04: Quick task `260604-i0x` tuned the Presenter View QR panel and typography after reference redesign feedback.
+- 2026-06-04: Quick task `260604-qmd` replaced fake Presenter View speaker identity with question metadata, fixed topbar settings/fullscreen actions, and pointed presenter QR scans straight to participant Q&A.
 
 ## Decisions
 
@@ -174,6 +175,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | 2026-06-04 | 260604-h68 | Presenter View stage layout polish from Hallmark screenshot review | `npm run lint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/presenter-view.spec.ts`, `npm run build`, six-width Playwright visual sweep passed |
 | 2026-06-04 | 260604-hpe | Presenter View executive briefing reference redesign | `npm run lint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/presenter-view.spec.ts`, `npm run build`, six-width Playwright sweep passed |
 | 2026-06-04 | 260604-i0x | Presenter View QR panel and typography tuning | `npm run lint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/presenter-view.spec.ts`, `npm run build`, six-width Playwright sweep passed |
+| 2026-06-04 | 260604-qmd | Presenter View question metadata, topbar actions, and Q&A QR target | `npm run lint`, `npx tsc --noEmit`, `npm test -- tests/qna/presenter.test.ts`, focused Playwright E2E, `npm run build` passed |
 
 ## Last Session
 

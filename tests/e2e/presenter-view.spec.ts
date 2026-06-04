@@ -19,12 +19,16 @@ test("presenter view shows approved questions only without management controls",
   await expect(page.getByRole("heading", { level: 2, name: "Scan to ask a question" })).toBeVisible();
   await expect(page.getByText("Q S B 2 X 9 Z A", { exact: true })).toBeVisible();
   await expect(page.getByText("Connected")).toBeVisible();
-  await expect(page.getByText("Active question")).toBeVisible();
-  await expect(page.getByText("Jameson Sterling")).toBeVisible();
+  await expect(page.getByText("Current question")).toBeVisible();
+  await expect(page.getByText("Q&A Status")).toBeVisible();
   await expect(page.getByText("How will follow-up actions be shared?")).toBeVisible();
   await expect(page.getByText("8 votes")).toBeVisible();
-  await expect(page.getByText("Live", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Asked at/)).toBeVisible();
+  await expect(page.getByText("Now Showing", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Enter fullscreen" })).toBeVisible();
 
+  await expect(page.getByText("Jameson Sterling")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Open event settings" })).toHaveCount(0);
   await expect(page.getByText("Will slides be shared?")).toHaveCount(0);
   await expect(page.getByText("Archived duplicate question")).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Approve question/ })).toHaveCount(0);

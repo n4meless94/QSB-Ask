@@ -336,7 +336,7 @@ export function ModeratorQueue({
 
         <div className="rounded-[6px] border border-teal-700 bg-teal-50 p-3 text-sm leading-[1.5] text-teal-950">
           <p className="font-semibold">Safety rule: pending questions are hidden from audience screens.</p>
-          <p>Approve only the questions that are safe to show publicly or in Presenter View.</p>
+          <p>Approve a question to move it into the Presenter View pool. Live questions show first, ordered by votes and then recency.</p>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3" aria-label="Moderation safety summary">

@@ -19,6 +19,7 @@ test("moderator queue supports tabs, search, sort, actions, edit marker, history
   await page.getByRole("tab", { name: "Q&A" }).click();
 
   await expect(page.getByRole("heading", { level: 2, name: "Moderation queue" })).toBeVisible();
+  await expect(page.getByText("Approve a question to move it into the Presenter View pool.")).toBeVisible();
   await expect(page.getByRole("tab", { name: "Pending 2" })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Live 1" })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Answered 1" })).toBeVisible();
@@ -47,6 +48,7 @@ test("moderator queue supports tabs, search, sort, actions, edit marker, history
   ).toBeVisible();
 
   await expect(page.getByRole("heading", { level: 3, name: "Moderation history" })).toBeVisible();
+  await page.getByRole("heading", { level: 3, name: "Moderation history" }).click();
   await expect(page.getByText("edit: pending to pending")).toBeVisible();
   await expect(page.getByText("approve: pending to live")).toBeVisible();
 });

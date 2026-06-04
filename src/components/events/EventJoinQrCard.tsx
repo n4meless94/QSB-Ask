@@ -1,5 +1,6 @@
 "use client";
 
+import { Download, QrCode } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 
@@ -40,7 +41,7 @@ export function EventJoinQrCard({
   const [message, setMessage] = useState("");
   const isPresenter = variant === "presenter";
   const qrSize = isPresenter ? 220 : 132;
-  const title = isPresenter ? "Scan to ask a question" : "Audience QR";
+  const title = isPresenter ? "Scan to ask a question" : "Audience access";
   const joinLinkDisplay = isPresenter ? displayJoinHost(joinLink) : joinLink;
 
   function downloadQr() {
@@ -89,6 +90,7 @@ export function EventJoinQrCard({
             }
             id={titleId}
           >
+            {!isPresenter ? <QrCode aria-hidden="true" className="mr-2 inline-block align-[-3px]" size={18} /> : null}
             {title}
           </h2>
           <p
@@ -126,10 +128,11 @@ export function EventJoinQrCard({
       {showDownload ? (
         <div className="grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center">
           <button
-            className="inline-flex min-h-11 items-center justify-center rounded-[6px] border border-slate-300 bg-white px-4 text-sm font-semibold leading-[1.4] text-slate-900 outline-none transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[6px] border border-slate-300 bg-white px-4 text-sm font-semibold leading-[1.4] text-slate-900 outline-none transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
             onClick={downloadQr}
             type="button"
           >
+            <Download aria-hidden="true" focusable="false" size={17} strokeWidth={2.2} />
             Download QR PNG
           </button>
           <p aria-live="polite" className="min-h-5 text-sm leading-[1.4] text-teal-700">

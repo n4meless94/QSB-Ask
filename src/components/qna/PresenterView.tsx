@@ -23,6 +23,10 @@ type PresenterSort = "popular" | "recent";
 
 function sortQuestions(questions: PublicQuestion[], sort: PresenterSort) {
   return [...questions].sort((left, right) => {
+    if (left.status !== right.status) {
+      return left.status === "live" ? -1 : 1;
+    }
+
     if (sort === "recent") {
       return new Date(right.submitted_at).getTime() - new Date(left.submitted_at).getTime();
     }
@@ -35,7 +39,7 @@ function sortQuestions(questions: PublicQuestion[], sort: PresenterSort) {
 }
 
 function statusLabel(status: PublicQuestion["status"]) {
-  return status === "answered" ? "Answered" : "Live";
+  return status === "answered" ? "Answered" : "Now Showing";
 }
 
 function connectionCopy(state: QnaConnectionState) {
@@ -65,6 +69,14 @@ function eventKicker(eventName: string) {
   return eventName.toUpperCase();
 }
 
+function metadataTime(value: string) {
+  return new Date(value).toLocaleTimeString("en-MY", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "Asia/Kuala_Lumpur",
+  });
+}
+
 export function PresenterView({
   eventId,
   eventName,
@@ -76,8 +88,20 @@ export function PresenterView({
   const router = useRouter();
   const [questionState, setQuestionState] = useState(questions);
   const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const sortedQuestions = useMemo(() => sortQuestions(questionState, "popular"), [questionState]);
   const featuredQuestion = sortedQuestions[0];
+
+  useEffect(() => {
+    function syncFullscreenState() {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    }
+
+    document.addEventListener("fullscreenchange", syncFullscreenState);
+    syncFullscreenState();
+
+    return () => document.removeEventListener("fullscreenchange", syncFullscreenState);
+  }, []);
 
   useEffect(() => {
     if (fixtureMode) {
@@ -116,41 +140,43 @@ export function PresenterView({
     });
   }, [eventId, fixtureMode, router]);
 
+  async function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen?.();
+      return;
+    }
+
+    await document.exitFullscreen?.();
+  }
+
   return (
     <main className="fixed inset-0 z-50 overflow-y-auto bg-[#fbfaf6] text-[#24231f]">
       <div className="grid min-h-screen grid-rows-[72px_minmax(0,1fr)_50px]">
         <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center border-b border-[#c9c5ba] px-4 sm:px-8 lg:px-16">
-          <div className="flex min-w-0 items-center gap-4 sm:gap-6">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-5">
             <h1
               aria-label={`${eventName} Presenter View`}
-              className="min-w-0 break-words text-[22px] font-bold leading-none text-[#00564f] sm:text-[26px]"
+              className="min-w-0 break-words text-[20px] font-semibold leading-none text-[#00564f] sm:text-[24px]"
             >
               Townhall Briefing
             </h1>
             <span className="hidden h-7 w-px bg-[#c9c5ba] sm:block" aria-hidden="true" />
-            <p className="hidden min-w-0 text-[13px] font-semibold uppercase leading-none tracking-[0.24em] text-[#5f625f] sm:block">
+            <p className="hidden min-w-0 truncate text-[13px] font-semibold uppercase leading-none tracking-[0.16em] text-[#5f625f] sm:block">
               {eventKicker(eventName)}
             </p>
           </div>
           <div className="flex items-center gap-3 text-[#00564f] sm:gap-6">
-            <div className="hidden items-center gap-2 text-[13px] font-semibold leading-none tracking-[0.08em] sm:flex">
+            <div className="hidden items-center gap-2 text-[13px] font-semibold leading-none sm:flex">
               <span className="font-mono text-base leading-none" aria-hidden="true">
                 ((•))
               </span>
               <span>QSB Ask · Live Q&amp;A</span>
             </div>
             <button
-              aria-label="Presenter settings"
+              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              aria-pressed={isFullscreen}
               className="grid size-9 place-items-center rounded-[4px] text-[#4c5b65] outline-none hover:bg-[#eeeae1] focus-visible:ring-2 focus-visible:ring-[#00564f] focus-visible:ring-offset-2"
-              type="button"
-            >
-              <span className="text-[23px] leading-none" aria-hidden="true">
-                ⚙
-              </span>
-            </button>
-            <button
-              aria-label="Fullscreen"
-              className="grid size-9 place-items-center rounded-[4px] text-[#4c5b65] outline-none hover:bg-[#eeeae1] focus-visible:ring-2 focus-visible:ring-[#00564f] focus-visible:ring-offset-2"
+              onClick={toggleFullscreen}
               type="button"
             >
               <span className="text-[24px] leading-none" aria-hidden="true">
@@ -168,7 +194,7 @@ export function PresenterView({
             <article className="grid gap-12 lg:gap-14">
               <div className="grid max-w-[760px] gap-6">
                 <p className="text-[13px] font-bold uppercase leading-none tracking-[0.36em] text-[#00615a]">
-                  Active question
+                  Current question
                 </p>
                 <p className="break-words text-[42px] font-bold leading-[1.18] tracking-normal text-[#252420] sm:text-[56px] lg:text-[51px]">
                   {featuredQuestion.current_text}
@@ -176,23 +202,23 @@ export function PresenterView({
               </div>
 
               <div className="flex items-center gap-6">
-                <div className="relative grid size-16 shrink-0 place-items-end overflow-hidden rounded-[8px] border border-[#00564f] bg-[#062d2d] shadow-[0_10px_24px_rgba(0,86,79,0.18)]">
-                  <div className="absolute inset-x-4 top-3 h-5 rounded-full bg-[#efe8dc]" aria-hidden="true" />
-                  <div className="absolute left-1/2 top-6 h-8 w-5 -translate-x-1/2 rounded-full bg-[#c9b59b]" aria-hidden="true" />
-                  <div className="relative h-8 w-12 rounded-t-[20px] bg-[#10181c]" aria-hidden="true" />
+                <div className="grid size-16 shrink-0 place-items-center rounded-[8px] border border-[#00564f] bg-[#eaf3ef] shadow-[0_10px_24px_rgba(0,86,79,0.12)]">
+                  <span className="font-mono text-[13px] font-bold uppercase leading-none tracking-[0.1em] text-[#00564f]">
+                    Q&amp;A
+                  </span>
                 </div>
                 <div className="min-w-0">
-                  <p className="break-words text-[23px] font-bold leading-[1.1] text-[#252420]">
-                    Jameson Sterling
+                  <p className="break-words text-[22px] font-semibold leading-[1.1] text-[#252420]">
+                    Q&amp;A Status
                   </p>
                   <p className="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-base font-medium leading-[1.3] text-[#5f625f]">
-                    <span>Global CEO</span>
-                    <span aria-hidden="true">·</span>
                     <span>{statusLabel(featuredQuestion.status)}</span>
                     <span aria-hidden="true">·</span>
                     <span>
                       {featuredQuestion.vote_count} {featuredQuestion.vote_count === 1 ? "vote" : "votes"}
                     </span>
+                    <span aria-hidden="true">·</span>
+                    <span>Asked at {metadataTime(featuredQuestion.submitted_at)}</span>
                   </p>
                   {featuredQuestion.is_edited ? (
                     <p className="mt-1 text-sm font-semibold leading-[1.3] text-[#5f625f]">Edited</p>

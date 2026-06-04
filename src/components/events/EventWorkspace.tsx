@@ -1,5 +1,6 @@
 "use client";
 
+import { ExternalLink, ShieldCheck, ShieldOff } from "lucide-react";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 
@@ -56,6 +57,13 @@ function LaterPlanPanel({ title, body }: { title: string; body: string }) {
   );
 }
 
+function moderationBadgeClasses(enabled: boolean) {
+  return [
+    "inline-flex items-center gap-1.5 rounded-[6px] border px-2 py-1 text-sm font-semibold leading-[1.4]",
+    enabled ? "border-teal-700 bg-teal-50 text-teal-800" : "border-amber-700 bg-amber-50 text-amber-800",
+  ].join(" ");
+}
+
 export function EventWorkspace({
   access,
   accessPanel,
@@ -68,17 +76,26 @@ export function EventWorkspace({
 }: EventWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(initialTab);
   const { event, role } = access;
+  const moderationEnabled = event.moderation_enabled;
 
   return (
     <div className="grid w-full gap-4">
-      <header className="grid gap-4 rounded-[6px] border border-slate-300 bg-white p-4 shadow-[var(--shadow-panel)] sm:p-5">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start">
-          <div className="min-w-0 self-center">
+      <header className="grid gap-5 rounded-[6px] border border-slate-300 bg-white p-4 shadow-[var(--shadow-panel)] sm:p-5">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(320px,380px)] lg:items-start">
+          <div className="min-w-0">
             <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={event.status}>{event.status}</Badge>
                 <span className="rounded-[6px] border border-slate-300 bg-slate-50 px-2 py-1 text-sm font-semibold leading-[1.4] text-slate-700">
                   {roleLabels[role]}
+                </span>
+                <span className={moderationBadgeClasses(moderationEnabled)}>
+                  {moderationEnabled ? (
+                    <ShieldCheck aria-hidden="true" focusable="false" size={16} strokeWidth={2.4} />
+                  ) : (
+                    <ShieldOff aria-hidden="true" focusable="false" size={16} strokeWidth={2.4} />
+                  )}
+                  {moderationEnabled ? "Moderation On" : "Moderation Off"}
                 </span>
               </div>
               <Link
@@ -92,42 +109,45 @@ export function EventWorkspace({
               {event.name}
             </h1>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-[1.5] text-slate-700">
-              Moderation safety: pending questions stay hidden until approved.
+              {moderationEnabled
+                ? "Moderation safety: pending questions stay hidden until approved."
+                : "Moderation is off: new audience questions can appear without approval."}
             </p>
+            <dl className="mt-4 grid gap-2 text-sm leading-[1.4] text-slate-700 sm:grid-cols-3">
+              <div className="rounded-[6px] border border-slate-200 bg-slate-50 px-3 py-2">
+                <dt className="font-semibold text-slate-900">Question limit</dt>
+                <dd>{event.question_character_limit} characters</dd>
+              </div>
+              <div className="rounded-[6px] border border-slate-200 bg-slate-50 px-3 py-2">
+                <dt className="font-semibold text-slate-900">Rate limit</dt>
+                <dd>{event.question_rate_limit_seconds} seconds</dd>
+              </div>
+              <div className="rounded-[6px] border border-slate-200 bg-slate-50 px-3 py-2">
+                <dt className="font-semibold text-slate-900">Duplicate block</dt>
+                <dd>{event.duplicate_block_enabled ? "On" : "Off"}</dd>
+              </div>
+            </dl>
           </div>
 
-          <div className="grid gap-3 rounded-[6px] border border-slate-300 bg-slate-50 p-3">
+          <div className="grid gap-3">
             <EventJoinQrCard
               eventName={event.name}
               joinCode={event.join_code}
               joinLink={event.joinLink}
               showDownload
             />
-            <dl className="grid gap-3 text-sm leading-[1.4] text-slate-600 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start">
-              <div className="min-w-32">
-                <dt className="font-semibold text-slate-900">Join code</dt>
-                <dd className="mt-1 w-fit rounded-[6px] border border-slate-300 bg-white px-3 py-2 font-mono text-[22px] font-semibold leading-none tracking-normal text-slate-950">
-                  {event.join_code}
-                </dd>
-              </div>
-              <div className="min-w-0">
-                <dt className="font-semibold text-slate-900">Join link</dt>
-                <dd className="mt-1 break-all rounded-[6px] border border-slate-200 bg-white px-3 py-2 font-mono text-xs leading-[1.45] text-slate-700">
-                  {event.joinLink}
-                </dd>
-              </div>
-            </dl>
-            <div className="grid items-start gap-2 sm:grid-cols-2">
+            <div className="grid items-start gap-2 xl:grid-cols-2">
               <CopyJoinLinkButton
                 eventName={event.name}
                 joinCode={event.join_code}
                 joinLink={event.joinLink}
               />
               <Link
-                className="inline-flex min-h-11 items-center justify-center rounded-[6px] border border-slate-300 bg-white px-4 text-base font-semibold leading-6 text-slate-900 outline-none transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[6px] border border-slate-300 bg-white px-4 text-base font-semibold leading-6 text-slate-900 outline-none transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
                 href={`/events/${event.id}/presenter`}
                 target="_blank"
               >
+                <ExternalLink aria-hidden="true" focusable="false" size={17} strokeWidth={2.2} />
                 Open Presenter View
               </Link>
             </div>

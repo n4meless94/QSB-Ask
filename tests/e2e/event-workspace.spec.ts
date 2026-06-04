@@ -32,9 +32,10 @@ test("D-01/D-03 event workspace renders tabs and organiser Access content with E
     "href",
     "/dashboard",
   );
-  await expect(page.getByRole("heading", { level: 2, name: "Audience QR" })).toBeVisible();
-  await expect(page.getByText("QSB2X9ZA", { exact: true })).toHaveCount(2);
-  await expect(page.getByText("http://127.0.0.1:3000/join/QSB2X9ZA")).toHaveCount(2);
+  await expect(page.getByText("Moderation On")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Audience access" })).toBeVisible();
+  await expect(page.getByText("QSB2X9ZA", { exact: true })).toHaveCount(1);
+  await expect(page.getByText("http://127.0.0.1:3000/join/QSB2X9ZA")).toHaveCount(1);
   await expect(page.getByRole("button", { name: "Download QR PNG" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy join link for Quarterly Briefing" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open Presenter View" })).toHaveAttribute(

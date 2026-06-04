@@ -9,6 +9,8 @@ test("participant submits a moderated question without rendering pending text pu
   await expect(
     page.locator("section[aria-labelledby='approved-questions-heading']").getByText("Connected"),
   ).toBeVisible();
+  await expect(page.getByText("Live updates active")).toHaveCount(0);
+  await expect(page.getByText("Checking for queue changes every 2 seconds.")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Surveys" })).toHaveAttribute(
     "href",
     "/join/QSB2X9ZA/surveys",
