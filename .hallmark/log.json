@@ -1,0 +1,23 @@
+[
+  {
+    "date": "2026-06-04",
+    "macrostructure": "Moderation Console Landing",
+    "theme": "Boardroom Ledger",
+    "enrichment": "moderation queue and workflow preview",
+    "brief": "Complete landing page redesign around controlled live-room moderation"
+  },
+  {
+    "date": "2026-06-03",
+    "macrostructure": "Operations Console",
+    "theme": "Boardroom Ledger",
+    "enrichment": "none",
+    "brief": "Redesign QSB Ask foundation setup landing screen"
+  },
+  {
+    "date": "2026-06-03",
+    "macrostructure": "Product Preview Landing",
+    "theme": "Boardroom Ledger",
+    "enrichment": "Live Q&A and poll preview",
+    "brief": "Participant-first Slido-like QSB Ask homepage with admin setup split"
+  }
+]
