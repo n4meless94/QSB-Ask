@@ -68,19 +68,21 @@ test("create event form renders required Phase 1 fields", async ({ page }) => {
 
   await expect(page.getByRole("heading", { level: 1, name: "Create Event" })).toBeVisible();
   await expect(page.getByLabel("Event name")).toBeVisible();
-  await expect(page.getByLabel("Event date/time")).toBeVisible();
+  await expect(page.getByLabel("Event date")).toBeVisible();
+  await expect(page.getByLabel("Event time")).toBeVisible();
   await expect(page.getByLabel("Time zone")).toBeVisible();
   await expect(page.getByLabel("Status")).toBeVisible();
   await expect(page.getByLabel("Participant identity mode")).toBeVisible();
-  await expect(page.getByLabel("Moderation enabled")).toBeChecked();
-  await expect(page.getByRole("button", { name: "Save event" })).toBeVisible();
+  await expect(page.getByLabel("Questions require approval before public display")).toBeChecked();
+  await expect(page.getByRole("button", { name: "Save draft" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Event access summary" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Cancel" })).toHaveAttribute("href", "/dashboard");
 });
 
 test("turning moderation off shows the required warning dialog", async ({ page }) => {
   await page.goto("/events/new");
 
-  await page.getByLabel("Moderation enabled").click();
+  await page.getByLabel("Questions require approval before public display").click();
 
   await expect(page.getByRole("dialog", { name: "Turn moderation off?" })).toBeVisible();
   await expect(
@@ -89,17 +91,17 @@ test("turning moderation off shows the required warning dialog", async ({ page }
     ),
   ).toBeVisible();
   await page.getByRole("button", { name: "Keep moderation on" }).click();
-  await expect(page.getByLabel("Moderation enabled")).toBeChecked();
+  await expect(page.getByLabel("Questions require approval before public display")).toBeChecked();
 
-  await page.getByLabel("Moderation enabled").click();
+  await page.getByLabel("Questions require approval before public display").click();
   await page.getByRole("button", { name: "Turn off moderation" }).click();
-  await expect(page.getByLabel("Moderation enabled")).not.toBeChecked();
+  await expect(page.getByLabel("Questions require approval before public display")).not.toBeChecked();
 });
 
 test("create event validation shows field errors and summary", async ({ page }) => {
   await page.goto("/events/new");
 
-  await page.getByRole("button", { name: "Save event" }).click();
+  await page.getByRole("button", { name: "Save draft" }).click();
 
   await expect(page.getByText("Fix the highlighted fields and try again.")).toBeVisible();
   await expect(page.getByLabel("Event details").getByText("Event name is required.")).toBeVisible();
@@ -112,11 +114,12 @@ test("successful create event save redirects to dashboard with join details", as
   await page.goto("/events/new");
 
   await page.getByLabel("Event name").fill("Board Briefing");
-  await page.getByLabel("Event date/time").fill("2099-08-20T10:30");
+  await page.getByLabel("Event date").fill("2099-08-20");
+  await page.getByLabel("Event time").fill("10:30");
   await page.getByLabel("Time zone").fill("Asia/Kuala_Lumpur");
   await page.getByLabel("Status").selectOption("draft");
   await page.getByLabel("Participant identity mode").selectOption("name_email_required");
-  await page.getByRole("button", { name: "Save event" }).click();
+  await page.getByRole("button", { name: "Save draft" }).click();
 
   await expect(page).toHaveURL(/\/dashboard/);
   const row = page.getByRole("listitem").filter({ hasText: "Board Briefing" });
