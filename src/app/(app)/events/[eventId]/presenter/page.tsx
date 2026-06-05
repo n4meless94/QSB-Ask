@@ -10,10 +10,12 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type PresenterPageProps = {
   params: Promise<{ eventId: string }>;
+  searchParams?: Promise<{ questionId?: string }>;
 };
 
-export default async function PresenterPage({ params }: PresenterPageProps) {
+export default async function PresenterPage({ params, searchParams }: PresenterPageProps) {
   const { eventId } = await params;
+  const { questionId } = (await searchParams) ?? {};
   const cookieStore = await cookies();
 
   if (isE2EAuthEnabled(cookieStore.get(E2E_AUTH_COOKIE)?.value)) {
@@ -31,6 +33,7 @@ export default async function PresenterPage({ params }: PresenterPageProps) {
         joinCode="QSB2X9ZA"
         joinLink="http://127.0.0.1:3000/join/QSB2X9ZA/qna"
         questions={questions}
+        selectedQuestionId={questionId}
       />
     );
   }
@@ -60,6 +63,7 @@ export default async function PresenterPage({ params }: PresenterPageProps) {
       joinCode={result.access.event.join_code}
       joinLink={`${result.access.event.joinLink.replace(/\/+$/, "")}/qna`}
       questions={result.questions}
+      selectedQuestionId={questionId}
     />
   );
 }

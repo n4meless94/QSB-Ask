@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 
 import {
   archiveQuestionAction,
@@ -19,6 +20,7 @@ import {
   type ModerationQuestion,
   STALE_MODERATION_MESSAGE,
 } from "@/lib/qna/moderation-shared";
+import { comparePresenterQueueQuestions, isPresenterQueueStatus } from "@/lib/qna/presenter-queue";
 import { subscribeToModeratorQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 import type { ModerationAction, QuestionStatus } from "@/types/app";
 
@@ -106,6 +108,10 @@ function compareQuestions(sort: QueueSort) {
 
     return new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime();
   };
+}
+
+function presenterQuestionUrl(eventId: string, questionId: string) {
+  return `/events/${encodeURIComponent(eventId)}/presenter?questionId=${encodeURIComponent(questionId)}`;
 }
 
 function toFormData(question: ModerationQuestion, text?: string) {
@@ -217,6 +223,13 @@ export function ModeratorQueue({
 
   const publicVisibleCount = counts.live + counts.answered;
   const hiddenFromAudienceCount = counts.pending + counts.archived;
+  const presenterQueueNumbers = useMemo(() => {
+    const queue = items
+      .filter((question) => isPresenterQueueStatus(question.status))
+      .sort(comparePresenterQueueQuestions);
+
+    return new Map(queue.map((question, index) => [question.id, index + 1]));
+  }, [items]);
 
   const visibleQuestions = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -441,6 +454,7 @@ export function ModeratorQueue({
             visibleQuestions.map((question) => {
               const isEditing = editingId === question.id;
               const busy = pendingActionId === question.id || isPending || connectionState === "offline";
+              const presenterQueueNumber = presenterQueueNumbers.get(question.id);
 
               return (
                 <article
@@ -455,6 +469,23 @@ export function ModeratorQueue({
                     >
                       {statusLabels[question.status]}
                     </span>
+                    {presenterQueueNumber ? (
+                      <>
+                        <span className="rounded-[6px] border border-teal-700 bg-teal-50 px-2 py-1 font-semibold text-teal-900">
+                          Queue #{presenterQueueNumber}
+                        </span>
+                        <a
+                          aria-label={`Show queue #${presenterQueueNumber} in Presenter View`}
+                          className="grid size-8 place-items-center rounded-[6px] border border-slate-300 bg-white text-slate-700 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2"
+                          href={presenterQuestionUrl(eventId, question.id)}
+                          rel="noreferrer"
+                          target="_blank"
+                          title={`Show queue #${presenterQueueNumber} in Presenter View`}
+                        >
+                          <ExternalLink aria-hidden="true" size={16} strokeWidth={2.4} />
+                        </a>
+                      </>
+                    ) : null}
                     <span>{question.vote_count} votes</span>
                     <time dateTime={question.submitted_at}>
                       {new Date(question.submitted_at).toLocaleString("en-MY", {

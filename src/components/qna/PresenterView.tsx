@@ -6,6 +6,7 @@ import { Maximize2, Minimize2, Radio } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 
 import type { PublicQuestion } from "@/lib/qna/public";
+import { comparePresenterQueueQuestions } from "@/lib/qna/presenter-queue";
 import { subscribeToPublicQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 
 type PresenterViewProps = {
@@ -15,28 +16,14 @@ type PresenterViewProps = {
   joinCode: string;
   joinLink: string;
   questions: PublicQuestion[];
+  selectedQuestionId?: string;
 };
-
-type PresenterSort = "popular" | "recent";
 
 /* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
 /* Hallmark · macrostructure: Executive Briefing Display · tone: austere corporate townhall · anchor hue: qsb-teal */
 
-function sortQuestions(questions: PublicQuestion[], sort: PresenterSort) {
-  return [...questions].sort((left, right) => {
-    if (left.status !== right.status) {
-      return left.status === "live" ? -1 : 1;
-    }
-
-    if (sort === "recent") {
-      return new Date(right.submitted_at).getTime() - new Date(left.submitted_at).getTime();
-    }
-
-    return (
-      right.vote_count - left.vote_count ||
-      new Date(right.submitted_at).getTime() - new Date(left.submitted_at).getTime()
-    );
-  });
+function sortQuestions(questions: PublicQuestion[]) {
+  return [...questions].sort(comparePresenterQueueQuestions);
 }
 
 function statusLabel(status: PublicQuestion["status"]) {
@@ -60,10 +47,6 @@ function spacedJoinCode(joinCode: string) {
   return joinCode.split("").join(" ");
 }
 
-function eventKicker(eventName: string) {
-  return eventName.toUpperCase();
-}
-
 function metadataTime(value: string) {
   return new Date(value).toLocaleTimeString("en-MY", {
     hour: "numeric",
@@ -79,14 +62,21 @@ export function PresenterView({
   joinCode,
   joinLink,
   questions,
+  selectedQuestionId,
 }: PresenterViewProps) {
   const router = useRouter();
   const [questionState, setQuestionState] = useState(questions);
   const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const sourceQuestions = fixtureMode ? questionState : questions;
-  const sortedQuestions = useMemo(() => sortQuestions(sourceQuestions, "popular"), [sourceQuestions]);
-  const featuredQuestion = sortedQuestions[0];
+  const sortedQuestions = useMemo(() => sortQuestions(sourceQuestions), [sourceQuestions]);
+  const focusedQuestion = selectedQuestionId
+    ? sortedQuestions.find((question) => question.id === selectedQuestionId)
+    : undefined;
+  const featuredQuestion = focusedQuestion ?? sortedQuestions[0];
+  const featuredQuestionQueueNumber = featuredQuestion
+    ? sortedQuestions.findIndex((question) => question.id === featuredQuestion.id) + 1
+    : 0;
 
   useEffect(() => {
     function syncFullscreenState() {
@@ -154,12 +144,8 @@ export function PresenterView({
               aria-label={`${eventName} Presenter View`}
               className="min-w-0 break-words text-[20px] font-bold leading-none text-[#006B66] sm:text-[24px]"
             >
-              Townhall Briefing
+              {eventName}
             </h1>
-            <span className="hidden h-8 w-px bg-[#D9D5C9] sm:block" aria-hidden="true" />
-            <p className="hidden min-w-0 truncate text-[13px] font-bold uppercase leading-none tracking-[0.18em] text-[#667085] sm:block">
-              {eventKicker(eventName)}
-            </p>
           </div>
           <div className="flex items-center gap-3 text-[#006B66] sm:gap-5">
             <div className="hidden items-center gap-2 rounded-full border border-[#B8D8D3] bg-white/70 px-4 py-2 text-[13px] font-bold leading-none shadow-[0_10px_30px_rgba(0,107,102,0.08)] sm:flex">
@@ -200,6 +186,8 @@ export function PresenterView({
                 <div className="min-w-0">
                   <p className="flex flex-wrap gap-x-3 gap-y-1 text-[20px] font-semibold leading-[1.35] text-[#667085]">
                     <span>{statusLabel(featuredQuestion.status)}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>Queue #{featuredQuestionQueueNumber}</span>
                     <span aria-hidden="true">·</span>
                     <span>
                       {featuredQuestion.vote_count} {featuredQuestion.vote_count === 1 ? "vote" : "votes"}
