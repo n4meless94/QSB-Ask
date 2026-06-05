@@ -23,9 +23,11 @@ test("audience list shows approved questions only, sorts, and votes once", async
   await expect(voteButton).toContainText("4");
   await expect(voteButton).toHaveAttribute("aria-pressed", "true");
   await expect(voteButton).toBeDisabled();
+  await expect(page.getByText("You voted")).toBeVisible();
 
   await expect(page.getByText("Answered", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Voting closed for question Already answered item" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Voting closed for question Already answered item" })).toHaveCount(0);
+  await expect(page.getByLabel("2 votes for answered question Already answered item")).toBeVisible();
 });
 
 test("audience Q&A has no mobile horizontal overflow at 360px", async ({ page }) => {

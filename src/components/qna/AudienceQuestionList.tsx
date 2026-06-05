@@ -21,6 +21,11 @@ type AudienceSort = "popular" | "recent";
 
 function sortQuestions(questions: PublicQuestion[], sort: AudienceSort) {
   return [...questions].sort((left, right) => {
+    const leftAnswered = left.status === "answered";
+    const rightAnswered = right.status === "answered";
+
+    if (leftAnswered !== rightAnswered) return leftAnswered ? 1 : -1;
+
     if (sort === "recent") {
       return new Date(right.submitted_at).getTime() - new Date(left.submitted_at).getTime();
     }
@@ -154,12 +159,17 @@ export function AudienceQuestionList({
       </div>
 
       {message ? (
-        <div className="rounded-[14px] border border-teal-100 bg-teal-50 p-3 text-[#00796B]" role="status">
+        <div
+          className="fixed bottom-4 left-4 right-4 z-30 mx-auto max-w-[420px] rounded-[14px] border border-teal-100 bg-white px-4 py-3 text-[#00796B] shadow-lg sm:left-auto sm:right-6 sm:mx-0"
+          role="status"
+        >
           <p className="text-sm font-semibold leading-[1.4]">{message}</p>
         </div>
       ) : null}
 
-      <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
+      {connectionState === "live" ? null : (
+        <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
+      )}
 
       {sortedQuestions.length === 0 ? (
         <div className="rounded-[16px] border border-dashed border-slate-300 bg-white/75 p-8 text-center shadow-sm">
@@ -171,42 +181,51 @@ export function AudienceQuestionList({
             const isAnswered = question.status === "answered";
             const isVoted = votedQuestionIds.has(question.id);
             const disabled = isPending || isAnswered || isVoted;
-            const isTopQuestion = sort === "popular" && index === 0 && question.vote_count > 0;
+            const isTopQuestion = sort === "popular" && !isAnswered && index === 0 && question.vote_count > 0;
 
             return (
               <li
                 className={[
                   "grid grid-cols-[auto_minmax(0,1fr)] gap-4 rounded-[16px] border p-4 shadow-sm transition-colors sm:p-5",
                   isTopQuestion ? "border-[#008578] bg-teal-50/40" : "border-slate-200 bg-white",
-                  isAnswered ? "opacity-85" : "",
+                  isAnswered ? "bg-slate-50/70 shadow-none" : "",
                 ].join(" ")}
                 data-testid="audience-question-card"
                 key={question.id}
               >
-                <button
-                  aria-label={
-                    isAnswered
-                      ? `Voting closed for question ${question.current_text}`
-                      : `Vote for question ${question.current_text}`
-                  }
-                  aria-pressed={isVoted}
-                  className={[
-                    "inline-flex min-h-[76px] w-16 shrink-0 flex-col items-center justify-center rounded-[12px] border px-2 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2 disabled:cursor-not-allowed sm:min-h-[84px] sm:w-[72px]",
-                    isVoted
-                      ? "border-[#008578] bg-[#008578] text-white"
-                      : "border-slate-200 bg-white text-[#00796B] hover:border-[#008578] hover:bg-white",
-                    isAnswered ? "bg-slate-50 text-slate-500 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-500" : "",
-                  ].join(" ")}
-                  disabled={disabled}
-                  onClick={() => vote(question)}
-                  type="button"
-                >
-                  <ChevronUp aria-hidden="true" className="h-5 w-5" strokeWidth={2.5} />
-                  <span className="text-lg font-semibold leading-6">{question.vote_count}</span>
-                  <span className="text-[11px] font-semibold uppercase leading-4 tracking-normal">
-                    {question.vote_count === 1 ? "vote" : "votes"}
-                  </span>
-                </button>
+                {isAnswered ? (
+                  <div
+                    aria-label={`${question.vote_count} ${
+                      question.vote_count === 1 ? "vote" : "votes"
+                    } for answered question ${question.current_text}`}
+                    className="inline-flex min-h-[76px] w-16 shrink-0 flex-col items-center justify-center rounded-[12px] border border-slate-200 bg-white px-2 text-center text-slate-500 sm:min-h-[84px] sm:w-[72px]"
+                  >
+                    <span className="text-lg font-semibold leading-6">{question.vote_count}</span>
+                    <span className="text-[11px] font-semibold uppercase leading-4 tracking-normal">
+                      {question.vote_count === 1 ? "vote" : "votes"}
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    aria-label={`Vote for question ${question.current_text}`}
+                    aria-pressed={isVoted}
+                    className={[
+                      "inline-flex min-h-[76px] w-16 shrink-0 flex-col items-center justify-center rounded-[12px] border px-2 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2 disabled:cursor-not-allowed sm:min-h-[84px] sm:w-[72px]",
+                      isVoted
+                        ? "border-[#008578] bg-teal-50 text-[#00796B]"
+                        : "border-slate-200 bg-white text-[#00796B] hover:border-[#008578] hover:bg-teal-50/60",
+                    ].join(" ")}
+                    disabled={disabled}
+                    onClick={() => vote(question)}
+                    type="button"
+                  >
+                    <ChevronUp aria-hidden="true" className="h-5 w-5" strokeWidth={2.5} />
+                    <span className="text-lg font-semibold leading-6">{question.vote_count}</span>
+                    <span className="text-[11px] font-semibold uppercase leading-4 tracking-normal">
+                      {question.vote_count === 1 ? "vote" : "votes"}
+                    </span>
+                  </button>
+                )}
                 <div className="min-w-0 self-center">
                   <div className="flex min-w-0 flex-wrap items-center gap-2">
                     {isTopQuestion ? (
@@ -230,13 +249,13 @@ export function AudienceQuestionList({
                   <p
                     className={[
                       "mt-2 break-words text-[18px] font-semibold leading-7",
-                      isAnswered ? "text-slate-700" : "text-slate-950",
+                      isAnswered ? "text-slate-600" : "text-slate-950",
                     ].join(" ")}
                   >
                     {question.current_text}
                   </p>
                   {isVoted ? (
-                    <p className="mt-2 text-sm font-semibold leading-[1.4] text-teal-700">Voted</p>
+                    <p className="mt-2 text-sm font-semibold leading-[1.4] text-teal-700">You voted</p>
                   ) : null}
                 </div>
               </li>

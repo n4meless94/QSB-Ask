@@ -18,7 +18,7 @@ test("audience and presenter realtime updates use approved-only payloads", async
 
   await audiencePage.goto("/join/QSB2X9ZA/qna");
   await presenterPage.goto("/events/event-1/presenter");
-  await expect(audiencePage.getByText("Connected").first()).toBeVisible();
+  await expect(audiencePage.getByText("Connected")).toHaveCount(0);
   await expect(presenterPage.getByText("Connected").first()).toBeVisible();
   await expect(audiencePage.locator("body[data-qna-realtime-ready='true']")).toBeAttached();
   await expect(presenterPage.locator("body[data-qna-realtime-ready='true']")).toBeAttached();
@@ -91,7 +91,7 @@ test("audience and presenter show offline and refresh-needed reconnect actions w
 
   await audiencePage.goto("/join/QSB2X9ZA/qna");
   await presenterPage.goto("/events/event-1/presenter");
-  await expect(audiencePage.getByText("Connected").first()).toBeVisible();
+  await expect(audiencePage.getByText("Connected")).toHaveCount(0);
   await expect(presenterPage.getByText("Connected").first()).toBeVisible();
   await expect(audiencePage.locator("body[data-qna-realtime-ready='true']")).toBeAttached();
   await expect(presenterPage.locator("body[data-qna-realtime-ready='true']")).toBeAttached();
