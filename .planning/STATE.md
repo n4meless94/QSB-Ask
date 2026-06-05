@@ -96,6 +96,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-04: Quick task `260604-qmd` replaced fake Presenter View speaker identity with question metadata, fixed topbar settings/fullscreen actions, and pointed presenter QR scans straight to participant Q&A.
 - 2026-06-04: Quick task `260604-s2b` fixed the Event Workspace "Open Presenter View" action wrapping and added an E2E layout regression check.
 - 2026-06-06: Quick task `260606-3md` removed the hardcoded Presenter View townhall title and added queue-first presenter focus links from the Q&A moderation queue.
+- 2026-06-06: Quick task `260606-4cc` changed queue presenter focus from popup links to an existing Presenter View update channel with a question-swap animation.
 
 ## Decisions
 
@@ -184,6 +185,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | 2026-06-04 | 260604-ept | Light QSB Event Portal landing with real event data | `npm run lint`, `npx tsc --noEmit`, `npm test -- tests/events/landing.test.ts`, Playwright desktop/mobile screenshots, `npm run build` passed |
 | 2026-06-05 | 260605-lpr | Modern QSB Event Portal landing redesign | `npm run lint`, `npm test`, `npx tsc --noEmit`, focused Playwright E2E, desktop/tablet/mobile screenshot sweep, clean temp-worktree `npm run build` passed |
 | 2026-06-06 | 260606-3md | Presenter event title and queue-first question focus | `npm run lint` focused files, `npx tsc --noEmit`, focused Playwright E2E, `git diff --check` passed |
+| 2026-06-06 | 260606-4cc | Existing Presenter View queue focus update | focused ESLint, `npx tsc --noEmit`, focused Playwright E2E, browser visual check, `git diff --check` passed |
 
 ## Last Session
 

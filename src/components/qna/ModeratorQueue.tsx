@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ExternalLink } from "lucide-react";
+import { MonitorUp } from "lucide-react";
 
 import {
   archiveQuestionAction,
@@ -21,6 +21,7 @@ import {
   STALE_MODERATION_MESSAGE,
 } from "@/lib/qna/moderation-shared";
 import { comparePresenterQueueQuestions, isPresenterQueueStatus } from "@/lib/qna/presenter-queue";
+import { publishPresenterFocus } from "@/lib/qna/presenter-control";
 import { subscribeToModeratorQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 import type { ModerationAction, QuestionStatus } from "@/types/app";
 
@@ -108,10 +109,6 @@ function compareQuestions(sort: QueueSort) {
 
     return new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime();
   };
-}
-
-function presenterQuestionUrl(eventId: string, questionId: string) {
-  return `/events/${encodeURIComponent(eventId)}/presenter?questionId=${encodeURIComponent(questionId)}`;
 }
 
 function toFormData(question: ModerationQuestion, text?: string) {
@@ -328,6 +325,11 @@ export function ModeratorQueue({
     setMessage(STALE_MODERATION_MESSAGE);
   }
 
+  function showInPresenterView(question: ModerationQuestion, queueNumber: number) {
+    publishPresenterFocus(eventId, question.id);
+    setMessage(`Presenter View now showing Queue #${queueNumber}.`);
+  }
+
   return (
     <div className="grid gap-4">
       <section
@@ -474,16 +476,15 @@ export function ModeratorQueue({
                         <span className="rounded-[6px] border border-teal-700 bg-teal-50 px-2 py-1 font-semibold text-teal-900">
                           Queue #{presenterQueueNumber}
                         </span>
-                        <a
+                        <button
                           aria-label={`Show queue #${presenterQueueNumber} in Presenter View`}
                           className="grid size-8 place-items-center rounded-[6px] border border-slate-300 bg-white text-slate-700 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2"
-                          href={presenterQuestionUrl(eventId, question.id)}
-                          rel="noreferrer"
-                          target="_blank"
+                          onClick={() => showInPresenterView(question, presenterQueueNumber)}
                           title={`Show queue #${presenterQueueNumber} in Presenter View`}
+                          type="button"
                         >
-                          <ExternalLink aria-hidden="true" size={16} strokeWidth={2.4} />
-                        </a>
+                          <MonitorUp aria-hidden="true" size={16} strokeWidth={2.4} />
+                        </button>
                       </>
                     ) : null}
                     <span>{question.vote_count} votes</span>

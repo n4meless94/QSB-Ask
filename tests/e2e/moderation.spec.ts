@@ -27,10 +27,7 @@ test("moderator queue supports tabs, search, sort, actions, edit marker, history
 
   await page.getByRole("tab", { name: "Live 1" }).click();
   await expect(page.getByText("Queue #1")).toBeVisible();
-  await expect(page.getByLabel("Show queue #1 in Presenter View")).toHaveAttribute(
-    "href",
-    "/events/event-1/presenter?questionId=question-live-1",
-  );
+  await expect(page.getByLabel("Show queue #1 in Presenter View")).toBeVisible();
   await page.getByRole("tab", { name: "Pending 2" }).click();
 
   await page.getByLabel("Search questions").fill("slides");

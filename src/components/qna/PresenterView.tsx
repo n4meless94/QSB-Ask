@@ -7,6 +7,7 @@ import { QRCodeCanvas } from "qrcode.react";
 
 import type { PublicQuestion } from "@/lib/qna/public";
 import { comparePresenterQueueQuestions } from "@/lib/qna/presenter-queue";
+import { subscribeToPresenterFocus } from "@/lib/qna/presenter-control";
 import { subscribeToPublicQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 
 type PresenterViewProps = {
@@ -66,17 +67,22 @@ export function PresenterView({
 }: PresenterViewProps) {
   const router = useRouter();
   const [questionState, setQuestionState] = useState(questions);
+  const [activeQuestionId, setActiveQuestionId] = useState(selectedQuestionId);
   const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const sourceQuestions = fixtureMode ? questionState : questions;
   const sortedQuestions = useMemo(() => sortQuestions(sourceQuestions), [sourceQuestions]);
-  const focusedQuestion = selectedQuestionId
-    ? sortedQuestions.find((question) => question.id === selectedQuestionId)
+  const focusedQuestion = activeQuestionId
+    ? sortedQuestions.find((question) => question.id === activeQuestionId)
     : undefined;
   const featuredQuestion = focusedQuestion ?? sortedQuestions[0];
   const featuredQuestionQueueNumber = featuredQuestion
     ? sortedQuestions.findIndex((question) => question.id === featuredQuestion.id) + 1
     : 0;
+
+  useEffect(() => {
+    return subscribeToPresenterFocus(eventId, setActiveQuestionId);
+  }, [eventId]);
 
   useEffect(() => {
     function syncFullscreenState() {
@@ -169,7 +175,11 @@ export function PresenterView({
             aria-label="Featured approved question"
             className="relative mx-auto grid w-full max-w-[1500px] grid-cols-1 items-center gap-10 px-5 py-8 sm:px-10 lg:grid-cols-[minmax(0,1.62fr)_minmax(340px,0.82fr)] lg:gap-24 lg:px-16 lg:py-0"
           >
-            <article className="grid min-w-0 gap-12 lg:gap-14">
+            <article
+              className="presenter-question-swap grid min-w-0 gap-12 lg:gap-14"
+              data-testid="presenter-featured-question"
+              key={featuredQuestion.id}
+            >
               <div className="grid max-w-[920px] gap-7">
                 <p className="text-[14px] font-black uppercase leading-none tracking-[0.34em] text-[#006B66]">
                   Current question

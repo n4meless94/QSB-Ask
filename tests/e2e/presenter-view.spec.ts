@@ -47,6 +47,30 @@ test("presenter view can focus a queue question from the query string", async ({
   await expect(page.getByText("Answered", { exact: true })).toBeVisible();
 });
 
+test("moderation queue updates the existing presenter view without opening a popup", async ({
+  context,
+}) => {
+  const presenterPage = await context.newPage();
+  const moderatorPage = await context.newPage();
+
+  await presenterPage.goto("/events/event-1/presenter");
+  await expect(presenterPage.getByText("How will follow-up actions be shared?")).toBeVisible();
+
+  await moderatorPage.goto("/events/event-1");
+  await moderatorPage.getByRole("tab", { name: "Q&A" }).click();
+  await moderatorPage.getByRole("tab", { name: "Answered 1" }).click();
+
+  const popupPromise = moderatorPage.waitForEvent("popup", { timeout: 750 }).catch(() => null);
+  await moderatorPage.getByLabel("Show queue #2 in Presenter View").click();
+
+  await expect(moderatorPage.getByText("Presenter View now showing Queue #2.")).toBeVisible();
+  await expect(presenterPage.getByTestId("presenter-featured-question")).toContainText(
+    "Who owns the next briefing?",
+  );
+  await expect(presenterPage.getByText("Queue #2")).toBeVisible();
+  expect(await popupPromise).toBeNull();
+});
+
 test("presenter view denies unassigned signed-in users", async ({ page }) => {
   await page.goto("/events/denied/presenter");
 
