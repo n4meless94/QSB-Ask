@@ -158,13 +158,15 @@ export function ModeratorQueue({
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<QueueSort>("most_recent");
   const [message, setMessage] = useState("");
-  const [items, setItems] = useState(questions);
-  const [historyItems, setHistoryItems] = useState(history);
+  const [fixtureItems, setFixtureItems] = useState<ModerationQuestion[] | null>(null);
+  const [fixtureHistoryItems, setFixtureHistoryItems] = useState<ModerationHistoryEntry[] | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [pendingActionId, setPendingActionId] = useState<string | null>(null);
   const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
   const [isPending, startTransition] = useTransition();
+  const items = fixtureMode ? (fixtureItems ?? questions) : questions;
+  const historyItems = fixtureMode ? (fixtureHistoryItems ?? history) : history;
 
   useEffect(() => {
     if (fixtureMode) {
@@ -172,7 +174,7 @@ export function ModeratorQueue({
         const detail = (event as CustomEvent<{ moderationQuestions?: ModerationQuestion[] }>).detail;
 
         if (detail?.moderationQuestions) {
-          setItems(detail.moderationQuestions);
+          setFixtureItems(detail.moderationQuestions);
           setConnectionState("live");
         }
       }
@@ -229,8 +231,8 @@ export function ModeratorQueue({
 
   function updateFixtureQuestion(question: ModerationQuestion, action: ActionVerb) {
     const nextStatus = statusAfterAction(question, action);
-    setItems((current) =>
-      current.map((item) =>
+    setFixtureItems((current) =>
+      (current ?? questions).map((item) =>
         item.id === question.id
           ? {
               ...item,
@@ -242,7 +244,7 @@ export function ModeratorQueue({
           : item,
       ),
     );
-    setHistoryItems((current) => [historyEntry(question, action, nextStatus), ...current]);
+    setFixtureHistoryItems((current) => [historyEntry(question, action, nextStatus), ...(current ?? history)]);
     setMessage(actionMessages[action]);
   }
 
@@ -281,13 +283,13 @@ export function ModeratorQueue({
         is_edited: true,
         updated_at: new Date().toISOString(),
       };
-      setItems((current) => current.map((item) => (item.id === question.id ? editedQuestion : item)));
-      setHistoryItems((current) => [
+      setFixtureItems((current) => (current ?? questions).map((item) => (item.id === question.id ? editedQuestion : item)));
+      setFixtureHistoryItems((current) => [
         {
           ...historyEntry(question, "edit", question.status),
           metadata: { next_text: nextText },
         },
-        ...current,
+        ...(current ?? history),
       ]);
       setEditingId(null);
       setMessage("Question edited.");

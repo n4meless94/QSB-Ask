@@ -84,7 +84,8 @@ export function PresenterView({
   const [questionState, setQuestionState] = useState(questions);
   const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const sortedQuestions = useMemo(() => sortQuestions(questionState, "popular"), [questionState]);
+  const sourceQuestions = fixtureMode ? questionState : questions;
+  const sortedQuestions = useMemo(() => sortQuestions(sourceQuestions, "popular"), [sourceQuestions]);
   const featuredQuestion = sortedQuestions[0];
 
   useEffect(() => {

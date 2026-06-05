@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, ChevronUp, Pencil } from "lucide-react";
 
 import { voteQuestionAction } from "@/app/join/[joinCode]/qna/vote-actions";
+import { ConnectionStatus } from "@/components/qna/ConnectionStatus";
 import type { PublicQuestion } from "@/lib/qna/public";
 import { subscribeToPublicQuestions, type QnaConnectionState } from "@/lib/qna/realtime";
 
@@ -42,10 +43,27 @@ export function AudienceQuestionList({
   const [sort, setSort] = useState<AudienceSort>("popular");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
-  const [votedQuestionIds, setVotedQuestionIds] = useState(() => new Set(initialVotedQuestionIds));
-  const [questionState, setQuestionState] = useState(questions);
-  const [, setConnectionState] = useState<QnaConnectionState>("live");
-  const sortedQuestions = useMemo(() => sortQuestions(questionState, sort), [questionState, sort]);
+  const [localVotedQuestionIds, setLocalVotedQuestionIds] = useState<Set<string>>(() => new Set());
+  const [optimisticVoteCounts, setOptimisticVoteCounts] = useState<Record<string, number>>({});
+  const [fixtureQuestions, setFixtureQuestions] = useState<PublicQuestion[] | null>(null);
+  const [connectionState, setConnectionState] = useState<QnaConnectionState>("live");
+  const sourceQuestions = fixtureMode ? (fixtureQuestions ?? questions) : questions;
+  const votedQuestionIds = useMemo(
+    () => new Set([...initialVotedQuestionIds, ...localVotedQuestionIds]),
+    [initialVotedQuestionIds, localVotedQuestionIds],
+  );
+  const displayedQuestions = useMemo(
+    () =>
+      sourceQuestions.map((question) => {
+        const optimisticVoteCount = optimisticVoteCounts[question.id];
+
+        return optimisticVoteCount === undefined
+          ? question
+          : { ...question, vote_count: Math.max(question.vote_count, optimisticVoteCount) };
+      }),
+    [optimisticVoteCounts, sourceQuestions],
+  );
+  const sortedQuestions = useMemo(() => sortQuestions(displayedQuestions, sort), [displayedQuestions, sort]);
 
   useEffect(() => {
     if (fixtureMode) {
@@ -53,7 +71,7 @@ export function AudienceQuestionList({
         const detail = (event as CustomEvent<{ questions?: PublicQuestion[] }>).detail;
 
         if (detail?.questions) {
-          setQuestionState(detail.questions);
+          setFixtureQuestions(detail.questions);
           setConnectionState("live");
         }
       }
@@ -93,17 +111,11 @@ export function AudienceQuestionList({
 
       if (!result.ok) return;
 
-      setVotedQuestionIds((current) => new Set(current).add(question.id));
-      setQuestionState((current) =>
-        current.map((item) =>
-          item.id === question.id
-            ? {
-                ...item,
-                vote_count: result.result?.question.vote_count ?? item.vote_count + (votedQuestionIds.has(question.id) ? 0 : 1),
-              }
-            : item,
-        ),
-      );
+      setLocalVotedQuestionIds((current) => new Set(current).add(question.id));
+      setOptimisticVoteCounts((current) => ({
+        ...current,
+        [question.id]: result.result?.question.vote_count ?? question.vote_count + (votedQuestionIds.has(question.id) ? 0 : 1),
+      }));
     });
   }
 
@@ -146,6 +158,8 @@ export function AudienceQuestionList({
           <p className="text-sm font-semibold leading-[1.4]">{message}</p>
         </div>
       ) : null}
+
+      <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
 
       {sortedQuestions.length === 0 ? (
         <div className="rounded-[16px] border border-dashed border-slate-300 bg-white/75 p-8 text-center shadow-sm">

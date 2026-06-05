@@ -63,7 +63,11 @@ test("audience and presenter realtime updates use approved-only payloads", async
     window.dispatchEvent(new CustomEvent("qsb-ask:e2e-qna-refresh", { detail: { questions } }));
   }, answeredQuestions);
 
-  await expect(audiencePage.getByText("2 votes")).toBeVisible({ timeout: 2000 });
+  await expect(
+    audiencePage.locator("[data-testid='audience-question-card']").filter({
+      hasText: "Approved realtime question",
+    }),
+  ).toContainText(/2\s*votes/, { timeout: 2000 });
   await expect(audiencePage.getByText("Answered", { exact: true })).toBeVisible({ timeout: 2000 });
   await expect(presenterPage.getByText("2 votes")).toBeVisible({ timeout: 2000 });
   await expect(presenterPage.getByText("Answered", { exact: true })).toBeVisible({ timeout: 2000 });
