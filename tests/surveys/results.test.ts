@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import { SurveyBarChart } from "@/components/surveys/SurveyBarChart";
 import {
@@ -322,6 +324,41 @@ describe("survey result aggregation", () => {
     });
   });
 
+  it("does not let another survey response contaminate per-question counts", async () => {
+    const otherSurveyResponse = {
+      id: "response-other-survey",
+      participant_session_id: "participant-4",
+      submitted_at: "2026-05-30T00:14:00.000Z",
+      survey_id: "survey-2",
+    };
+
+    mockResultQueries({
+      surveys: surveyRows,
+      responses: [...responseRows, otherSurveyResponse],
+      answers: [
+        ...answerRows,
+        {
+          id: "answer-other-survey",
+          rating_value: null,
+          selected_option_ids: ["option-yes"],
+          survey_question_id: "question-choice",
+          survey_response_id: otherSurveyResponse.id,
+          text_value: null,
+          survey_responses: otherSurveyResponse,
+        },
+      ],
+    });
+
+    const [result] = await getOrganiserSurveyResults("organiser-1", "event-1");
+
+    expect(result.responseCount).toBe(3);
+    expect(result.questions.find((question) => question.id === "question-choice")?.responseCount).toBe(3);
+    expect(result.questions.find((question) => question.id === "question-choice")?.chartData).toEqual([
+      { count: 2, label: "Yes", percentage: 67 },
+      { count: 1, label: "No", percentage: 33 },
+    ]);
+  });
+
   it("returns staff-only open text rows without token hashes, raw tokens, or participant emails", async () => {
     const [result] = await getOrganiserSurveyResults("organiser-1", "event-1");
     const textQuestion = result.questions.find((question) => question.id === "question-text");
@@ -378,14 +415,15 @@ describe("survey result aggregation", () => {
 
 describe("SurveyBarChart", () => {
   it("renders readable labels, values, percentages, and an adjacent data table alternative", () => {
-    const element = SurveyBarChart({
-      data: [
-        { count: 2, label: "Yes", percentage: 67 },
-        { count: 1, label: "No", percentage: 33 },
-      ],
-      title: "Is the pace clear?",
-    });
-    const tree = JSON.stringify(element);
+    const tree = renderToStaticMarkup(
+      createElement(SurveyBarChart, {
+        data: [
+          { count: 2, label: "Yes", percentage: 67 },
+          { count: 1, label: "No", percentage: 33 },
+        ],
+        title: "Is the pace clear?",
+      }),
+    );
 
     expect(tree).toContain("Is the pace clear?");
     expect(tree).toContain("Yes");
@@ -395,14 +433,15 @@ describe("SurveyBarChart", () => {
   });
 
   it("preserves chart and table structure for zero-response surveys", () => {
-    const element = SurveyBarChart({
-      data: [
-        { count: 0, label: "Agree", percentage: 0 },
-        { count: 0, label: "Disagree", percentage: 0 },
-      ],
-      title: "Should we repeat this format?",
-    });
-    const tree = JSON.stringify(element);
+    const tree = renderToStaticMarkup(
+      createElement(SurveyBarChart, {
+        data: [
+          { count: 0, label: "Agree", percentage: 0 },
+          { count: 0, label: "Disagree", percentage: 0 },
+        ],
+        title: "Should we repeat this format?",
+      }),
+    );
 
     expect(tree).toContain("No responses yet");
     expect(tree).toContain("Charts will update when participants submit this survey.");

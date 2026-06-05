@@ -92,7 +92,7 @@ export default async function EventDetailPage({ params, searchParams }: EventDet
 
   let access: EventAccessContext;
   let exportCounts: ExportCounts = zeroExportCounts();
-  let members: EventMemberSummary[];
+  let members: EventMemberSummary[] = [];
   let moderationQuestions: ModerationQuestion[] = [];
   let history: ModerationHistoryEntry[] = [];
   let results: SurveyResult[] = [];
@@ -100,21 +100,47 @@ export default async function EventDetailPage({ params, searchParams }: EventDet
 
   try {
     access = await assertEventRole(user.id, eventId, PRESENTER_ROLES);
-    members = access.role === "organiser" ? await listEventMembersForOrganiser(user.id, eventId) : [];
-    surveys = access.role === "organiser" ? await listSurveysForOrganiser(user.id, eventId) : [];
-    results = access.role === "organiser" ? await getOrganiserSurveyResults(user.id, eventId) : [];
-    exportCounts = access.role === "organiser" ? await getOrganiserExportCounts(user.id, eventId) : zeroExportCounts();
-    if (canModerate(access.role)) {
-      const [pending, live, answered, archived, actionHistory] = await Promise.all([
-        listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "pending" }),
-        listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "live" }),
-        listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "answered" }),
-        listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "archived" }),
-        listModerationHistory(user.id, eventId),
-      ]);
-      moderationQuestions = [...pending, ...live, ...answered, ...archived];
-      history = actionHistory;
-    }
+
+    const organiserLoaders =
+      access.role === "organiser"
+        ? Promise.all([
+            listEventMembersForOrganiser(user.id, eventId),
+            listSurveysForOrganiser(user.id, eventId),
+            getOrganiserSurveyResults(user.id, eventId),
+            getOrganiserExportCounts(user.id, eventId),
+          ])
+        : Promise.resolve([[], [], [], zeroExportCounts()] as [
+            EventMemberSummary[],
+            SurveySummary[],
+            SurveyResult[],
+            ExportCounts,
+          ]);
+
+    const moderationLoaders = canModerate(access.role)
+      ? Promise.all([
+          listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "pending" }),
+          listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "live" }),
+          listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "answered" }),
+          listModerationQuestions(user.id, eventId, { sort: "most_recent", status: "archived" }),
+          listModerationHistory(user.id, eventId),
+        ])
+      : Promise.resolve([[], [], [], [], []] as [
+          ModerationQuestion[],
+          ModerationQuestion[],
+          ModerationQuestion[],
+          ModerationQuestion[],
+          ModerationHistoryEntry[],
+        ]);
+
+    const [[loadedMembers, loadedSurveys, loadedResults, loadedExportCounts], [pending, live, answered, archived, actionHistory]] =
+      await Promise.all([organiserLoaders, moderationLoaders]);
+
+    members = loadedMembers;
+    surveys = loadedSurveys;
+    results = loadedResults;
+    exportCounts = loadedExportCounts;
+    moderationQuestions = [...pending, ...live, ...answered, ...archived];
+    history = actionHistory;
   } catch {
     return (
       <div className="grid max-w-3xl gap-4">
@@ -201,7 +227,6 @@ function EventDetailContent({
             eventId={access.event.id}
             fixtureMode={fixtureMode}
             history={history}
-            key={moderationQuestions.map((question) => `${question.id}:${question.updated_at}:${question.status}`).join("|")}
             questions={moderationQuestions}
           />
         ) : (

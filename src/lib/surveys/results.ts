@@ -89,14 +89,10 @@ function answerSubmittedAt(answer: AnswerWithResponse, responsesById: Map<string
   return answer.survey_responses?.submitted_at ?? responsesById.get(answer.survey_response_id)?.submitted_at ?? "";
 }
 
-function answersForQuestion(questionId: string, answers: AnswerWithResponse[]) {
-  return answers.filter((answer) => answer.survey_question_id === questionId);
-}
-
-function answeredResponseCount(question: SurveyQuestionWithOptions, answers: AnswerWithResponse[]) {
+function answeredResponseCount(question: SurveyQuestionWithOptions, questionAnswers: AnswerWithResponse[]) {
   const responseIds = new Set<string>();
 
-  for (const answer of answersForQuestion(question.id, answers)) {
+  for (const answer of questionAnswers) {
     if (question.type === "multiple_choice" || question.type === "multiple_select") {
       if ((answer.selected_option_ids ?? []).length > 0) responseIds.add(answerResponseId(answer));
     } else if (question.type === "rating") {
@@ -109,14 +105,21 @@ function answeredResponseCount(question: SurveyQuestionWithOptions, answers: Ans
   return responseIds.size;
 }
 
-function choiceChartData(question: SurveyQuestionWithOptions, answers: AnswerWithResponse[]) {
-  const questionAnswers = answersForQuestion(question.id, answers);
-  const total = answeredResponseCount(question, answers);
+function choiceChartData(
+  question: SurveyQuestionWithOptions,
+  questionAnswers: AnswerWithResponse[],
+  total: number,
+) {
+  const countsByOptionId = new Map<string, number>();
+
+  for (const answer of questionAnswers) {
+    for (const optionId of answer.selected_option_ids ?? []) {
+      countsByOptionId.set(optionId, (countsByOptionId.get(optionId) ?? 0) + 1);
+    }
+  }
 
   return sortByPosition(question.survey_options).map((option) => {
-    const count = questionAnswers.filter((answer) =>
-      (answer.selected_option_ids ?? []).includes(option.id),
-    ).length;
+    const count = countsByOptionId.get(option.id) ?? 0;
 
     return {
       count,
@@ -126,14 +129,19 @@ function choiceChartData(question: SurveyQuestionWithOptions, answers: AnswerWit
   });
 }
 
-function ratingChartData(question: SurveyQuestionWithOptions, answers: AnswerWithResponse[]) {
+function ratingChartData(question: SurveyQuestionWithOptions, questionAnswers: AnswerWithResponse[], total: number) {
   const scale = question.rating_scale === 10 ? 10 : 5;
-  const questionAnswers = answersForQuestion(question.id, answers);
-  const total = answeredResponseCount(question, answers);
+  const countsByRating = new Map<number, number>();
+
+  for (const answer of questionAnswers) {
+    if (typeof answer.rating_value === "number") {
+      countsByRating.set(answer.rating_value, (countsByRating.get(answer.rating_value) ?? 0) + 1);
+    }
+  }
 
   return Array.from({ length: scale }, (_, index) => {
     const rating = index + 1;
-    const count = questionAnswers.filter((answer) => answer.rating_value === rating).length;
+    const count = countsByRating.get(rating) ?? 0;
 
     return {
       count,
@@ -144,11 +152,10 @@ function ratingChartData(question: SurveyQuestionWithOptions, answers: AnswerWit
 }
 
 function openTextRows(
-  question: SurveyQuestionWithOptions,
-  answers: AnswerWithResponse[],
+  questionAnswers: AnswerWithResponse[],
   responsesById: Map<string, SurveyResponseRow>,
 ) {
-  return answersForQuestion(question.id, answers)
+  return questionAnswers
     .filter((answer) => (answer.text_value ?? "").trim())
     .sort((left, right) => answerSubmittedAt(left, responsesById).localeCompare(answerSubmittedAt(right, responsesById)))
     .map((answer, index) => ({
@@ -160,7 +167,7 @@ function openTextRows(
 
 function mapQuestionResult(
   question: SurveyQuestionWithOptions,
-  answers: AnswerWithResponse[],
+  questionAnswers: AnswerWithResponse[],
   responsesById: Map<string, SurveyResponseRow>,
   includeOpenText: boolean,
 ): SurveyQuestionResult {
@@ -169,24 +176,56 @@ function mapQuestionResult(
     label: option.label,
     position: option.position,
   }));
+  const responseCount = answeredResponseCount(question, questionAnswers);
   const chartData =
     question.type === "multiple_choice" || question.type === "multiple_select"
-      ? choiceChartData(question, answers)
+      ? choiceChartData(question, questionAnswers, responseCount)
       : question.type === "rating"
-        ? ratingChartData(question, answers)
+        ? ratingChartData(question, questionAnswers, responseCount)
         : [];
 
   return {
     chartData,
     id: question.id,
-    openTextResponses: includeOpenText && question.type === "open_text" ? openTextRows(question, answers, responsesById) : [],
+    openTextResponses: includeOpenText && question.type === "open_text" ? openTextRows(questionAnswers, responsesById) : [],
     options,
     position: question.position,
     prompt: question.prompt,
     ratingScale: question.rating_scale === 5 || question.rating_scale === 10 ? question.rating_scale : null,
-    responseCount: answeredResponseCount(question, answers),
+    responseCount,
     type: question.type,
   };
+}
+
+function buildAnswerIndex(responses: SurveyResponseRow[], answers: AnswerWithResponse[]) {
+  const responsesBySurveyId = new Map<string, SurveyResponseRow[]>();
+  const responsesById = new Map(responses.map((response) => [response.id, response]));
+  const answersBySurveyAndQuestion = new Map<string, Map<string, AnswerWithResponse[]>>();
+
+  for (const response of responses) {
+    const existing = responsesBySurveyId.get(response.survey_id) ?? [];
+    existing.push(response);
+    responsesBySurveyId.set(response.survey_id, existing);
+  }
+
+  for (const answer of answers) {
+    const surveyId = answer.survey_responses?.survey_id ?? responsesById.get(answer.survey_response_id)?.survey_id;
+
+    if (!surveyId) continue;
+
+    let answersByQuestion = answersBySurveyAndQuestion.get(surveyId);
+
+    if (!answersByQuestion) {
+      answersByQuestion = new Map<string, AnswerWithResponse[]>();
+      answersBySurveyAndQuestion.set(surveyId, answersByQuestion);
+    }
+
+    const existing = answersByQuestion.get(answer.survey_question_id) ?? [];
+    existing.push(answer);
+    answersByQuestion.set(answer.survey_question_id, existing);
+  }
+
+  return { answersBySurveyAndQuestion, responsesById, responsesBySurveyId };
 }
 
 function buildResults(
@@ -195,26 +234,18 @@ function buildResults(
   answers: AnswerWithResponse[],
   includeOpenText: boolean,
 ): SurveyResult[] {
-  const responsesBySurveyId = new Map<string, SurveyResponseRow[]>();
-  const responsesById = new Map(responses.map((response) => [response.id, response]));
-
-  for (const response of responses) {
-    const existing = responsesBySurveyId.get(response.survey_id) ?? [];
-    existing.push(response);
-    responsesBySurveyId.set(response.survey_id, existing);
-  }
+  const { answersBySurveyAndQuestion, responsesById, responsesBySurveyId } = buildAnswerIndex(responses, answers);
 
   return surveys.map((survey) => {
     const surveyResponses = responsesBySurveyId.get(survey.id) ?? [];
-    const responseIds = new Set(surveyResponses.map((response) => response.id));
-    const surveyAnswers = answers.filter((answer) => responseIds.has(answer.survey_response_id));
+    const answersByQuestion = answersBySurveyAndQuestion.get(survey.id) ?? new Map<string, AnswerWithResponse[]>();
 
     return {
       id: survey.id,
       lastUpdated: survey.updated_at,
       presentationHref: `/events/${survey.event_id}/presentation/surveys/${survey.id}`,
       questions: sortByPosition(survey.survey_questions).map((question) =>
-        mapQuestionResult(question, surveyAnswers, responsesById, includeOpenText),
+        mapQuestionResult(question, answersByQuestion.get(question.id) ?? [], responsesById, includeOpenText),
       ),
       responseCount: surveyResponses.length,
       resultsVisibleToParticipants: survey.results_visible_to_participants,

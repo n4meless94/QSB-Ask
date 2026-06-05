@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   Bar,
   BarChart,
@@ -27,10 +28,15 @@ function labelCopy(datum: SurveyChartDatum) {
 }
 
 export function SurveyBarChart({ data, title }: SurveyBarChartProps) {
-  const total = data.reduce((sum, datum) => sum + datum.count, 0);
+  const { chartHeight, maxCount, summaryItems, total } = useMemo(() => {
+    return {
+      chartHeight: Math.min(260, Math.max(156, data.length * 54)),
+      maxCount: data.reduce((highest, datum) => Math.max(highest, datum.count), 1),
+      summaryItems: data.map((datum) => labelCopy(datum)),
+      total: data.reduce((sum, datum) => sum + datum.count, 0),
+    };
+  }, [data]);
   const hasResponses = total > 0;
-  const maxCount = Math.max(1, ...data.map((datum) => datum.count));
-  const chartHeight = Math.min(260, Math.max(156, data.length * 54));
 
   return (
     <div className="grid gap-3">
@@ -93,9 +99,9 @@ export function SurveyBarChart({ data, title }: SurveyBarChartProps) {
       </div>
 
       <ul className="grid gap-2 text-sm leading-[1.4] text-slate-700">
-        {data.map((datum) => (
+        {data.map((datum, index) => (
           <li className="break-words" key={datum.label}>
-            {labelCopy(datum)}
+            {summaryItems[index]}
           </li>
         ))}
       </ul>

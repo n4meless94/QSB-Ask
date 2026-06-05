@@ -2,12 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
+import dynamic from "next/dynamic";
 
 import {
   submitSurveyAction,
   type SubmitSurveyActionResult,
 } from "@/app/join/[joinCode]/surveys/submit-actions";
-import { SurveyBarChart } from "@/components/surveys/SurveyBarChart";
 import { Button } from "@/components/ui/Button";
 import type { ParticipantSurvey } from "@/lib/surveys/participant";
 import type { SurveyResult } from "@/lib/surveys/results";
@@ -22,6 +22,26 @@ type SurveySubmitFormProps = {
 };
 
 const initialState: SubmitSurveyActionResult = { ok: true, message: "" };
+
+function ChartLoadingFallback() {
+  return (
+    <div
+      aria-live="polite"
+      className="rounded-[6px] border border-slate-200 bg-slate-50 p-3 text-sm font-semibold leading-[1.4] text-slate-700"
+      role="status"
+    >
+      Loading chart...
+    </div>
+  );
+}
+
+const ParticipantSurveyBarChart = dynamic(
+  () => import("@/components/surveys/SurveyBarChart").then((module) => module.SurveyBarChart),
+  {
+    loading: ChartLoadingFallback,
+    ssr: false,
+  },
+);
 
 function ratingValues(scale: 5 | 10 | null) {
   return Array.from({ length: scale ?? 5 }, (_, index) => index + 1);
@@ -82,7 +102,7 @@ export function SurveySubmitForm({
               {result.questions
                 .filter((question) => question.type !== "open_text")
                 .map((question) => (
-                  <SurveyBarChart data={question.chartData} key={question.id} title={question.prompt} />
+                  <ParticipantSurveyBarChart data={question.chartData} key={question.id} title={question.prompt} />
                 ))}
             </section>
           ) : (

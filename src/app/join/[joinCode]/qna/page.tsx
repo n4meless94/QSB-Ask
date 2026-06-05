@@ -68,28 +68,11 @@ function errorCopy(error?: string) {
 }
 
 export default async function ParticipantQnaPage({ params, searchParams }: ParticipantQnaPageProps) {
-  const { joinCode } = await params;
-  const query = await searchParams;
+  const [{ joinCode }, query] = await Promise.all([params, searchParams]);
   const event =
     process.env.QSB_ASK_E2E_AUTH === "1"
       ? e2eEvent(joinCode)
       : await getJoinableEventByCode(joinCode);
-  let rawToken: string | undefined;
-
-  if (event && process.env.QSB_ASK_E2E_AUTH !== "1") {
-    const cookieStore = await cookies();
-    rawToken = cookieStore.get(getParticipantCookieName(event.id))?.value;
-  }
-
-  const questions =
-    process.env.QSB_ASK_E2E_AUTH === "1" || !event
-      ? e2eQuestions()
-      : await listPublicQuestions(event.id, { participantToken: rawToken });
-  let votedQuestionIds: string[] = [];
-
-  if (event && process.env.QSB_ASK_E2E_AUTH !== "1" && rawToken) {
-    votedQuestionIds = await listParticipantVoteQuestionIds(event.id, rawToken);
-  }
 
   if (!event) {
     return (
@@ -104,6 +87,25 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
         </div>
       </main>
     );
+  }
+
+  let questions: PublicQuestion[];
+  let votedQuestionIds: string[] = [];
+
+  if (process.env.QSB_ASK_E2E_AUTH === "1") {
+    questions = e2eQuestions();
+  } else {
+    const cookieStore = await cookies();
+    const rawToken = cookieStore.get(getParticipantCookieName(event.id))?.value;
+
+    if (rawToken) {
+      [questions, votedQuestionIds] = await Promise.all([
+        listPublicQuestions(event.id, { participantToken: rawToken }),
+        listParticipantVoteQuestionIds(event.id, rawToken),
+      ]);
+    } else {
+      questions = await listPublicQuestions(event.id, { participantToken: rawToken });
+    }
   }
 
   return (
@@ -160,7 +162,6 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
           fixtureMode={process.env.QSB_ASK_E2E_AUTH === "1"}
           initialVotedQuestionIds={votedQuestionIds}
           joinCode={joinCode}
-          key={questions.map((question) => `${question.id}:${question.updated_at}:${question.vote_count}`).join("|")}
           questions={questions}
         />
       </div>
