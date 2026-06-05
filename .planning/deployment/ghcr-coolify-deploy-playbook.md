@@ -10,7 +10,7 @@ Use this for normal source changes after local verification has passed. QSB Ask 
 | --- | --- |
 | GitHub repo | `n4meless94/QSB-Ask` |
 | Deploy branch | `main` |
-| Local branch note | This checkout may be named `master`; push `HEAD:main` for the GHCR publish workflow. |
+| Local branch note | Local `main` tracks `origin/main`; do not recreate a parallel `master` branch. |
 | GHCR workflow | `.github/workflows/publish-ghcr.yml` |
 | Production image | `ghcr.io/n4meless94/qsb-ask:latest` |
 | Coolify app UUID | `btstg1x4zzuqjc16yf4qluqv` |
@@ -59,10 +59,11 @@ git commit -m "<type>: <summary>"
 
 ### 4. Push To The Deploy Branch
 
-The GHCR `latest` image is published from `main`, so push the current commit there even if the local branch is named `master`.
+The GHCR `latest` image is published from `main`, so the local branch should be `main` before pushing.
 
 ```powershell
-git push origin HEAD:main
+git branch --show-current
+git push origin main
 ```
 
 ### 5. Wait For GHCR Publish
@@ -182,17 +183,6 @@ Expected:
 - `configuration.missingKeys` is empty
 - no secret values appear
 
-### 11. Sync The Secondary Remote Branch
-
-If the local checkout is still using `master`, keep `origin/master` aligned after the deployed commit is proven healthy.
-
-```powershell
-git push origin HEAD:master
-git ls-remote origin refs/heads/main refs/heads/master
-```
-
-Both remote refs should point at the same commit hash.
-
 ## Troubleshooting
 
 ### Public Health Is OK But Revision Is Old
@@ -230,5 +220,4 @@ Do not print Coolify tokens, Supabase keys, or application environment values wh
 - [ ] Coolify deployment was queued and finished.
 - [ ] Running container OCI revision matches `HEAD`.
 - [ ] Public `/api/health` returns HTTP 200 with `ok=true`.
-- [ ] `origin/master` was synced if needed.
 - [ ] Any durable deploy caveat was recorded in `.planning/STATE.md` or the relevant project memory.
