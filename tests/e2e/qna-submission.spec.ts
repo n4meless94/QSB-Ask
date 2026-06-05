@@ -8,7 +8,8 @@ test("participant submits a moderated question without rendering pending text pu
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing Q&A" })).toBeVisible();
   await expect(
     page.locator("section[aria-labelledby='approved-questions-heading']").getByText("Connected"),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(page.getByText("Q&A open")).toBeVisible();
   await expect(page.getByText("Live updates active")).toHaveCount(0);
   await expect(page.getByText("Checking for queue changes every 2 seconds.")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Surveys" })).toHaveAttribute(
@@ -20,7 +21,7 @@ test("participant submits a moderated question without rendering pending text pu
 
   await questionInput.fill("Will slides be shared after the briefing?");
   await expect(page.getByText("41 / 280")).toBeVisible();
-  await page.getByRole("button", { name: "Submit question" }).click();
+  await page.getByRole("button", { name: "Ask question" }).click();
 
   await expect(page.getByText("Question submitted. It is waiting for moderator review.")).toBeVisible();
   await expect(page.getByText("Will slides be shared after the briefing?")).toHaveCount(0);

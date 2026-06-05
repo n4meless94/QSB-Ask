@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 
 import {
   submitSurveyAction,
@@ -54,19 +55,22 @@ export function SurveySubmitForm({
 
   if (isCompleted) {
     return (
-      <section className="grid gap-3 rounded-[6px] border border-slate-300 bg-white p-4" aria-live="polite">
-        <div className="rounded-[6px] border border-teal-700 bg-white p-3 text-teal-700" role="status">
+      <section className="grid gap-4 rounded-[16px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7" aria-live="polite">
+        <div className="rounded-[14px] border border-teal-100 bg-teal-50 p-3 text-[#00796B]" role="status">
           <p className="text-sm font-semibold leading-[1.4]">
             {state.message || "Survey submitted. Thank you. Your response has been recorded for this event."}
           </p>
         </div>
-        <p className="text-base leading-6 text-slate-700">You have already submitted this survey.</p>
+        <p className="inline-flex items-center gap-2 text-base font-semibold leading-6 text-slate-700">
+          <CheckCircle2 aria-hidden="true" className="h-5 w-5 text-[#00796B]" />
+          You have already submitted this survey.
+        </p>
         {resultsVisible ? (
           result ? (
-            <section className="grid gap-4 border-t border-slate-300 pt-3" aria-labelledby="participant-results-heading">
+            <section className="grid gap-4 border-t border-slate-200 pt-4" aria-labelledby="participant-results-heading">
               <div className="grid gap-1">
                 <h3
-                  className="text-[20px] font-semibold leading-[1.25] text-slate-900"
+                  className="text-[22px] font-semibold leading-[1.2] text-slate-950"
                   id="participant-results-heading"
                 >
                   Participant results
@@ -85,7 +89,7 @@ export function SurveySubmitForm({
             <p className="text-base leading-6 text-slate-700">Survey results are available to participants.</p>
           )
         ) : (
-          <p className="text-base font-semibold leading-6 text-amber-700">
+          <p className="rounded-[14px] bg-amber-50 p-3 text-base font-semibold leading-6 text-amber-700">
             Results are hidden by the organiser.
           </p>
         )}
@@ -94,13 +98,13 @@ export function SurveySubmitForm({
   }
 
   return (
-    <form action={formAction} className="grid gap-4 rounded-[6px] border border-slate-300 bg-white p-4">
+    <form action={formAction} className="grid gap-5 rounded-[16px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
       <input name="surveyId" type="hidden" value={survey.id} />
 
       {state.message ? (
         <div
-          className={`rounded-[6px] border bg-white p-3 ${
-            state.ok ? "border-teal-700 text-teal-700" : "border-red-700 text-red-700"
+          className={`rounded-[14px] border p-3 ${
+            state.ok ? "border-teal-100 bg-teal-50 text-[#00796B]" : "border-red-100 bg-red-50 text-red-700"
           }`}
           role={state.ok ? "status" : "alert"}
         >
@@ -112,8 +116,8 @@ export function SurveySubmitForm({
         const fieldName = `answers.${question.id}`;
 
         return (
-          <fieldset className="grid gap-3 border-t border-slate-300 pt-4 first:border-t-0 first:pt-0" key={question.id}>
-            <legend className="text-base font-semibold leading-6 text-slate-900">
+          <fieldset className="grid gap-3 border-t border-slate-100 pt-5 first:border-t-0 first:pt-0" key={question.id}>
+            <legend className="text-[18px] font-semibold leading-7 text-slate-950">
               {question.prompt}
             </legend>
 
@@ -121,11 +125,11 @@ export function SurveySubmitForm({
               <div className="grid gap-2">
                 {question.options.map((option) => (
                   <label
-                    className="flex min-h-11 items-center gap-3 rounded-[6px] border border-slate-300 bg-white px-3 py-2 text-base leading-6 text-slate-900"
+                    className="flex min-h-12 items-center gap-3 rounded-[14px] border border-slate-200 bg-white px-4 py-3 text-base leading-6 text-slate-900 shadow-sm transition-colors hover:border-[#008578] hover:bg-teal-50/50"
                     key={option.id}
                   >
                     <input
-                      className="h-5 w-5 accent-teal-700"
+                      className="h-5 w-5 accent-[#008578]"
                       name={fieldName}
                       required
                       type="radio"
@@ -141,11 +145,11 @@ export function SurveySubmitForm({
               <div className="grid gap-2">
                 {question.options.map((option) => (
                   <label
-                    className="flex min-h-11 items-center gap-3 rounded-[6px] border border-slate-300 bg-white px-3 py-2 text-base leading-6 text-slate-900"
+                    className="flex min-h-12 items-center gap-3 rounded-[14px] border border-slate-200 bg-white px-4 py-3 text-base leading-6 text-slate-900 shadow-sm transition-colors hover:border-[#008578] hover:bg-teal-50/50"
                     key={option.id}
                   >
                     <input
-                      className="h-5 w-5 accent-teal-700"
+                      className="h-5 w-5 accent-[#008578]"
                       name={fieldName}
                       type="checkbox"
                       value={option.id}
@@ -160,11 +164,11 @@ export function SurveySubmitForm({
               <div className="flex flex-wrap gap-2">
                 {ratingValues(question.ratingScale).map((value) => (
                   <label
-                    className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[6px] border border-slate-300 bg-white px-3 text-base font-semibold leading-6 text-slate-900"
+                    className="flex min-h-12 min-w-14 items-center justify-center gap-2 rounded-[14px] border border-slate-200 bg-white px-3 text-base font-semibold leading-6 text-slate-900 shadow-sm transition-colors hover:border-[#008578] hover:bg-teal-50/50"
                     key={value}
                   >
                     <input
-                      className="h-5 w-5 accent-teal-700"
+                      className="h-5 w-5 accent-[#008578]"
                       name={`${fieldName}.rating`}
                       required
                       type="radio"
@@ -179,7 +183,7 @@ export function SurveySubmitForm({
             {question.type === "open_text" ? (
               <textarea
                 aria-label={question.prompt}
-                className="min-h-28 resize-y rounded-[6px] border border-slate-300 bg-white px-3 py-2 text-base leading-6 text-slate-900 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-700 focus:ring-offset-2"
+                className="min-h-32 resize-y rounded-[14px] border border-slate-300 bg-white px-4 py-3 text-base leading-6 text-slate-950 outline-none transition-colors focus:border-[#008578] focus:ring-2 focus:ring-[#008578]/20"
                 maxLength={2000}
                 name={`${fieldName}.text`}
                 required
@@ -192,12 +196,16 @@ export function SurveySubmitForm({
       {resultsVisible ? (
         <p className="text-sm leading-[1.4] text-slate-600">Survey results are available to participants.</p>
       ) : (
-        <p className="text-sm font-semibold leading-[1.4] text-amber-700">
+        <p className="rounded-[14px] bg-amber-50 p-3 text-sm font-semibold leading-[1.4] text-amber-700">
           Results are hidden by the organiser.
         </p>
       )}
 
-      <Button loading={isPending} type="submit">
+      <Button
+        className="rounded-[12px] bg-[#008578] px-6 shadow-sm hover:bg-[#00796B] focus-visible:ring-[#008578]"
+        loading={isPending}
+        type="submit"
+      >
         Submit survey
       </Button>
     </form>

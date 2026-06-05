@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BarChart3, MessageSquare } from "lucide-react";
 
 import { SurveySubmitForm } from "@/components/surveys/SurveySubmitForm";
 import {
@@ -159,8 +160,8 @@ function e2eVisibleSurveyResults(): SurveyResult[] {
 
 function AlertPanel({ children, title }: { children: ReactNode; title: string }) {
   return (
-    <section className="rounded-[6px] border border-amber-700 bg-white p-4" role="status">
-      <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900">{title}</h2>
+    <section className="rounded-[16px] border border-amber-100 bg-white p-5 shadow-sm" role="status">
+      <h2 className="text-[22px] font-semibold leading-[1.2] text-slate-950">{title}</h2>
       <div className="mt-2 text-base leading-6 text-slate-700">{children}</div>
     </section>
   );
@@ -205,12 +206,12 @@ export default async function ParticipantSurveysPage({
 
   if (!event) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 sm:px-6">
-        <div className="mx-auto grid max-w-[760px] gap-4">
-          <h1 className="text-[28px] font-semibold leading-[1.2] text-slate-900">Event surveys</h1>
-          <div className="rounded-[6px] border border-red-700 bg-white p-4" role="alert">
+      <main className="min-h-screen bg-[#F6F8FB] px-4 py-8 text-slate-900 sm:px-6">
+        <div className="mx-auto grid max-w-[860px] gap-4">
+          <h1 className="text-[28px] font-semibold leading-[1.2] text-slate-950">Event surveys</h1>
+          <div className="rounded-[16px] border border-red-100 bg-white p-5 shadow-sm" role="alert">
             <p className="text-base font-semibold leading-6 text-red-700">
-              We could not find an active event for that code.
+              This event is not available right now.
             </p>
           </div>
         </div>
@@ -219,26 +220,42 @@ export default async function ParticipantSurveysPage({
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 sm:px-6">
-      <div className="mx-auto grid max-w-[760px] gap-5">
-        <header className="grid gap-2 border-b border-slate-300 pb-4">
-          <p className="text-sm font-semibold leading-[1.4] text-teal-700">Connected</p>
-          <h1 className="text-[28px] font-semibold leading-[1.2] text-slate-900">{event.name}</h1>
-          <p className="text-base leading-6 text-slate-600">
-            Submit the active event survey from this public participant view.
-          </p>
-          <nav aria-label="Participant event sections" className="flex min-w-0 flex-wrap gap-2 pt-2">
+    <main className="min-h-screen bg-[#F6F8FB] px-4 py-8 text-slate-900 sm:px-6 sm:py-10">
+      <div className="mx-auto grid max-w-[860px] gap-7">
+        <header className="grid gap-5">
+          <div className="grid gap-3">
+            <h1 className="text-[34px] font-semibold leading-[1.08] text-slate-950 sm:text-[44px]">
+              {event.name} Surveys
+            </h1>
+            <p className="max-w-[720px] text-base leading-7 text-slate-600 sm:text-lg">
+              Share quick feedback with the organiser. Your response helps shape the session.
+            </p>
+            <p className="flex min-w-0 flex-wrap items-center gap-2 text-sm font-semibold leading-[1.4] text-slate-500">
+              <span className="inline-flex items-center gap-2 text-[#00796B]">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#008578]" aria-hidden="true" />
+                Survey open
+              </span>
+              <span aria-hidden="true">·</span>
+              <span>Live session</span>
+            </p>
+          </div>
+          <nav
+            aria-label="Participant event sections"
+            className="inline-flex w-fit max-w-full min-w-0 rounded-[16px] border border-slate-200 bg-white p-1 shadow-sm"
+          >
             <Link
-              className="inline-flex min-h-11 items-center rounded-[6px] border border-slate-300 bg-white px-3 text-base font-semibold leading-6 text-slate-700 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[12px] px-4 text-base font-semibold leading-6 text-slate-600 outline-none transition-colors hover:bg-slate-50 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2 sm:min-h-10"
               href={`/join/${joinCode}/qna`}
             >
+              <MessageSquare aria-hidden="true" className="h-4 w-4" />
               Q&A
             </Link>
             <Link
               aria-current="page"
-              className="inline-flex min-h-11 items-center rounded-[6px] border border-teal-700 bg-white px-3 text-base font-semibold leading-6 text-teal-700 outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 sm:min-h-10"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[12px] bg-[#008578] px-4 text-base font-semibold leading-6 !text-white shadow-sm outline-none hover:bg-[#00796B] focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2 sm:min-h-10"
               href={`/join/${joinCode}/surveys`}
             >
+              <BarChart3 aria-hidden="true" className="h-4 w-4" />
               Surveys
             </Link>
           </nav>
@@ -250,17 +267,17 @@ export default async function ParticipantSurveysPage({
           </AlertPanel>
         ) : (
           <section className="grid gap-4" aria-labelledby="survey-title">
-            <div className="grid gap-2">
-              <h2 className="text-[20px] font-semibold leading-[1.25] text-slate-900" id="survey-title">
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+              <h2 className="text-[26px] font-semibold leading-[1.15] text-slate-950" id="survey-title">
                 {surveyState.survey.title}
               </h2>
               {surveyState.results.visible ? (
-                <p className="text-sm leading-[1.4] text-slate-600">
-                  Survey results are available to participants.
+                <p className="rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold leading-[1.4] text-[#00796B]">
+                  Results visible
                 </p>
               ) : (
-                <p className="text-sm font-semibold leading-[1.4] text-amber-700">
-                  Results are hidden by the organiser.
+                <p className="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold leading-[1.4] text-amber-700">
+                  Results hidden
                 </p>
               )}
             </div>

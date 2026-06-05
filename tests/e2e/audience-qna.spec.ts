@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("audience list shows approved questions only, sorts, and votes once", async ({ page }) => {
   await page.goto("/join/QSB2X9ZA/qna");
 
-  await expect(page.getByRole("heading", { level: 2, name: "Approved questions" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Questions" })).toBeVisible();
   await expect(page.getByText("Will slides be shared?")).toBeVisible();
   await expect(page.getByText("Already answered item")).toBeVisible();
   await expect(page.getByText("Pending private question")).toHaveCount(0);
