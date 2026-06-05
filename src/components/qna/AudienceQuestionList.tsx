@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronUp } from "lucide-react";
 
 import { voteQuestionAction } from "@/app/join/[joinCode]/qna/vote-actions";
 import { ConnectionStatus } from "@/components/qna/ConnectionStatus";
@@ -152,28 +153,22 @@ export function AudienceQuestionList({
         </div>
       ) : (
         <ul className="grid gap-3">
-          {sortedQuestions.map((question) => {
+          {sortedQuestions.map((question, index) => {
             const isAnswered = question.status === "answered";
             const isVoted = votedQuestionIds.has(question.id);
             const disabled = isPending || isAnswered || isVoted;
+            const isTopQuestion = sort === "popular" && index === 0 && question.vote_count > 0;
 
             return (
               <li
-                className="grid gap-3 rounded-[6px] border border-slate-300 bg-white p-4"
+                className={[
+                  "grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[6px] border bg-white p-3 shadow-sm transition-colors sm:gap-4 sm:p-4",
+                  isTopQuestion ? "border-teal-700" : "border-slate-300",
+                  isAnswered ? "bg-slate-50" : "bg-white",
+                ].join(" ")}
                 data-testid="audience-question-card"
                 key={question.id}
               >
-                <div className="min-w-0">
-                  <p className="break-words text-base leading-6 text-slate-900">{question.current_text}</p>
-                  <div className="mt-2 flex flex-wrap gap-2 text-sm leading-[1.4] text-slate-600">
-                    {question.is_edited ? <span>Edited</span> : null}
-                    {isAnswered ? (
-                      <span className="rounded-[6px] border border-slate-300 px-2 py-1 font-semibold text-slate-700">
-                        Answered
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
                 <button
                   aria-label={
                     isAnswered
@@ -181,13 +176,53 @@ export function AudienceQuestionList({
                       : `Vote for question ${question.current_text}`
                   }
                   aria-pressed={isVoted}
-                  className="inline-flex min-h-11 w-fit items-center justify-center rounded-[6px] border border-slate-300 bg-white px-4 text-base font-semibold leading-6 text-slate-900 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 sm:min-h-10"
+                  className={[
+                    "inline-flex min-h-16 w-14 shrink-0 flex-col items-center justify-center rounded-[6px] border px-2 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed sm:min-h-[72px] sm:w-16",
+                    isVoted
+                      ? "border-teal-700 bg-teal-700 text-white"
+                      : "border-slate-300 bg-white text-slate-900 hover:border-teal-700 hover:bg-teal-50 hover:text-teal-800",
+                    isAnswered ? "bg-slate-100 text-slate-500 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-500" : "",
+                  ].join(" ")}
                   disabled={disabled}
                   onClick={() => vote(question)}
                   type="button"
                 >
-                  {question.vote_count} votes
+                  <ChevronUp aria-hidden="true" className="h-5 w-5" strokeWidth={2.5} />
+                  <span className="text-lg font-semibold leading-6">{question.vote_count}</span>
+                  <span className="text-[11px] font-semibold uppercase leading-4 tracking-normal">
+                    {question.vote_count === 1 ? "vote" : "votes"}
+                  </span>
                 </button>
+                <div className="min-w-0 self-center">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    {isTopQuestion ? (
+                      <span className="rounded-[6px] border border-teal-700 bg-teal-50 px-2 py-1 text-xs font-semibold leading-[1.3] text-teal-800">
+                        Top question
+                      </span>
+                    ) : null}
+                    {isAnswered ? (
+                      <span className="rounded-[6px] border border-slate-300 bg-white px-2 py-1 text-xs font-semibold leading-[1.3] text-slate-700">
+                        Answered
+                      </span>
+                    ) : null}
+                    {question.is_edited ? (
+                      <span className="rounded-[6px] border border-slate-300 bg-white px-2 py-1 text-xs font-semibold leading-[1.3] text-slate-600">
+                        Edited
+                      </span>
+                    ) : null}
+                  </div>
+                  <p
+                    className={[
+                      "mt-2 break-words text-base font-medium leading-6",
+                      isAnswered ? "text-slate-600" : "text-slate-950",
+                    ].join(" ")}
+                  >
+                    {question.current_text}
+                  </p>
+                  {isVoted ? (
+                    <p className="mt-2 text-sm font-semibold leading-[1.4] text-teal-700">Voted</p>
+                  ) : null}
+                </div>
               </li>
             );
           })}
