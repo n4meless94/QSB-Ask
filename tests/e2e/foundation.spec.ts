@@ -37,24 +37,37 @@ test("root page renders one h1 without mobile horizontal overflow", async ({ pag
 
   await expect(page.locator("h1")).toHaveCount(1);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Make every QSB event interactive." }),
+    page.getByRole("heading", { level: 1, name: "QSB Event Portal" }),
   ).toBeVisible();
-  await expect(page.getByLabel("Joining an event?")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Join now" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Join an Event" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Join Event" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Skip to main content" })).toHaveAttribute("href", "#main-content");
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
 });
 
-test("root page shows product preview without setup diagnostics", async ({ page }) => {
+test("root page shows event actions without event list sections", async ({ page }) => {
   await page.goto("/");
 
-  const preview = page.getByLabel("QSB Ask product preview");
-
-  await expect(preview.getByRole("heading", { exact: true, name: "Live Q&A" })).toBeVisible();
-  await expect(preview.getByRole("heading", { exact: true, name: "Live Poll" })).toBeVisible();
-  await expect(page.getByText("Nothing unapproved reaches a public screen.")).toBeVisible();
+  await expect(page.getByRole("heading", { exact: true, name: "Host an Event" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Create Event" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Knowledge Base" })).toHaveCount(2);
+  await expect(page.getByRole("link", { name: "Knowledge Base" }).first()).toHaveAttribute("href", "/knowledge-base");
+  await expect(page.getByRole("link", { name: "Support" })).toHaveCount(0);
+  await expect(page.getByText("Active & Upcoming QSB Events")).toHaveCount(0);
+  await expect(page.getByText("Recent Events")).toHaveCount(0);
+  await expect(page.getByText("© 2026 Qhazanah Sabah Berhad.")).toBeVisible();
   await expect(page.getByText(/setup item|environment keys|system diagnostics/i)).toHaveCount(0);
+});
+
+test("knowledge base route is reachable from the homepage", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Knowledge Base" }).first().click();
+
+  await expect(page).toHaveURL(/\/knowledge-base$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Knowledge Base" })).toBeVisible();
 });
 
 test("admin setup page keeps diagnostics off the public homepage", async ({ page }) => {

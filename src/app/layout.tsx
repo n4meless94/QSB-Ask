@@ -30,7 +30,12 @@ export default async function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: publicRuntimeConfigScript() }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
+        <div id="main-content">{children}</div>
+      </body>
     </html>
   );
 }
