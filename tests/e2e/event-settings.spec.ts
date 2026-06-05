@@ -24,15 +24,19 @@ test("organiser can edit event settings only after acknowledging moderation-off 
   await expect(page.getByLabel("Question character limit")).toHaveValue("280");
   await expect(page.getByLabel("Question rate limit seconds")).toHaveValue("30");
 
-  await page.getByLabel("Moderation enabled").uncheck();
+  const moderationCheckbox = page.getByRole("checkbox", {
+    name: /Moderation required before public display/,
+  });
+
+  await moderationCheckbox.uncheck();
   await expect(page.getByRole("dialog", { name: "Turn moderation off?" })).toBeVisible();
   await expect(page.getByText("Audience questions may appear publicly without review.")).toBeVisible();
   await page.getByRole("button", { name: "Keep moderation on" }).click();
-  await expect(page.getByLabel("Moderation enabled")).toBeChecked();
+  await expect(moderationCheckbox).toBeChecked();
 
-  await page.getByLabel("Moderation enabled").uncheck();
+  await moderationCheckbox.uncheck();
   await page.getByRole("button", { name: "I understand, turn moderation off" }).click();
-  await expect(page.getByLabel("Moderation enabled")).not.toBeChecked();
+  await expect(moderationCheckbox).not.toBeChecked();
   await expect(page.locator("input[name='moderation_warning_acknowledged']")).toHaveValue("true");
   await expect(page.getByRole("button", { name: "Save settings" })).toBeVisible();
 });
@@ -50,6 +54,11 @@ test("organiser lifecycle actions require close and archive confirmations", asyn
   await expect(page.getByRole("dialog", { name: "Archive event?" })).toBeVisible();
   await expect(page.getByText("Archived events stay available for records but are hidden from active workflows.")).toBeVisible();
   await page.getByRole("button", { name: "Keep event active" }).click();
+
+  await page.getByRole("button", { name: "Archive event" }).click();
+  await page.getByRole("dialog", { name: "Archive event?" }).getByRole("button", { name: "Archive event" }).click();
+  await expect(page.getByRole("dialog", { name: "Archive event?" })).toBeHidden();
+  await expect(page.getByRole("status").filter({ hasText: "Event archived." })).toBeVisible();
 });
 
 test("event settings has no mobile horizontal overflow at 360px", async ({ page }) => {

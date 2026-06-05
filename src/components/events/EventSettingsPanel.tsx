@@ -33,6 +33,8 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
   const closeAction = closeEventFormAction.bind(null, event.id);
   const archiveAction = archiveEventFormAction.bind(null, event.id);
   const [state, formAction, isPending] = useActionState(updateAction, initialState);
+  const [closeState, closeFormAction, isClosing] = useActionState(closeAction, initialState);
+  const [archiveState, archiveFormAction, isArchiving] = useActionState(archiveAction, initialState);
   const [moderationEnabled, setModerationEnabled] = useState(event.moderation_enabled);
   const [moderationWarningAcknowledged, setModerationWarningAcknowledged] = useState(
     event.moderation_enabled,
@@ -41,6 +43,13 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
   const [dialog, setDialog] = useState<"moderation" | "close" | "archive" | null>(null);
   const canManageSettings = role === "organiser";
   const fieldErrors = state.ok ? {} : state.fieldErrors ?? {};
+  const lifecycleState = archiveState.message ? archiveState : closeState.message ? closeState : null;
+  const visibleDialog =
+    dialog === "close" && closeState.ok && closeState.message
+      ? null
+      : dialog === "archive" && archiveState.ok && archiveState.message
+        ? null
+        : dialog;
 
   function requestModerationChange(checked: boolean) {
     if (!checked) {
@@ -89,6 +98,23 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
       ) : state.message ? (
         <div className="rounded-[6px] border border-teal-700 bg-white p-4" role="status">
           <p className="text-base font-semibold leading-6 text-teal-700">{state.message}</p>
+        </div>
+      ) : null}
+
+      {lifecycleState ? (
+        <div
+          className={`rounded-[6px] border bg-white p-4 ${
+            lifecycleState.ok ? "border-teal-700" : "border-red-700"
+          }`}
+          role={lifecycleState.ok ? "status" : "alert"}
+        >
+          <p
+            className={`text-base font-semibold leading-6 ${
+              lifecycleState.ok ? "text-teal-700" : "text-red-700"
+            }`}
+          >
+            {lifecycleState.message}
+          </p>
         </div>
       ) : null}
 
@@ -224,7 +250,7 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
         </div>
       </div>
 
-      {dialog === "moderation" ? (
+      {visibleDialog === "moderation" ? (
         <div
           aria-labelledby="moderation-dialog-title"
           aria-modal="true"
@@ -265,7 +291,7 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
         </div>
       ) : null}
 
-      {dialog === "close" ? (
+      {visibleDialog === "close" ? (
         <div
           aria-labelledby="close-dialog-title"
           aria-modal="true"
@@ -284,8 +310,8 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
               <Button onClick={() => setDialog(null)} variant="secondary">
                 Keep event open
               </Button>
-              <form action={closeAction}>
-                <Button type="submit" variant="destructive">
+              <form action={closeFormAction}>
+                <Button loading={isClosing} type="submit" variant="destructive">
                   Close event
                 </Button>
               </form>
@@ -294,7 +320,7 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
         </div>
       ) : null}
 
-      {dialog === "archive" ? (
+      {visibleDialog === "archive" ? (
         <div
           aria-labelledby="archive-dialog-title"
           aria-modal="true"
@@ -312,8 +338,8 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
               <Button onClick={() => setDialog(null)} variant="secondary">
                 Keep event active
               </Button>
-              <form action={archiveAction}>
-                <Button type="submit" variant="destructive">
+              <form action={archiveFormAction}>
+                <Button loading={isArchiving} type="submit" variant="destructive">
                   Archive event
                 </Button>
               </form>

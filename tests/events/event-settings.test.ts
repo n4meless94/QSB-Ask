@@ -2,13 +2,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   archiveEventAction,
+  archiveEventFormAction,
   closeEventAction,
+  closeEventFormAction,
   updateEventSettingsAction,
 } from "@/app/(app)/events/[eventId]/settings-actions";
 import { archiveEvent, closeEvent, updateEventSettings } from "@/lib/events/settings";
 import { assertEventRole } from "@/lib/events/access";
 
 const revalidatePathMock = vi.hoisted(() => vi.fn());
+const cookiesGetMock = vi.hoisted(() => vi.fn());
 const getUserMock = vi.hoisted(() => vi.fn());
 const fromMock = vi.hoisted(() => vi.fn());
 const assertEventRoleMock = vi.hoisted(() => vi.fn());
@@ -17,6 +20,12 @@ vi.mock("server-only", () => ({}));
 
 vi.mock("next/cache", () => ({
   revalidatePath: revalidatePathMock,
+}));
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(async () => ({
+    get: cookiesGetMock,
+  })),
 }));
 
 vi.mock("@/lib/events/access", async () => {
@@ -149,6 +158,7 @@ describe("event settings helpers", () => {
 describe("event settings actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    delete process.env.QSB_ASK_E2E_AUTH;
     getUserMock.mockResolvedValue({
       data: { user: { id: "organiser-1", email: "organiser@qsb.com" } },
       error: null,
@@ -187,6 +197,34 @@ describe("event settings actions", () => {
       ok: true,
       message: "Event archived.",
     });
+    expect(revalidatePathMock).toHaveBeenCalledWith("/events/event-1");
+  });
+
+  it("returns lifecycle form action results so the settings panel can show feedback", async () => {
+    const eventsQuery = makeEventsQuery();
+    fromMock.mockReturnValue(eventsQuery);
+
+    await expect(closeEventFormAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event closed.",
+    });
+    await expect(archiveEventFormAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event archived.",
+    });
+  });
+
+  it("allows lifecycle actions from the E2E fixture auth cookie", async () => {
+    process.env.QSB_ASK_E2E_AUTH = "1";
+    getUserMock.mockResolvedValue({ data: { user: null }, error: null });
+    cookiesGetMock.mockReturnValue({ value: "1" });
+
+    await expect(archiveEventFormAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event archived.",
+    });
+    expect(assertEventRole).not.toHaveBeenCalled();
+    expect(fromMock).not.toHaveBeenCalled();
     expect(revalidatePathMock).toHaveBeenCalledWith("/events/event-1");
   });
 });

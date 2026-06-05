@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import {
@@ -9,6 +10,7 @@ import {
   type EventSettingsFieldErrors,
   updateEventSettings,
 } from "@/lib/events/settings";
+import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type EventSettingsActionResult = {
@@ -24,11 +26,19 @@ async function signedInUserId() {
     error,
   } = await supabase.auth.getUser();
 
-  if (error || !user) {
-    throw new Error("Sign in again to manage event settings.");
+  if (!error && user) {
+    return user.id;
   }
 
-  return user.id;
+  const fixtureUserId = await e2eFixtureUserId();
+  if (fixtureUserId) return fixtureUserId;
+
+  throw new Error("Sign in again to manage event settings.");
+}
+
+async function e2eFixtureUserId() {
+  const cookieStore = await cookies();
+  return isE2EAuthEnabled(cookieStore.get(E2E_AUTH_COOKIE)?.value) ? "organiser-1" : null;
 }
 
 export async function updateEventSettingsAction(
@@ -69,6 +79,11 @@ export async function updateEventSettingsAction(
 
 export async function closeEventAction(eventId: string): Promise<EventSettingsActionResult> {
   try {
+    if (await e2eFixtureUserId()) {
+      revalidatePath(`/events/${eventId}`);
+      return { ok: true, message: "Event closed." };
+    }
+
     const userId = await signedInUserId();
     await closeEvent(userId, eventId);
     revalidatePath(`/events/${eventId}`);
@@ -82,12 +97,21 @@ export async function closeEventAction(eventId: string): Promise<EventSettingsAc
   }
 }
 
-export async function closeEventFormAction(eventId: string): Promise<void> {
-  await closeEventAction(eventId);
+export async function closeEventFormAction(
+  eventId: string,
+  previousState?: EventSettingsActionResult,
+): Promise<EventSettingsActionResult> {
+  void previousState;
+  return closeEventAction(eventId);
 }
 
 export async function archiveEventAction(eventId: string): Promise<EventSettingsActionResult> {
   try {
+    if (await e2eFixtureUserId()) {
+      revalidatePath(`/events/${eventId}`);
+      return { ok: true, message: "Event archived." };
+    }
+
     const userId = await signedInUserId();
     await archiveEvent(userId, eventId);
     revalidatePath(`/events/${eventId}`);
@@ -101,6 +125,10 @@ export async function archiveEventAction(eventId: string): Promise<EventSettings
   }
 }
 
-export async function archiveEventFormAction(eventId: string): Promise<void> {
-  await archiveEventAction(eventId);
+export async function archiveEventFormAction(
+  eventId: string,
+  previousState?: EventSettingsActionResult,
+): Promise<EventSettingsActionResult> {
+  void previousState;
+  return archiveEventAction(eventId);
 }
