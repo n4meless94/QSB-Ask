@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Copy, Maximize2, Minimize2 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 
-import { ConnectionStatus } from "@/components/qna/ConnectionStatus";
 import type { SurveyChartDatum, SurveyQuestionResult, SurveyResult } from "@/lib/surveys/results";
 import { subscribeToSurveyResults, type SurveyConnectionState } from "@/lib/surveys/realtime";
 
@@ -18,7 +17,7 @@ type SurveyPresentationViewProps = {
   result: SurveyResult;
 };
 
-type ChartMode = "treemap" | "bar";
+type ChartMode = "tiles" | "bar";
 
 function responseCopy(count: number) {
   return `${count} ${count === 1 ? "response" : "responses"}`;
@@ -27,10 +26,24 @@ function responseCopy(count: number) {
 function displayJoinLink(joinLink: string) {
   try {
     const url = new URL(joinLink);
-    return `${url.host}${url.pathname}`;
+    return url.host;
   } catch {
-    return joinLink.replace(/^https?:\/\//, "");
+    return joinLink.replace(/^https?:\/\//, "").split("/")[0] || joinLink;
   }
+}
+
+function connectionCopy(state: SurveyConnectionState) {
+  if (state === "live") return "Connected";
+  if (state === "reconnecting") return "Reconnecting";
+  if (state === "offline") return "Offline";
+  return "Refresh needed";
+}
+
+function connectionDetail(state: SurveyConnectionState) {
+  if (state === "reconnecting") return "Reconnecting. Live updates may be delayed.";
+  if (state === "offline") return "You are offline. Live updates will resume when the connection returns.";
+  if (state === "refresh-needed") return "Live updates are not reconnecting. Refresh this view to continue.";
+  return "";
 }
 
 function chartGradient(index: number) {
@@ -90,7 +103,7 @@ function NoResponsesPanel() {
   );
 }
 
-function TreemapResults({ question }: { question: SurveyQuestionResult }) {
+function TilesResults({ question }: { question: SurveyQuestionResult }) {
   const hasResponses = question.chartData.some((datum) => datum.count > 0);
 
   if (!hasResponses) return <NoResponsesPanel />;
@@ -151,23 +164,28 @@ function BarResults({ question }: { question: SurveyQuestionResult }) {
 function ChartGroup({ mode, question }: { mode: ChartMode; question: SurveyQuestionResult }) {
   if (question.type === "open_text") {
     return (
-      <section className="grid gap-4">
-        <h2 className="break-words text-[clamp(2rem,3.4vw,3.8rem)] font-bold uppercase leading-[1.12] text-[#006B66]">
+      <section className="grid gap-10">
+        <h2 className="break-words text-[clamp(2.5rem,4.2vw,4.9rem)] font-bold uppercase leading-[1.08] text-[#006B66]">
           {question.prompt}
         </h2>
-        <p className="max-w-3xl text-[22px] font-semibold leading-[1.35] text-[#006B66]">
-          Open text responses are available to organisers in the Results workspace.
-        </p>
+        <div className="grid max-w-3xl gap-3 rounded-[8px] border border-[#7AB8BD] bg-white/42 p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
+          <p className="text-[clamp(2.3rem,4vw,4rem)] font-bold leading-none text-[#006B66]">
+            {responseCopy(question.responseCount)} collected
+          </p>
+          <p className="text-[20px] font-semibold leading-[1.35] text-[#006B66]">
+            Open text answers stay hidden from this presentation screen and remain available to organisers in Results.
+          </p>
+        </div>
       </section>
     );
   }
 
   return (
-    <section className="grid gap-14">
-      <h2 className="break-words text-[clamp(2rem,3.4vw,3.8rem)] font-bold uppercase leading-[1.12] text-[#006B66]">
+    <section className="grid gap-12">
+      <h2 className="break-words text-[clamp(2.5rem,4.2vw,4.9rem)] font-bold uppercase leading-[1.08] text-[#006B66]">
         {question.prompt}
       </h2>
-      {mode === "treemap" ? <TreemapResults question={question} /> : <BarResults question={question} />}
+      {mode === "tiles" ? <TilesResults question={question} /> : <BarResults question={question} />}
     </section>
   );
 }
@@ -184,7 +202,7 @@ export function SurveyPresentationView({
   const [connectionState, setConnectionState] = useState<SurveyConnectionState>("live");
   const [copied, setCopied] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [mode, setMode] = useState<ChartMode>("treemap");
+  const [mode, setMode] = useState<ChartMode>("tiles");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [resultState, setResultState] = useState(result);
   const questions = resultState.questions;
@@ -269,9 +287,13 @@ export function SurveyPresentationView({
   return (
     <main className="fixed inset-0 z-50 overflow-hidden bg-[linear-gradient(135deg,#35D3CE_0%,#DDF7F4_24%,#CFE7F7_66%,#3F8EE7_100%)] text-[#006B66]">
       <header className="grid h-11 grid-cols-[minmax(0,1fr)_auto] items-center border-b border-white/45 bg-white/82 px-4 text-[13px] font-semibold text-[#334155]">
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 items-center gap-3">
           <span aria-hidden="true" className="grid size-4 place-items-center rounded-[3px] border border-[#64748B]" />
           <h1 className="truncate">Present</h1>
+          <div aria-live="polite" className="hidden items-center gap-2 rounded-full border border-[#8BC8C5] bg-white/70 px-3 py-1 text-[#006B66] sm:flex">
+            <span className="size-2 rounded-full bg-current" aria-hidden="true" />
+            <span>{connectionCopy(connectionState)}</span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -287,26 +309,25 @@ export function SurveyPresentationView({
       </header>
 
       <div className="grid h-[calc(100vh-44px)] place-items-center px-4 py-8 sm:px-8 lg:px-12">
-        <section className="grid h-full max-h-[900px] w-full max-w-[1640px] overflow-hidden rounded-[8px] bg-[#DDF4F3]/82 shadow-[0_24px_70px_rgba(15,82,124,0.28)] lg:grid-cols-[330px_minmax(0,1fr)]">
-          <aside className="relative hidden bg-[#A8D4D2]/70 px-10 py-12 text-center lg:grid lg:grid-rows-[auto_minmax(0,1fr)_auto]">
-            <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
-            <div className="grid content-center gap-8">
-              <p className="text-[24px] font-bold leading-[1.25]">
-                Scan the QR or use link to join
+        <section className="grid h-full max-h-[900px] w-full max-w-[1640px] overflow-hidden rounded-[8px] bg-[#DDF4F3]/82 shadow-[0_24px_70px_rgba(15,82,124,0.28)] lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="relative hidden bg-[#A8D4D2]/62 px-8 py-12 text-center lg:grid lg:content-center">
+            <div className="grid gap-7">
+              <p className="mx-auto max-w-[13rem] text-[22px] font-bold leading-[1.25]">
+                Scan the QR or enter the code
               </p>
-              <div className="mx-auto grid size-[220px] place-items-center rounded-[8px] bg-white p-4 shadow-[0_16px_32px_rgba(0,107,102,0.12)]">
+              <div className="mx-auto grid size-[196px] place-items-center rounded-[8px] bg-white p-4 shadow-[0_16px_32px_rgba(0,107,102,0.12)]">
                 <QRCodeCanvas
                   bgColor="#ffffff"
                   fgColor="#020617"
                   level="M"
                   marginSize={2}
-                  size={188}
+                  size={164}
                   title={`QR code for ${eventName} survey join link`}
                   value={joinLink}
                 />
               </div>
               <div className="grid gap-4">
-                <p aria-label="Join link" className="break-words text-[20px] font-bold leading-[1.35]">
+                <p aria-label="Join link" className="break-words text-[17px] font-bold leading-[1.25]">
                   {displayJoinLink(joinLink)}
                 </p>
                 <button
@@ -322,14 +343,16 @@ export function SurveyPresentationView({
                 </p>
               </div>
             </div>
-            <div aria-hidden="true" />
           </aside>
 
-          <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] px-6 py-8 sm:px-10 lg:px-20 lg:py-12">
+          <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] px-6 py-8 sm:px-10 lg:px-16 lg:py-12">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-6">
-              <div className="min-w-0">
+              <div className="min-w-0 space-y-2">
                 <p className="sr-only">{eventName} survey presentation</p>
-                <h2 className="break-words text-[clamp(2rem,3vw,3.6rem)] font-bold uppercase leading-[1.12]">
+                <p className="text-[14px] font-bold uppercase leading-none tracking-[0.18em] text-[#007C78]/80">
+                  Survey
+                </p>
+                <h2 className="break-words text-[clamp(1.45rem,2.2vw,2.6rem)] font-bold uppercase leading-[1.12]">
                   {resultState.title}
                 </h2>
               </div>
@@ -337,6 +360,20 @@ export function SurveyPresentationView({
                 {responseCopy(resultState.responseCount)} submitted
               </p>
             </div>
+            {connectionState !== "live" ? (
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-[6px] border border-[#007C78] bg-white/58 px-4 py-3 text-[15px] font-semibold leading-[1.35] text-[#006B66]" role="status">
+                <p>{connectionDetail(connectionState)}</p>
+                {connectionState === "refresh-needed" ? (
+                  <button
+                    className="min-h-10 rounded-[6px] border border-[#007C78] bg-white px-3 text-sm font-bold outline-none hover:bg-[#E8F8F6] focus-visible:ring-2 focus-visible:ring-[#006B66]"
+                    onClick={() => router.refresh()}
+                    type="button"
+                  >
+                    Refresh view
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="grid min-h-0 content-center py-8">
               {activeQuestion ? <ChartGroup mode={mode} question={activeQuestion} /> : <NoResponsesPanel />}
@@ -345,7 +382,7 @@ export function SurveyPresentationView({
             <footer className="grid items-center gap-5 sm:grid-cols-[1fr_auto_1fr]">
               <div className="flex justify-center sm:justify-start">
                 <div className="grid w-[260px] grid-cols-2 rounded-full bg-white p-1 shadow-[0_12px_26px_rgba(15,82,124,0.10)]">
-                  {(["treemap", "bar"] as const).map((option) => (
+                  {(["tiles", "bar"] as const).map((option) => (
                     <button
                       aria-pressed={mode === option}
                       className={[
@@ -356,7 +393,7 @@ export function SurveyPresentationView({
                       onClick={() => setMode(option)}
                       type="button"
                     >
-                      {option === "treemap" ? "Treemap" : "Bar"}
+                      {option === "tiles" ? "Tiles" : "Bar"}
                     </button>
                   ))}
                 </div>

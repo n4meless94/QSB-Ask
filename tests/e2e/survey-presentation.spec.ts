@@ -22,7 +22,7 @@ test("presentation view shows aggregate charts without admin controls or private
   await expect(page.getByText("Connected")).toBeVisible();
   await expect(page.getByText("3 responses submitted")).toBeVisible();
   await expect(page.getByText("1 of 3")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Treemap" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Tiles" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("heading", { name: "Is the pace clear?" })).toBeVisible();
   await expect(page.getByText("Yes: 2 responses, 67%")).toBeVisible();
   await expect(page.getByRole("table", { name: "Is the pace clear? data" })).toContainText("No");
