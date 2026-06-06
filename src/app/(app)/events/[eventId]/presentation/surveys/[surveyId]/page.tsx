@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { SurveyPresentationView } from "@/components/surveys/SurveyPresentationView";
 import { Button } from "@/components/ui/Button";
 import { E2E_AUTH_COOKIE, isE2EAuthEnabled } from "@/lib/auth/e2e";
+import { buildJoinLink } from "@/lib/events/events";
 import { getPresentationSurveyResults, type SurveyResult } from "@/lib/surveys/results";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -25,6 +26,8 @@ export default async function SurveyPresentationPage({ params }: SurveyPresentat
         eventId={eventId}
         eventName="Quarterly Briefing"
         fixtureMode
+        joinCode="QSB2X9ZA"
+        joinLink={buildJoinLink("QSB2X9ZA")}
         result={e2eSurveyResult(eventId, surveyId)}
       />
     );
@@ -52,6 +55,8 @@ export default async function SurveyPresentationPage({ params }: SurveyPresentat
     <SurveyPresentationView
       eventId={eventId}
       eventName={presentation.access.event.name}
+      joinCode={presentation.access.event.join_code}
+      joinLink={buildJoinLink(presentation.access.event.join_code)}
       key={`${presentation.result.id}:${presentation.result.lastUpdated}:${presentation.result.responseCount}`}
       result={presentation.result}
     />

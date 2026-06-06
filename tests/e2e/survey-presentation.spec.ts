@@ -17,13 +17,23 @@ test("presentation view shows aggregate charts without admin controls or private
 }) => {
   await page.goto("/events/event-results/presentation/surveys/survey-1");
 
-  await expect(page.getByRole("heading", { level: 1, name: /Quarterly Briefing/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Present" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Pulse check" })).toBeVisible();
   await expect(page.getByText("Connected")).toBeVisible();
-  await expect(page.getByText("3 responses").first()).toBeVisible();
+  await expect(page.getByText("3 responses submitted")).toBeVisible();
+  await expect(page.getByText("1 of 3")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Treemap" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("heading", { name: "Is the pace clear?" })).toBeVisible();
   await expect(page.getByText("Yes: 2 responses, 67%")).toBeVisible();
   await expect(page.getByRole("table", { name: "Is the pace clear? data" })).toContainText("No");
+  await page.getByRole("button", { name: "Bar" }).click();
+  await expect(page.getByRole("button", { name: "Bar" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("67%").first()).toBeVisible();
+  await page.getByRole("button", { name: "Next question" }).click();
+  await expect(page.getByText("2 of 3")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Which topics should we expand?" })).toBeVisible();
+  await page.getByRole("button", { name: "Next question" }).click();
+  await expect(page.getByText("3 of 3")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Should we repeat this format?" })).toBeVisible();
   await expect(page.getByText("No responses yet")).toBeVisible();
 

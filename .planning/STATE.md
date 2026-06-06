@@ -98,6 +98,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-06: Quick task `260606-3md` removed the hardcoded Presenter View townhall title and added queue-first presenter focus links from the Q&A moderation queue.
 - 2026-06-06: Quick task `260606-4cc` changed queue presenter focus from popup links to an existing Presenter View update channel with a question-swap animation.
 - 2026-06-06: Quick task `260606-4np` removed stale `master` deployment branch notes after standardising the repo on `main`.
+- 2026-06-06: Quick task `260606-gsg` redesigned the survey presentation view into a Microsoft Forms-style presenter stage with QR rail, slide navigation, and large chart modes.
 
 ## Decisions
 
@@ -188,6 +189,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | 2026-06-06 | 260606-3md | Presenter event title and queue-first question focus | `npm run lint` focused files, `npx tsc --noEmit`, focused Playwright E2E, `git diff --check` passed |
 | 2026-06-06 | 260606-4cc | Existing Presenter View queue focus update | focused ESLint, `npx tsc --noEmit`, focused Playwright E2E, browser visual check, `git diff --check` passed |
 | 2026-06-06 | 260606-4np | Main-only deployment branch cleanup docs | default branch/workflow check, remote branch pruning check, `git diff --check` passed |
+| 2026-06-06 | 260606-gsg | Microsoft Forms-style survey presentation redesign | `npm run lint`, `npx tsc --noEmit`, focused Playwright E2E, desktop/mobile visual overflow checks, `npm run build` passed |
 
 ## Last Session
 
