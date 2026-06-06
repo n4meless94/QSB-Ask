@@ -22,15 +22,39 @@ type ParticipantSurveysPageProps = {
 };
 
 function e2eEvent(joinCode: string): JoinableEvent | null {
-  if (joinCode.toUpperCase() !== "QSB2X9ZA") return null;
+  const normalizedCode = joinCode.toUpperCase();
 
-  return {
-    id: "event-1",
-    identity_mode: "name_required",
-    join_code: "QSB2X9ZA",
-    name: "Quarterly Briefing",
-    status: "active",
-  };
+  if (normalizedCode === "QSB2X9ZA") {
+    return {
+      id: "event-1",
+      identity_mode: "name_required",
+      join_code: "QSB2X9ZA",
+      name: "Quarterly Briefing",
+      status: "active",
+    };
+  }
+
+  if (normalizedCode === "QSB7HALL") {
+    return {
+      id: "event-1",
+      identity_mode: "anonymous",
+      join_code: "QSB7HALL",
+      name: "Town Hall",
+      status: "active",
+    };
+  }
+
+  if (normalizedCode === "QSBEMAIL") {
+    return {
+      id: "event-1",
+      identity_mode: "name_email_required",
+      join_code: "QSBEMAIL",
+      name: "Stakeholder Briefing",
+      status: "active",
+    };
+  }
+
+  return null;
 }
 
 function e2eSurvey(

@@ -209,7 +209,7 @@ describe("join participant action", () => {
     makeQueries();
   });
 
-  it("sets an HTTP-only SameSite=Lax event-scoped cookie and redirects to event Q&A", async () => {
+  it("sets an HTTP-only SameSite=Lax participant cookie for join pages and redirects to event Q&A", async () => {
     await expect(
       joinParticipantAction(form({ join_code: "QSB2X9ZA", display_name: "Jerry" })),
     ).rejects.toThrow("REDIRECT:/join/QSB2X9ZA/qna");
@@ -219,12 +219,13 @@ describe("join participant action", () => {
       expect.any(String),
       expect.objectContaining({
         httpOnly: true,
+        path: "/join",
         sameSite: "lax",
       }),
     );
   });
 
-  it("auto-joins anonymous events and redirects shared links to event Q&A", async () => {
+  it("auto-joins anonymous events and keeps the cookie valid across join subroutes", async () => {
     makeQueries({ ...activeEvent, identity_mode: "anonymous" });
 
     await expect(autoJoinAnonymousParticipantAction(form({ join_code: "QSB2X9ZA" }))).rejects.toThrow(
@@ -236,7 +237,7 @@ describe("join participant action", () => {
       expect.any(String),
       expect.objectContaining({
         httpOnly: true,
-        path: "/join/QSB2X9ZA",
+        path: "/join",
         sameSite: "lax",
       }),
     );

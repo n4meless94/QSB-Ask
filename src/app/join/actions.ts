@@ -6,7 +6,12 @@ import { redirect } from "next/navigation";
 import {
   getParticipantCookieName,
   joinParticipantEvent,
+  type JoinableEvent,
 } from "@/lib/participants/session";
+import {
+  normaliseJoinCode,
+  validateParticipantIdentity,
+} from "@/lib/participants/validation";
 
 export type JoinParticipantActionResult = {
   ok: boolean;
@@ -25,27 +30,89 @@ function fieldErrorFor(message: string): JoinParticipantActionResult["fieldError
   return {};
 }
 
-function participantCookieOptions(joinCode: string) {
+function participantCookieOptions() {
   return {
     httpOnly: true,
     maxAge: 60 * 60 * 8,
-    path: `/join/${joinCode}`,
+    path: "/join",
     sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
   };
+}
+
+function e2eEvent(code: string): JoinableEvent | null {
+  const normalizedCode = normaliseJoinCode(code);
+
+  if (normalizedCode === "QSB2X9ZA") {
+    return {
+      id: "event-1",
+      identity_mode: "name_required",
+      join_code: "QSB2X9ZA",
+      name: "Quarterly Briefing",
+      status: "active",
+    };
+  }
+
+  if (normalizedCode === "QSB7HALL") {
+    return {
+      id: "event-1",
+      identity_mode: "anonymous",
+      join_code: "QSB7HALL",
+      name: "Town Hall",
+      status: "active",
+    };
+  }
+
+  if (normalizedCode === "QSBEMAIL") {
+    return {
+      id: "event-1",
+      identity_mode: "name_email_required",
+      join_code: "QSBEMAIL",
+      name: "Stakeholder Briefing",
+      status: "active",
+    };
+  }
+
+  return null;
+}
+
+async function joinE2EParticipantEvent(
+  joinCode: string,
+  identity: { display_name?: string; email?: string },
+) {
+  if (process.env.QSB_ASK_E2E_AUTH !== "1") return null;
+
+  const event = e2eEvent(joinCode);
+
+  if (!event) {
+    throw new Error("We could not find an active event for that code.");
+  }
+
+  validateParticipantIdentity(event.identity_mode, identity);
+
+  const cookieStore = await cookies();
+  cookieStore.set(
+    getParticipantCookieName(event.id),
+    "e2e-participant-token",
+    participantCookieOptions(),
+  );
+
+  redirect(`/join/${event.join_code}/qna`);
 }
 
 export async function autoJoinAnonymousParticipantAction(formData: FormData) {
   const joinCode = String(formData.get("join_code") ?? "");
 
   try {
+    await joinE2EParticipantEvent(joinCode, {});
+
     const joined = await joinParticipantEvent(joinCode, {});
     const cookieStore = await cookies();
 
     cookieStore.set(
       getParticipantCookieName(joined.event.id),
       joined.rawToken,
-      participantCookieOptions(joined.event.join_code),
+      participantCookieOptions(),
     );
 
     redirect(`/join/${joined.event.join_code}/qna`);
@@ -77,6 +144,11 @@ export async function joinParticipantAction(
   }
 
   try {
+    await joinE2EParticipantEvent(String(formData.get("join_code") ?? ""), {
+      display_name: String(formData.get("display_name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+    });
+
     const joined = await joinParticipantEvent(String(formData.get("join_code") ?? ""), {
       display_name: String(formData.get("display_name") ?? ""),
       email: String(formData.get("email") ?? ""),
@@ -86,7 +158,7 @@ export async function joinParticipantAction(
     cookieStore.set(
       getParticipantCookieName(joined.event.id),
       joined.rawToken,
-      participantCookieOptions(joined.event.join_code),
+      participantCookieOptions(),
     );
 
     redirect(`/join/${joined.event.join_code}/qna`);

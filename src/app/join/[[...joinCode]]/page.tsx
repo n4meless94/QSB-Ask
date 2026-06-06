@@ -8,15 +8,39 @@ type JoinPageProps = {
 };
 
 function e2eEvent(code: string): JoinableEvent | null {
-  if (code.toUpperCase() !== "QSB2X9ZA") return null;
+  const normalizedCode = code.toUpperCase();
 
-  return {
-    id: "event-1",
-    identity_mode: "name_required",
-    join_code: "QSB2X9ZA",
-    name: "Quarterly Briefing",
-    status: "active",
-  };
+  if (normalizedCode === "QSB2X9ZA") {
+    return {
+      id: "event-1",
+      identity_mode: "name_required",
+      join_code: "QSB2X9ZA",
+      name: "Quarterly Briefing",
+      status: "active",
+    };
+  }
+
+  if (normalizedCode === "QSB7HALL") {
+    return {
+      id: "event-1",
+      identity_mode: "anonymous",
+      join_code: "QSB7HALL",
+      name: "Town Hall",
+      status: "active",
+    };
+  }
+
+  if (normalizedCode === "QSBEMAIL") {
+    return {
+      id: "event-1",
+      identity_mode: "name_email_required",
+      join_code: "QSBEMAIL",
+      name: "Stakeholder Briefing",
+      status: "active",
+    };
+  }
+
+  return null;
 }
 
 export default async function JoinPage({ params, searchParams }: JoinPageProps) {
