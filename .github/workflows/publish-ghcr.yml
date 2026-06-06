@@ -65,5 +65,28 @@ jobs:
             exit 1
           fi
 
-          curl --fail --show-error --silent --request GET "$COOLIFY_WEBHOOK" \
-            --header "Authorization: Bearer $COOLIFY_TOKEN"
+          for attempt in 1 2 3 4 5; do
+            echo "Triggering Coolify deployment, attempt ${attempt}/5..."
+            http_code="$(
+              curl --show-error --silent --output /tmp/coolify-webhook-response.txt \
+                --write-out "%{http_code}" \
+                --connect-timeout 10 \
+                --max-time 60 \
+                --request GET "$COOLIFY_WEBHOOK" \
+                --header "Authorization: Bearer $COOLIFY_TOKEN" \
+                || true
+            )"
+
+            if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+              echo "Coolify deployment webhook accepted with HTTP ${http_code}."
+              exit 0
+            fi
+
+            echo "Coolify deployment webhook returned HTTP ${http_code}."
+            if [ "$attempt" -lt 5 ]; then
+              sleep 20
+            fi
+          done
+
+          echo "Coolify deployment webhook did not succeed after 5 attempts."
+          exit 1
