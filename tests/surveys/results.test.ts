@@ -380,6 +380,24 @@ describe("survey result aggregation", () => {
     );
   });
 
+  it("derives open text keyword counts without exposing full response rows to presenter results", async () => {
+    const [organiserResult] = await getOrganiserSurveyResults("organiser-1", "event-1");
+    const organiserTextQuestion = organiserResult.questions.find((question) => question.id === "question-text");
+
+    expect(organiserTextQuestion?.openTextKeywords).toEqual([
+      { count: 1, label: "budget" },
+      { count: 1, label: "detail" },
+      { count: 1, label: "timeline" },
+    ]);
+
+    const presentation = await getPresentationSurveyResults("speaker-1", "event-1", "survey-1");
+    const presenterTextQuestion = presentation.result.questions.find((question) => question.id === "question-text");
+
+    expect(presenterTextQuestion?.openTextKeywords).toEqual(organiserTextQuestion?.openTextKeywords);
+    expect(presenterTextQuestion?.openTextResponses).toEqual([]);
+    expect(JSON.stringify(presentation)).not.toMatch(/Need more budget detail|Timeline please/i);
+  });
+
   it("exposes participant-visible aggregate results only when visibility is enabled", async () => {
     await expect(getParticipantVisibleSurveyResults("event-1", "raw-token", "survey-1")).resolves.toHaveLength(1);
 

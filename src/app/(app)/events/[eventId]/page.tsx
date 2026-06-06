@@ -400,6 +400,7 @@ function e2eSurveyResults(eventId: string): SurveyResult[] {
             { count: 1, label: "No", percentage: 33 },
           ],
           id: "question-choice",
+          openTextKeywords: [],
           openTextResponses: [],
           options: [
             { id: "option-yes", label: "Yes", position: 0 },
@@ -417,6 +418,7 @@ function e2eSurveyResults(eventId: string): SurveyResult[] {
             { count: 2, label: "Risks", percentage: 100 },
           ],
           id: "question-select",
+          openTextKeywords: [],
           openTextResponses: [],
           options: [
             { id: "option-budget", label: "Budget", position: 0 },
@@ -437,6 +439,7 @@ function e2eSurveyResults(eventId: string): SurveyResult[] {
             { count: 1, label: "5", percentage: 33 },
           ],
           id: "question-rating",
+          openTextKeywords: [],
           openTextResponses: [],
           options: [],
           position: 2,
@@ -448,6 +451,11 @@ function e2eSurveyResults(eventId: string): SurveyResult[] {
         {
           chartData: [],
           id: "question-text",
+          openTextKeywords: [
+            { count: 2, label: "budget" },
+            { count: 1, label: "timeline" },
+            { count: 1, label: "detail" },
+          ],
           openTextResponses: [
             {
               label: "Response 1",
@@ -473,6 +481,7 @@ function e2eSurveyResults(eventId: string): SurveyResult[] {
             { count: 0, label: "Disagree", percentage: 0 },
           ],
           id: "question-zero",
+          openTextKeywords: [],
           openTextResponses: [],
           options: [
             { id: "option-agree", label: "Agree", position: 0 },

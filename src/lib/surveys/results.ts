@@ -38,9 +38,15 @@ export type OpenTextResponse = {
   text: string;
 };
 
+export type OpenTextKeyword = {
+  count: number;
+  label: string;
+};
+
 export type SurveyQuestionResult = {
   chartData: SurveyChartDatum[];
   id: string;
+  openTextKeywords: OpenTextKeyword[];
   openTextResponses: OpenTextResponse[];
   options: Array<{ id: string; label: string; position: number }>;
   position: number;
@@ -68,6 +74,41 @@ export type PresentationSurveyResults = {
 
 const SURVEY_RESULT_SELECT =
   "id,event_id,title,status,results_visible_to_participants,created_at,updated_at,created_by,survey_questions(id,survey_id,type,prompt,position,rating_scale,created_at,survey_options(id,survey_question_id,label,position))";
+
+const OPEN_TEXT_KEYWORD_STOPWORDS = new Set([
+  "ada",
+  "akan",
+  "and",
+  "atau",
+  "boleh",
+  "can",
+  "dalam",
+  "dan",
+  "dengan",
+  "for",
+  "from",
+  "ini",
+  "itu",
+  "kami",
+  "kau",
+  "kepada",
+  "lagi",
+  "lebih",
+  "macam",
+  "mana",
+  "maybe",
+  "more",
+  "need",
+  "next",
+  "please",
+  "saya",
+  "should",
+  "the",
+  "this",
+  "untuk",
+  "what",
+  "yang",
+]);
 
 function percent(count: number, total: number) {
   return total > 0 ? Math.round((count / total) * 100) : 0;
@@ -165,11 +206,36 @@ function openTextRows(
     }));
 }
 
+function openTextKeywords(questionAnswers: AnswerWithResponse[]) {
+  const counts = new Map<string, { count: number; label: string }>();
+
+  for (const answer of questionAnswers) {
+    const tokens = (answer.text_value ?? "")
+      .normalize("NFKD")
+      .toLowerCase()
+      .replace(/https?:\/\/\S+|\S+@\S+|\+?\d[\d\s-]{5,}\d/g, " ")
+      .match(/[\p{L}\p{N}][\p{L}\p{N}'-]*/gu) ?? [];
+
+    for (const token of tokens) {
+      const label = token.replace(/^[-']+|[-']+$/g, "");
+
+      if (label.length < 4 || OPEN_TEXT_KEYWORD_STOPWORDS.has(label)) continue;
+
+      const existing = counts.get(label);
+      counts.set(label, { count: (existing?.count ?? 0) + 1, label: existing?.label ?? label });
+    }
+  }
+
+  return [...counts.values()]
+    .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label))
+    .slice(0, 24);
+}
+
 function mapQuestionResult(
   question: SurveyQuestionWithOptions,
   questionAnswers: AnswerWithResponse[],
   responsesById: Map<string, SurveyResponseRow>,
-  includeOpenText: boolean,
+  resultOptions: { includeOpenTextKeywords: boolean; includeOpenTextResponses: boolean },
 ): SurveyQuestionResult {
   const options = sortByPosition(question.survey_options).map((option) => ({
     id: option.id,
@@ -187,7 +253,10 @@ function mapQuestionResult(
   return {
     chartData,
     id: question.id,
-    openTextResponses: includeOpenText && question.type === "open_text" ? openTextRows(questionAnswers, responsesById) : [],
+    openTextKeywords:
+      resultOptions.includeOpenTextKeywords && question.type === "open_text" ? openTextKeywords(questionAnswers) : [],
+    openTextResponses:
+      resultOptions.includeOpenTextResponses && question.type === "open_text" ? openTextRows(questionAnswers, responsesById) : [],
     options,
     position: question.position,
     prompt: question.prompt,
@@ -232,9 +301,13 @@ function buildResults(
   surveys: SurveyWithQuestions[],
   responses: SurveyResponseRow[],
   answers: AnswerWithResponse[],
-  includeOpenText: boolean,
+  options: { includeOpenTextKeywords?: boolean; includeOpenTextResponses?: boolean },
 ): SurveyResult[] {
   const { answersBySurveyAndQuestion, responsesById, responsesBySurveyId } = buildAnswerIndex(responses, answers);
+  const resultOptions = {
+    includeOpenTextKeywords: Boolean(options.includeOpenTextKeywords),
+    includeOpenTextResponses: Boolean(options.includeOpenTextResponses),
+  };
 
   return surveys.map((survey) => {
     const surveyResponses = responsesBySurveyId.get(survey.id) ?? [];
@@ -245,7 +318,7 @@ function buildResults(
       lastUpdated: survey.updated_at,
       presentationHref: `/events/${survey.event_id}/presentation/surveys/${survey.id}`,
       questions: sortByPosition(survey.survey_questions).map((question) =>
-        mapQuestionResult(question, answersByQuestion.get(question.id) ?? [], responsesById, includeOpenText),
+        mapQuestionResult(question, answersByQuestion.get(question.id) ?? [], responsesById, resultOptions),
       ),
       responseCount: surveyResponses.length,
       resultsVisibleToParticipants: survey.results_visible_to_participants,
@@ -311,7 +384,7 @@ export async function getOrganiserSurveyResults(userId: string, eventId: string)
   await assertEventRole(userId, eventId, EVENT_MANAGEMENT_ROLES);
   const { answers, responses, surveys } = await loadResultRows(eventId);
 
-  return buildResults(surveys, responses, answers, true);
+  return buildResults(surveys, responses, answers, { includeOpenTextKeywords: true, includeOpenTextResponses: true });
 }
 
 export async function getPresentationSurveyResults(
@@ -325,7 +398,7 @@ export async function getPresentationSurveyResults(
     surveys.filter((survey) => survey.id === surveyId),
     responses,
     answers,
-    false,
+    { includeOpenTextKeywords: true, includeOpenTextResponses: false },
   );
 
   if (!result) {
@@ -356,5 +429,8 @@ export async function getParticipantVisibleSurveyResults(
       survey.results_visible_to_participants && (survey.status === "published" || survey.status === "closed"),
   );
 
-  return buildResults(visibleSurveys, responses, answers, false);
+  return buildResults(visibleSurveys, responses, answers, {
+    includeOpenTextKeywords: false,
+    includeOpenTextResponses: false,
+  });
 }

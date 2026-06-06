@@ -166,6 +166,7 @@ function e2eVisibleSurveyResults(): SurveyResult[] {
             { count: 1, label: "No", percentage: 33 },
           ],
           id: "question-choice",
+          openTextKeywords: [],
           openTextResponses: [],
           options: [
             { id: "option-yes", label: "Yes", position: 0 },

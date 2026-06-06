@@ -637,8 +637,45 @@ a {
   animation: presenter-question-swap 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+.presenter-word-cloud {
+  flex-wrap: wrap;
+}
+
+.presenter-word-cloud-token {
+  animation:
+    presenter-cloud-enter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    presenter-cloud-float 4200ms ease-in-out infinite;
+  animation-delay: var(--cloud-enter-delay, 0ms), calc(var(--cloud-enter-delay, 0ms) + 520ms);
+  transform-origin: center;
+  white-space: nowrap;
+}
+
+@keyframes presenter-cloud-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes presenter-cloud-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(calc(var(--cloud-drift, 1) * 5px), -8px, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .presenter-question-swap {
+  .presenter-question-swap,
+  .presenter-word-cloud-token {
     animation: none;
   }
 }

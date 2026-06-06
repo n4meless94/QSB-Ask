@@ -161,6 +161,69 @@ function BarResults({ question }: { question: SurveyQuestionResult }) {
   );
 }
 
+function cloudSize(count: number, maxCount: number) {
+  const ratio = maxCount > 0 ? count / maxCount : 0;
+  return `clamp(1.4rem, ${1.2 + ratio * 3.8}vw, ${2.2 + ratio * 3.9}rem)`;
+}
+
+function cloudWeight(count: number, maxCount: number) {
+  const ratio = maxCount > 0 ? count / maxCount : 0;
+  return Math.round(650 + ratio * 200);
+}
+
+function OpenTextWordCloud({ question }: { question: SurveyQuestionResult }) {
+  if (question.responseCount === 0) return <NoResponsesPanel />;
+
+  if (question.openTextKeywords.length === 0) {
+    return (
+      <div className="grid min-h-[260px] place-items-center rounded-[8px] border border-[#7AB8BD] bg-white/42 px-8 text-center text-[#006B66] shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
+        <div className="grid gap-3">
+          <p className="text-[clamp(2.3rem,4vw,4rem)] font-bold leading-none">
+            {responseCopy(question.responseCount)} collected
+          </p>
+          <p className="text-[20px] font-semibold leading-[1.35]">
+            Keywords will appear as repeated themes emerge.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const maxCount = Math.max(...question.openTextKeywords.map((keyword) => keyword.count), 1);
+
+  return (
+    <div
+      aria-label={`${question.prompt} keyword cloud`}
+      className="presenter-word-cloud flex min-h-[330px] content-center items-center justify-center gap-x-8 gap-y-6 overflow-hidden rounded-[8px] border border-[#7AB8BD] bg-white/30 px-8 py-9 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]"
+      role="img"
+    >
+      {question.openTextKeywords.map((keyword, index) => (
+        <span
+          aria-label={`${keyword.label}: ${keyword.count} mentions`}
+          className="presenter-word-cloud-token inline-flex rounded-full px-3 py-1 leading-none text-[#006B66] drop-shadow-[0_8px_18px_rgba(0,107,102,0.13)]"
+          key={keyword.label}
+          style={{
+            fontSize: cloudSize(keyword.count, maxCount),
+            fontWeight: cloudWeight(keyword.count, maxCount),
+            ["--cloud-drift" as string]: `${index % 2 === 0 ? -1 : 1}`,
+            ["--cloud-enter-delay" as string]: `${index * 90}ms`,
+          }}
+        >
+          {keyword.label}
+        </span>
+      ))}
+      <AccessibleResults
+        data={question.openTextKeywords.map((keyword) => ({
+          count: keyword.count,
+          label: keyword.label,
+          percentage: Math.round((keyword.count / maxCount) * 100),
+        }))}
+        title={`${question.prompt} keywords`}
+      />
+    </div>
+  );
+}
+
 function ChartGroup({ mode, question }: { mode: ChartMode; question: SurveyQuestionResult }) {
   if (question.type === "open_text") {
     return (
@@ -168,14 +231,7 @@ function ChartGroup({ mode, question }: { mode: ChartMode; question: SurveyQuest
         <h2 className="break-words text-[clamp(2.5rem,4.2vw,4.9rem)] font-bold uppercase leading-[1.08] text-[#006B66]">
           {question.prompt}
         </h2>
-        <div className="grid max-w-3xl gap-3 rounded-[8px] border border-[#7AB8BD] bg-white/42 p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
-          <p className="text-[clamp(2.3rem,4vw,4rem)] font-bold leading-none text-[#006B66]">
-            {responseCopy(question.responseCount)} collected
-          </p>
-          <p className="text-[20px] font-semibold leading-[1.35] text-[#006B66]">
-            Open text answers stay hidden from this presentation screen and remain available to organisers in Results.
-          </p>
-        </div>
+        <OpenTextWordCloud question={question} />
       </section>
     );
   }
@@ -381,22 +437,30 @@ export function SurveyPresentationView({
 
             <footer className="grid items-center gap-5 sm:grid-cols-[1fr_auto_1fr]">
               <div className="flex justify-center sm:justify-start">
-                <div className="grid w-[260px] grid-cols-2 rounded-full bg-white p-1 shadow-[0_12px_26px_rgba(15,82,124,0.10)]">
-                  {(["tiles", "bar"] as const).map((option) => (
-                    <button
-                      aria-pressed={mode === option}
-                      className={[
-                        "min-h-11 rounded-full px-4 text-[18px] font-semibold leading-none outline-none focus-visible:ring-2 focus-visible:ring-[#006B66]",
-                        mode === option ? "bg-[#007C78] text-white" : "text-[#007C78] hover:bg-[#E8F8F6]",
-                      ].join(" ")}
-                      key={option}
-                      onClick={() => setMode(option)}
-                      type="button"
-                    >
-                      {option === "tiles" ? "Tiles" : "Bar"}
-                    </button>
-                  ))}
-                </div>
+                {activeQuestion?.type === "open_text" ? (
+                  <div className="grid w-[180px] rounded-full bg-white p-1 shadow-[0_12px_26px_rgba(15,82,124,0.10)]">
+                    <span className="grid min-h-11 place-items-center rounded-full bg-[#007C78] px-4 text-[18px] font-semibold leading-none text-white">
+                      Cloud
+                    </span>
+                  </div>
+                ) : (
+                  <div className="grid w-[260px] grid-cols-2 rounded-full bg-white p-1 shadow-[0_12px_26px_rgba(15,82,124,0.10)]">
+                    {(["tiles", "bar"] as const).map((option) => (
+                      <button
+                        aria-pressed={mode === option}
+                        className={[
+                          "min-h-11 rounded-full px-4 text-[18px] font-semibold leading-none outline-none focus-visible:ring-2 focus-visible:ring-[#006B66]",
+                          mode === option ? "bg-[#007C78] text-white" : "text-[#007C78] hover:bg-[#E8F8F6]",
+                        ].join(" ")}
+                        key={option}
+                        onClick={() => setMode(option)}
+                        type="button"
+                      >
+                        {option === "tiles" ? "Tiles" : "Bar"}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-4 text-[20px] font-semibold">

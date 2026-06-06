@@ -98,6 +98,7 @@ function e2eSurveyResult(eventId: string, surveyId: string): SurveyResult {
           { count: 1, label: "No", percentage: 33 },
         ],
         id: "question-choice",
+        openTextKeywords: [],
         openTextResponses: [],
         options: [
           { id: "option-yes", label: "Yes", position: 0 },
@@ -115,6 +116,7 @@ function e2eSurveyResult(eventId: string, surveyId: string): SurveyResult {
           { count: 2, label: "Risks", percentage: 100 },
         ],
         id: "question-select",
+        openTextKeywords: [],
         openTextResponses: [],
         options: [
           { id: "option-budget", label: "Budget", position: 0 },
@@ -131,17 +133,19 @@ function e2eSurveyResult(eventId: string, surveyId: string): SurveyResult {
           { count: 0, label: "Agree", percentage: 0 },
           { count: 0, label: "Disagree", percentage: 0 },
         ],
-        id: "question-zero",
-        openTextResponses: [],
-        options: [
-          { id: "option-agree", label: "Agree", position: 0 },
-          { id: "option-disagree", label: "Disagree", position: 1 },
+        id: "question-text",
+        openTextKeywords: [
+          { count: 3, label: "budget" },
+          { count: 2, label: "timeline" },
+          { count: 1, label: "detail" },
         ],
+        openTextResponses: [],
+        options: [],
         position: 2,
-        prompt: "Should we repeat this format?",
+        prompt: "What should we clarify next?",
         ratingScale: null,
-        responseCount: 0,
-        type: "multiple_choice",
+        responseCount: 3,
+        type: "open_text",
       },
     ],
   };

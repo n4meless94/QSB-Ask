@@ -34,8 +34,12 @@ test("presentation view shows aggregate charts without admin controls or private
   await expect(page.getByRole("heading", { name: "Which topics should we expand?" })).toBeVisible();
   await page.getByRole("button", { name: "Next question" }).click();
   await expect(page.getByText("3 of 3")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Should we repeat this format?" })).toBeVisible();
-  await expect(page.getByText("No responses yet")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What should we clarify next?" })).toBeVisible();
+  await expect(page.getByText("Cloud")).toBeVisible();
+  await expect(page.getByLabel("budget: 3 mentions")).toBeVisible();
+  await expect(page.getByLabel("timeline: 2 mentions")).toBeVisible();
+  await expect(page.getByRole("table", { name: "What should we clarify next? keywords data" })).toContainText("detail");
+  await expect(page.getByText(/Need more budget detail|Timeline please/i)).toHaveCount(0);
 
   await expect(page.getByRole("tab", { name: "Surveys" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Publish survey" })).toHaveCount(0);
@@ -76,6 +80,7 @@ test("fixture refresh updates aggregate counts within 2 seconds without trusting
                   { count: 1, label: "No", percentage: 25 },
                 ],
                 id: "question-choice",
+                openTextKeywords: [],
                 openTextResponses: [],
                 options: [
                   { id: "option-yes", label: "Yes", position: 0 },

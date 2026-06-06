@@ -190,6 +190,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | 2026-06-06 | 260606-4cc | Existing Presenter View queue focus update | focused ESLint, `npx tsc --noEmit`, focused Playwright E2E, browser visual check, `git diff --check` passed |
 | 2026-06-06 | 260606-4np | Main-only deployment branch cleanup docs | default branch/workflow check, remote branch pruning check, `git diff --check` passed |
 | 2026-06-06 | 260606-gsg | Microsoft Forms-style survey presentation redesign | `npm run lint`, `npx tsc --noEmit`, focused Playwright E2E, desktop/mobile visual overflow checks, `npm run build` passed |
+| 2026-06-06 | 260606-i5w | Animated open-text survey presenter word cloud | `npm run test -- tests/surveys/results.test.ts`, `npm run lint`, focused Playwright E2E, `npm run build` passed |
 
 ## Last Session
 
