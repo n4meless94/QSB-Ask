@@ -184,7 +184,7 @@ export function PresenterView({
                 <p className="text-[14px] font-black uppercase leading-none tracking-[0.34em] text-[#006B66]">
                   Current question
                 </p>
-                <p className="break-words text-[clamp(2.25rem,min(5.5vw,8.5vh),6.7rem)] font-black leading-[1.04] tracking-normal text-[#1F2933]">
+                <p className="break-words text-[clamp(2.25rem,min(5.5vw,8.5vh),6.7rem)] font-bold leading-[1.04] tracking-normal text-[#1F2933]">
                   {featuredQuestion.current_text}
                 </p>
               </div>
