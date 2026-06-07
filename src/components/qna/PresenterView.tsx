@@ -49,11 +49,15 @@ function statusTone(state: QnaConnectionState) {
   return "text-red-800";
 }
 
-/** Moderator-facing queue hint derived from how many approved questions sit behind the hero. */
-function queueCopy(waiting: number) {
-  if (waiting <= 0) return "No questions waiting";
-  if (waiting === 1) return "1 question waiting";
-  return `${waiting} questions waiting`;
+/**
+ * Moderator-facing queue hint: how many approved-but-unanswered (live) questions are still
+ * queued up behind the one on screen. Mirrors the dashboard "Live" pool, and intentionally
+ * avoids the word "waiting" so it does not clash with the dashboard's pending-approval metric.
+ */
+function queueCopy(remaining: number) {
+  if (remaining <= 0) return "Queue clear";
+  if (remaining === 1) return "Next question ready";
+  return `${remaining} questions in queue`;
 }
 
 /** Group the join code into readable blocks of four, e.g. "8HP3WQ6C" -> "8HP3-WQ6C". */
@@ -93,7 +97,9 @@ export function PresenterView({
   const featuredQuestionQueueNumber = featuredQuestion
     ? sortedQuestions.findIndex((question) => question.id === featuredQuestion.id) + 1
     : 0;
-  const questionsWaiting = Math.max(sortedQuestions.length - featuredQuestionQueueNumber, 0);
+  const liveQuestionsRemaining = sortedQuestions.filter(
+    (question) => question.status !== "answered" && question.id !== featuredQuestion?.id,
+  ).length;
 
   useEffect(() => {
     return subscribeToPresenterFocus(eventId, setActiveQuestionId);
@@ -307,7 +313,7 @@ export function PresenterView({
             ) : null}
           </div>
           <p className="shrink-0 text-[#8A93A0]" data-testid="presenter-queue-indicator">
-            {queueCopy(questionsWaiting)}
+            {queueCopy(liveQuestionsRemaining)}
           </p>
         </footer>
       </div>

@@ -26,7 +26,7 @@ test("presenter view shows approved questions only without management controls",
   await expect(page.getByText("Queue #1")).toBeVisible();
   await expect(page.getByText("8 votes")).toBeVisible();
   await expect(page.getByText("Live now", { exact: true })).toBeVisible();
-  await expect(page.getByText("1 question waiting")).toBeVisible();
+  await expect(page.getByText("Queue clear")).toBeVisible();
   await expect(page.getByRole("button", { name: "Enter fullscreen" })).toBeVisible();
 
   await expect(page.getByText("Jameson Sterling")).toHaveCount(0);
