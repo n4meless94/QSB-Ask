@@ -143,7 +143,7 @@ export function PresenterView({
 
   return (
     <main className="fixed inset-0 z-50 overflow-hidden bg-[#F8F7F2] text-[#1F2933]">
-      <div className="grid min-h-screen grid-rows-[74px_minmax(0,1fr)_42px]">
+      <div className="grid h-full min-h-0 grid-rows-[clamp(56px,9vh,74px)_minmax(0,1fr)_clamp(36px,6vh,42px)]">
         <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center border-b border-[#D9D5C9] bg-[rgba(248,247,242,0.9)] px-4 sm:px-8 lg:px-16">
           <div className="flex min-w-0 items-center gap-3 sm:gap-5">
             <h1
@@ -173,18 +173,18 @@ export function PresenterView({
         {featuredQuestion ? (
           <section
             aria-label="Featured approved question"
-            className="relative mx-auto grid w-full max-w-[1500px] grid-cols-1 items-center gap-10 px-5 py-8 sm:px-10 lg:grid-cols-[minmax(0,1.62fr)_minmax(340px,0.82fr)] lg:gap-24 lg:px-16 lg:py-0"
+            className="relative mx-auto grid h-full min-h-0 w-full max-w-[1500px] grid-cols-1 content-center items-center gap-[clamp(1.5rem,4vh,2.5rem)] overflow-y-auto px-5 py-[clamp(1rem,3vh,2rem)] sm:px-10 lg:grid-cols-[minmax(0,1.62fr)_minmax(300px,0.82fr)] lg:gap-[clamp(2rem,5vw,6rem)] lg:px-16 lg:py-0"
           >
             <article
-              className="presenter-question-swap grid min-w-0 gap-12 lg:gap-14"
+              className="presenter-question-swap grid min-w-0 gap-[clamp(1.5rem,4vh,3.5rem)]"
               data-testid="presenter-featured-question"
               key={featuredQuestion.id}
             >
-              <div className="grid max-w-[920px] gap-7">
+              <div className="grid max-w-[920px] gap-[clamp(0.75rem,2.4vh,1.75rem)]">
                 <p className="text-[14px] font-black uppercase leading-none tracking-[0.34em] text-[#006B66]">
                   Current question
                 </p>
-                <p className="break-words text-[clamp(3.1rem,5.5vw,6.7rem)] font-black leading-[1.04] tracking-normal text-[#1F2933]">
+                <p className="break-words text-[clamp(2.25rem,min(5.5vw,8.5vh),6.7rem)] font-black leading-[1.04] tracking-normal text-[#1F2933]">
                   {featuredQuestion.current_text}
                 </p>
               </div>
@@ -194,7 +194,7 @@ export function PresenterView({
                   Q&amp;A Status
                 </span>
                 <div className="min-w-0">
-                  <p className="flex flex-wrap gap-x-3 gap-y-1 text-[20px] font-semibold leading-[1.35] text-[#667085]">
+                  <p className="flex flex-wrap gap-x-3 gap-y-1 text-[clamp(1rem,min(1.4vw,2vh),1.25rem)] font-semibold leading-[1.35] text-[#667085]">
                     <span>{statusLabel(featuredQuestion.status)}</span>
                     <span aria-hidden="true">·</span>
                     <span>Queue #{featuredQuestionQueueNumber}</span>
@@ -212,7 +212,7 @@ export function PresenterView({
               </div>
             </article>
 
-            <aside className="relative mx-auto grid w-full max-w-[430px] gap-8 overflow-hidden rounded-[8px] border border-[#DCE7E3] bg-white/82 px-8 py-9 text-center shadow-[0_28px_70px_rgba(31,41,51,0.12)] sm:px-10">
+            <aside className="relative mx-auto grid w-full max-w-[430px] gap-[clamp(1rem,2.6vh,2rem)] overflow-hidden rounded-[8px] border border-[#DCE7E3] bg-white/82 px-8 py-[clamp(1.25rem,3vh,2.25rem)] text-center shadow-[0_28px_70px_rgba(31,41,51,0.12)] sm:px-10">
               <div
                 className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-[radial-gradient(circle,rgba(0,107,102,0.20),rgba(0,107,102,0)_68%)]"
                 aria-hidden="true"
@@ -221,24 +221,26 @@ export function PresenterView({
                 className="pointer-events-none absolute bottom-10 left-8 size-40 rounded-full bg-[radial-gradient(circle,rgba(0,107,102,0.10),rgba(0,107,102,0)_70%)]"
                 aria-hidden="true"
               />
-              <div className="relative mx-auto grid size-[300px] place-items-center rounded-[8px] bg-[#006B66] p-5 shadow-[0_22px_54px_rgba(0,107,102,0.22)] sm:size-[328px] sm:p-6">
-                <div className="grid size-[246px] place-items-center rounded-[6px] border-[10px] border-white bg-[#F8F7F2] sm:size-[272px]">
+              <div className="relative mx-auto grid size-[clamp(11rem,26vh,20.5rem)] place-items-center rounded-[8px] bg-[#006B66] p-[clamp(0.75rem,1.6vh,1.5rem)] shadow-[0_22px_54px_rgba(0,107,102,0.22)]">
+                <div className="grid size-full place-items-center rounded-[6px] border-[clamp(6px,1.2vh,10px)] border-white bg-[#F8F7F2]">
                   <QRCodeCanvas
                     bgColor="#F8F7F2"
+                    className="h-auto w-full max-w-full"
                     fgColor="#020617"
                     level="M"
                     marginSize={2}
                     size={224}
+                    style={{ height: "auto", width: "100%" }}
                     title={`QR code for ${eventName} Q&A join link`}
                     value={joinLink}
                   />
                 </div>
               </div>
-              <div className="relative grid gap-4">
-                <h2 className="mx-auto max-w-[14ch] text-[30px] font-black leading-[1.08] text-[#006B66]">
+              <div className="relative grid gap-[clamp(0.5rem,1.6vh,1rem)]">
+                <h2 className="mx-auto max-w-[14ch] text-[clamp(1.375rem,min(2.4vw,3.2vh),1.875rem)] font-black leading-[1.08] text-[#006B66]">
                   Scan to ask a question
                 </h2>
-                <p className="text-[17px] font-semibold leading-[1.35] text-[#667085]">or enter join code</p>
+                <p className="text-[clamp(0.95rem,1.8vh,1.0625rem)] font-semibold leading-[1.35] text-[#667085]">or enter join code</p>
                 <p
                   aria-label="Join code"
                   className="w-full max-w-full whitespace-nowrap rounded-full border border-[#D9D5C9] bg-[#F8F7F2] px-5 py-4 font-mono text-[clamp(1.2rem,2.2vw,1.6rem)] font-black leading-none tracking-[0.14em] text-[#1F2933] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]"
@@ -249,12 +251,12 @@ export function PresenterView({
             </aside>
           </section>
         ) : (
-          <section className="mx-auto grid w-full max-w-[1280px] place-items-center px-4 py-10 text-center sm:px-8 lg:px-16">
+          <section className="mx-auto grid h-full min-h-0 w-full max-w-[1280px] place-items-center px-4 py-10 text-center sm:px-8 lg:px-16">
             <div className="grid max-w-3xl gap-6">
               <p className="text-[14px] font-black uppercase leading-none tracking-[0.34em] text-[#006B66]">
                 Active question
               </p>
-              <h2 className="break-words text-[42px] font-black leading-[1.12] text-[#1F2933] sm:text-[56px]">
+              <h2 className="break-words text-[clamp(2rem,min(5vw,7vh),3.5rem)] font-black leading-[1.12] text-[#1F2933]">
                 No approved questions yet
               </h2>
               <p className="text-lg font-semibold leading-[1.5] text-[#667085]">

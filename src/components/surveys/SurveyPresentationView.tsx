@@ -92,7 +92,7 @@ function AccessibleResults({ data, title }: { data: SurveyChartDatum[]; title: s
 
 function NoResponsesPanel() {
   return (
-    <div className="grid min-h-[220px] place-items-center rounded-[8px] border border-[#7AB8BD] bg-white/40 px-8 text-center text-[#006B66] shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
+    <div className="grid h-full min-h-[clamp(7rem,18vh,13.75rem)] place-items-center rounded-[8px] border border-[#7AB8BD] bg-white/40 px-8 text-center text-[#006B66] shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
       <div className="grid gap-3">
         <p className="text-[28px] font-bold leading-[1.15]">No responses yet</p>
         <p className="text-[18px] font-semibold leading-[1.4]">
@@ -109,19 +109,19 @@ function TilesResults({ question }: { question: SurveyQuestionResult }) {
   if (!hasResponses) return <NoResponsesPanel />;
 
   return (
-    <div className="grid gap-5 md:grid-cols-2">
+    <div className="grid h-full min-h-0 content-stretch gap-[clamp(0.75rem,1.6vh,1.25rem)] md:grid-cols-2">
       {question.chartData.map((datum, index) => (
         <article
-          className={`grid min-h-[220px] place-items-center rounded-[8px] bg-gradient-to-br ${chartGradient(
+          className={`grid min-h-[clamp(7rem,16vh,13.75rem)] place-items-center rounded-[8px] bg-gradient-to-br ${chartGradient(
             index,
-          )} px-6 py-8 text-center text-white shadow-[0_18px_44px_rgba(15,82,124,0.18)]`}
+          )} px-6 py-[clamp(0.75rem,2.4vh,2rem)] text-center text-white shadow-[0_18px_44px_rgba(15,82,124,0.18)]`}
           key={datum.label}
         >
-          <div className="grid gap-4">
-            <p className="text-[clamp(2.5rem,5vw,4.4rem)] font-bold leading-none">
+          <div className="grid gap-[clamp(0.5rem,1.4vh,1rem)]">
+            <p className="text-[clamp(2rem,min(5vw,7vh),4.4rem)] font-bold leading-none">
               {datum.percentage}%
             </p>
-            <h3 className="break-words text-[clamp(1.25rem,2vw,2rem)] font-bold uppercase leading-[1.18]">
+            <h3 className="break-words text-[clamp(1.05rem,min(2vw,2.6vh),2rem)] font-bold uppercase leading-[1.18]">
               {datum.label}
             </h3>
           </div>
@@ -139,19 +139,19 @@ function BarResults({ question }: { question: SurveyQuestionResult }) {
   if (!hasResponses) return <NoResponsesPanel />;
 
   return (
-    <div aria-label={`${question.prompt} chart`} className="grid gap-8" role="img">
+    <div aria-label={`${question.prompt} chart`} className="grid gap-[clamp(0.75rem,2.4vh,2rem)]" role="img">
       {question.chartData.map((datum, index) => (
-        <div className="grid items-center gap-5 md:grid-cols-[minmax(220px,0.7fr)_minmax(0,1.3fr)_90px]" key={datum.label}>
-          <h3 className="break-words text-[clamp(1.25rem,1.9vw,1.8rem)] font-bold uppercase leading-[1.18] text-[#006B66]">
+        <div className="grid items-center gap-5 md:grid-cols-[minmax(140px,0.7fr)_minmax(0,1.3fr)_90px]" key={datum.label}>
+          <h3 className="break-words text-[clamp(1.05rem,min(1.9vw,2.4vh),1.8rem)] font-bold uppercase leading-[1.18] text-[#006B66]">
             {datum.label}
           </h3>
-          <div className="h-[34px] overflow-hidden rounded-[6px] bg-white/35">
+          <div className="h-[clamp(1.5rem,3.6vh,2.125rem)] overflow-hidden rounded-[6px] bg-white/35">
             <div
               className={`h-full rounded-[6px] bg-gradient-to-r ${chartGradient(index)}`}
               style={{ width: `${Math.max((datum.percentage / maxPercentage) * 100, 3)}%` }}
             />
           </div>
-          <p className="text-[clamp(1.5rem,2.2vw,2.25rem)] font-bold leading-none text-[#006B66]">
+          <p className="text-[clamp(1.25rem,min(2.2vw,2.8vh),2.25rem)] font-bold leading-none text-[#006B66]">
             {datum.percentage}%
           </p>
         </div>
@@ -163,7 +163,8 @@ function BarResults({ question }: { question: SurveyQuestionResult }) {
 
 function cloudSize(count: number, maxCount: number) {
   const ratio = maxCount > 0 ? count / maxCount : 0;
-  return `clamp(1.4rem, ${1.2 + ratio * 3.8}vw, ${2.2 + ratio * 3.9}rem)`;
+  const fluid = `min(${1.2 + ratio * 3.8}vw, ${1.6 + ratio * 4.8}vh)`;
+  return `clamp(1.2rem, ${fluid}, ${2.2 + ratio * 3.9}rem)`;
 }
 
 function cloudWeight(count: number, maxCount: number) {
@@ -176,9 +177,9 @@ function OpenTextWordCloud({ question }: { question: SurveyQuestionResult }) {
 
   if (question.openTextKeywords.length === 0) {
     return (
-      <div className="grid min-h-[260px] place-items-center rounded-[8px] border border-[#7AB8BD] bg-white/42 px-8 text-center text-[#006B66] shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
+      <div className="grid h-full min-h-[clamp(8rem,22vh,16.25rem)] place-items-center rounded-[8px] border border-[#7AB8BD] bg-white/42 px-8 text-center text-[#006B66] shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
         <div className="grid gap-3">
-          <p className="text-[clamp(2.3rem,4vw,4rem)] font-bold leading-none">
+          <p className="text-[clamp(1.75rem,min(4vw,5vh),4rem)] font-bold leading-none">
             {responseCopy(question.responseCount)} collected
           </p>
           <p className="text-[20px] font-semibold leading-[1.35]">
@@ -194,7 +195,7 @@ function OpenTextWordCloud({ question }: { question: SurveyQuestionResult }) {
   return (
     <div
       aria-label={`${question.prompt} keyword cloud`}
-      className="presenter-word-cloud flex min-h-[330px] content-center items-center justify-center gap-x-8 gap-y-6 overflow-hidden rounded-[8px] border border-[#7AB8BD] bg-white/30 px-8 py-9 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]"
+      className="presenter-word-cloud flex h-full min-h-[clamp(10rem,28vh,20.625rem)] content-center items-center justify-center gap-x-8 gap-y-6 overflow-hidden rounded-[8px] border border-[#7AB8BD] bg-white/30 px-8 py-9 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]"
       role="img"
     >
       {question.openTextKeywords.map((keyword, index) => (
@@ -227,8 +228,8 @@ function OpenTextWordCloud({ question }: { question: SurveyQuestionResult }) {
 function ChartGroup({ mode, question }: { mode: ChartMode; question: SurveyQuestionResult }) {
   if (question.type === "open_text") {
     return (
-      <section className="grid gap-10">
-        <h2 className="break-words text-[clamp(2.5rem,4.2vw,4.9rem)] font-bold uppercase leading-[1.08] text-[#006B66]">
+      <section className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[clamp(0.75rem,2.6vh,2.5rem)]">
+        <h2 className="break-words text-[clamp(1.75rem,min(4.2vw,5.4vh),4.9rem)] font-bold uppercase leading-[1.08] text-[#006B66]">
           {question.prompt}
         </h2>
         <OpenTextWordCloud question={question} />
@@ -237,8 +238,8 @@ function ChartGroup({ mode, question }: { mode: ChartMode; question: SurveyQuest
   }
 
   return (
-    <section className="grid gap-12">
-      <h2 className="break-words text-[clamp(2.5rem,4.2vw,4.9rem)] font-bold uppercase leading-[1.08] text-[#006B66]">
+    <section className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[clamp(0.75rem,3vh,3rem)]">
+      <h2 className="break-words text-[clamp(1.75rem,min(4.2vw,5.4vh),4.9rem)] font-bold uppercase leading-[1.08] text-[#006B66]">
         {question.prompt}
       </h2>
       {mode === "tiles" ? <TilesResults question={question} /> : <BarResults question={question} />}
@@ -401,14 +402,14 @@ export function SurveyPresentationView({
             </div>
           </aside>
 
-          <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] px-6 py-8 sm:px-10 lg:px-16 lg:py-12">
+          <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] px-6 py-[clamp(1rem,3vh,3rem)] sm:px-10 lg:px-16">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-6">
-              <div className="min-w-0 space-y-2">
+              <div className="min-w-0 space-y-1.5">
                 <p className="sr-only">{eventName} survey presentation</p>
-                <p className="text-[14px] font-bold uppercase leading-none tracking-[0.18em] text-[#007C78]/80">
+                <p className="text-[clamp(0.7rem,1.4vh,0.875rem)] font-bold uppercase leading-none tracking-[0.18em] text-[#007C78]/80">
                   Survey
                 </p>
-                <h2 className="break-words text-[clamp(1.45rem,2.2vw,2.6rem)] font-bold uppercase leading-[1.12]">
+                <h2 className="break-words text-[clamp(1.2rem,min(2.2vw,2.8vh),2.6rem)] font-bold uppercase leading-[1.12]">
                   {resultState.title}
                 </h2>
               </div>
@@ -431,7 +432,7 @@ export function SurveyPresentationView({
               </div>
             ) : null}
 
-            <div className="grid min-h-0 content-center py-8">
+            <div className="grid min-h-0 content-center overflow-y-auto py-[clamp(0.75rem,2.4vh,2rem)]">
               {activeQuestion ? <ChartGroup mode={mode} question={activeQuestion} /> : <NoResponsesPanel />}
             </div>
 
