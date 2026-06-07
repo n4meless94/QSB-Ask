@@ -9,3 +9,4 @@ playwright-report/
 .env
 supabase/.branches/
 supabase/.temp/
+*.tsbuildinfo
