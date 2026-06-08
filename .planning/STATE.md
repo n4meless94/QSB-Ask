@@ -6,7 +6,7 @@ current_phase: 5
 current_plan: 1
 status: planning
 last_updated: "2026-06-06T02:41:02.000+08:00"
-last_activity: 2026-06-06
+last_activity: 2026-06-09
 progress:
   total_phases: 4
   completed_phases: 0
@@ -22,7 +22,7 @@ progress:
 **Current Plan:** 1
 **Total Plans in Phase:** 2
 **Status:** Phase 5 Plan 01 ready - PDF deck upload and storage
-**Last Activity:** 2026-06-06
+**Last Activity:** 2026-06-09
 **Workflow mode:** yolo / auto  
 **Project mode:** mvp
 
@@ -100,6 +100,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-06: Quick task `260606-4np` removed stale `master` deployment branch notes after standardising the repo on `main`.
 - 2026-06-06: Quick task `260606-gsg` redesigned the survey presentation view into a Microsoft Forms-style presenter stage with QR rail, slide navigation, and large chart modes.
 - 2026-06-09: Quick task `260609-17x` changed participant surveys from latest-only to an all-published survey queue with per-survey completion state and focused unit/E2E coverage.
+- 2026-06-09: Quick task `260609-1jj` added mobile bottom tab navigation for participant Q&A/Surveys and replaced the Q&A vote chevron with a stronger upvote icon.
 
 ## Decisions
 
@@ -172,6 +173,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 
 | Date | Quick ID | Task | Verification |
 |------|----------|------|--------------|
+| 2026-06-09 | 260609-1jj | Mobile participant bottom tab navigation and Q&A upvote icon | Implementation commit `ee5df84`; focused ESLint, `npx tsc --noEmit`, participant Playwright E2E, in-app browser mobile viewport check, focused Vitest, `npm run build`, and `git diff --check` passed |
 | 2026-06-09 | 260609-17x | Participant all-published survey queue | `npx vitest run tests/surveys/participant.test.ts`, targeted `npx eslint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/survey-submission.spec.ts`, and `git diff --check` passed; full `npm test` has unrelated date-sensitive failures in `tests/events/events.test.ts` |
 | 2026-06-03 | 260603-wib | Participant-first QSB Ask homepage and admin setup split | `npm run lint`, `npm run build`, `npx playwright test tests/e2e/foundation.spec.ts` passed |
 | 2026-06-04 | 260604-1jv | Hallmark presenter view and event workspace audience/operator UI redesign | `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, focused Playwright E2E passed |
