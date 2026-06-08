@@ -193,6 +193,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 | 2026-06-06 | 260606-i5w | Animated open-text survey presenter word cloud | `npm run test -- tests/surveys/results.test.ts`, `npm run lint`, focused Playwright E2E, `npm run build` passed |
 | 2026-06-07 | 260607-p7q | Executive townhall presenter view redesign (question hero, secondary QR, natural copy) | `npx eslint` focused files, `npx tsc --noEmit`, `npx playwright test tests/e2e/presenter-view.spec.ts` (pre-existing dashboard-route flake aside), `npm run build`, 1920/1536/1366 visual sweep passed |
 | 2026-06-08 | 260608-rq4 | Event lifecycle draft-active toggle controls | `npm run lint`, `npx tsc --noEmit`, `npm test -- tests/events/event-settings.test.ts`, `npx playwright test tests/e2e/event-settings.spec.ts --workers=1`, `git diff --check` passed |
+| 2026-06-08 | 260608-zc9 | Refresh npm lockfile for GitHub Docker build | `npm ci --no-audit --no-fund`, `npm run lint`, `npm run build`, `git diff --check` passed |
 
 ## Last Session
 
