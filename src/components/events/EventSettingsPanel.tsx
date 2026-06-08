@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import type { EventAccessContext } from "@/lib/events/access";
+import { utcToZonedDatetimeLocal } from "@/lib/time/zoned";
 import type { EventRole } from "@/types/app";
 
 type EventSettingsPanelProps = {
@@ -19,14 +20,6 @@ type EventSettingsPanelProps = {
 };
 
 const initialState: EventSettingsActionResult = { ok: true, message: "" };
-
-function toDatetimeLocal(value: string) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) return "";
-
-  return date.toISOString().slice(0, 16);
-}
 
 export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
   const updateAction = updateEventSettingsAction.bind(null, event.id);
@@ -133,7 +126,7 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
             type="text"
           />
           <Field
-            defaultValue={toDatetimeLocal(event.starts_at)}
+            defaultValue={utcToZonedDatetimeLocal(event.starts_at, event.time_zone)}
             error={fieldErrors.starts_at}
             label="Event date/time"
             name="starts_at"

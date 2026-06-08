@@ -1,3 +1,4 @@
+import { zonedDatetimeLocalToUtc } from "@/lib/time/zoned";
 import type { EventStatus, IdentityMode } from "@/types/app";
 
 export const EVENT_STATUSES = ["draft", "active", "ended"] as const satisfies EventStatus[];
@@ -91,20 +92,22 @@ export const createEventSchema = {
       fieldErrors.name = "Event name is required.";
     }
 
-    if (!startsAt) {
-      fieldErrors.starts_at = "Event date/time is required.";
-    } else {
-      const parsedStart = new Date(startsAt);
-
-      if (Number.isNaN(parsedStart.getTime())) {
-        fieldErrors.starts_at = "Event date/time is required.";
-      } else if (parsedStart.getTime() <= now.getTime()) {
-        fieldErrors.starts_at = "Event date/time cannot be in the past.";
-      }
-    }
-
     if (!timeZone) {
       fieldErrors.time_zone = "Time zone is required.";
+    }
+
+    const startsAtUtc = startsAt && timeZone ? zonedDatetimeLocalToUtc(startsAt, timeZone) : null;
+
+    if (!startsAt || startsAtUtc === null) {
+      // Only flag the date when the timezone itself is valid, so a bad tz
+      // surfaces its own error rather than masking it as a date error.
+      if (startsAt && !timeZone) {
+        // timezone error already recorded above
+      } else {
+        fieldErrors.starts_at = "Event date/time is required.";
+      }
+    } else if (new Date(startsAtUtc).getTime() <= now.getTime()) {
+      fieldErrors.starts_at = "Event date/time cannot be in the past.";
     }
 
     if (!status) {
@@ -131,7 +134,8 @@ export const createEventSchema = {
       Object.keys(fieldErrors).length > 0 ||
       !parsedStatus ||
       !parsedIdentityMode ||
-      moderationEnabled === null
+      moderationEnabled === null ||
+      !startsAtUtc
     ) {
       return { success: false, fieldErrors };
     }
@@ -140,7 +144,7 @@ export const createEventSchema = {
       success: true,
       data: {
         name,
-        starts_at: new Date(startsAt).toISOString(),
+        starts_at: startsAtUtc,
         time_zone: timeZone,
         status: parsedStatus,
         identity_mode: parsedIdentityMode,

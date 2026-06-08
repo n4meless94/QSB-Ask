@@ -1,6 +1,7 @@
 import "server-only";
 
 import { assertEventRole } from "@/lib/events/access";
+import { zonedDatetimeLocalToUtc } from "@/lib/time/zoned";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { EVENT_MANAGEMENT_ROLES } from "@/lib/supabase/rls";
 import type { Tables } from "@/lib/supabase/database.types";
@@ -76,11 +77,13 @@ export const eventSettingsSchema = {
 
     if (!name) fieldErrors.name = "Event name is required.";
 
-    if (!startsAt || Number.isNaN(new Date(startsAt).getTime())) {
+    if (!timeZone) fieldErrors.time_zone = "Time zone is required.";
+
+    const startsAtUtc = timeZone ? zonedDatetimeLocalToUtc(startsAt, timeZone) : null;
+
+    if (!startsAt || startsAtUtc === null) {
       fieldErrors.starts_at = "Event date/time is required.";
     }
-
-    if (!timeZone) fieldErrors.time_zone = "Time zone is required.";
 
     if (!identityMode || !isIdentityMode(identityMode)) {
       fieldErrors.identity_mode = "Choose a valid participant identity mode.";
@@ -100,7 +103,7 @@ export const eventSettingsSchema = {
         "Confirm the moderation warning before turning moderation off.";
     }
 
-    if (Object.keys(fieldErrors).length > 0 || !isIdentityMode(identityMode)) {
+    if (Object.keys(fieldErrors).length > 0 || !isIdentityMode(identityMode) || !startsAtUtc) {
       return { success: false, fieldErrors };
     }
 
@@ -114,7 +117,7 @@ export const eventSettingsSchema = {
         name,
         question_character_limit: characterLimit ?? 280,
         question_rate_limit_seconds: rateLimit ?? 30,
-        starts_at: new Date(startsAt).toISOString(),
+        starts_at: startsAtUtc,
         time_zone: timeZone,
       },
     };
