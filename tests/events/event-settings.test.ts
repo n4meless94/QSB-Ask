@@ -1,13 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  activateEventAction,
+  activateEventFormAction,
   archiveEventAction,
   archiveEventFormAction,
   closeEventAction,
   closeEventFormAction,
+  moveEventToDraftAction,
+  moveEventToDraftFormAction,
   updateEventSettingsAction,
 } from "@/app/(app)/events/[eventId]/settings-actions";
-import { archiveEvent, closeEvent, updateEventSettings } from "@/lib/events/settings";
+import { activateEvent, archiveEvent, closeEvent, moveEventToDraft, updateEventSettings } from "@/lib/events/settings";
 import { assertEventRole } from "@/lib/events/access";
 
 const revalidatePathMock = vi.hoisted(() => vi.fn());
@@ -142,16 +146,20 @@ describe("event settings helpers", () => {
     ).rejects.toThrow("Fix the highlighted fields and try again.");
   });
 
-  it("close and archive preserve records by updating event status only", async () => {
+  it("lifecycle helpers preserve records by updating event status only", async () => {
     const eventsQuery = makeEventsQuery();
     fromMock.mockReturnValue(eventsQuery);
 
+    await activateEvent("organiser-1", "event-1");
+    await moveEventToDraft("organiser-1", "event-1");
     await closeEvent("organiser-1", "event-1");
     await archiveEvent("organiser-1", "event-1");
 
-    expect(eventsQuery.update).toHaveBeenNthCalledWith(1, { status: "ended" });
-    expect(eventsQuery.update).toHaveBeenNthCalledWith(2, { status: "archived" });
-    expect(assertEventRole).toHaveBeenCalledTimes(2);
+    expect(eventsQuery.update).toHaveBeenNthCalledWith(1, { status: "active" });
+    expect(eventsQuery.update).toHaveBeenNthCalledWith(2, { status: "draft" });
+    expect(eventsQuery.update).toHaveBeenNthCalledWith(3, { status: "ended" });
+    expect(eventsQuery.update).toHaveBeenNthCalledWith(4, { status: "archived" });
+    expect(assertEventRole).toHaveBeenCalledTimes(4);
   });
 });
 
@@ -189,6 +197,14 @@ describe("event settings actions", () => {
       ok: true,
       message: "Event settings saved.",
     });
+    await expect(activateEventAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event activated.",
+    });
+    await expect(moveEventToDraftAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event moved to draft.",
+    });
     await expect(closeEventAction("event-1")).resolves.toMatchObject({
       ok: true,
       message: "Event closed.",
@@ -204,6 +220,14 @@ describe("event settings actions", () => {
     const eventsQuery = makeEventsQuery();
     fromMock.mockReturnValue(eventsQuery);
 
+    await expect(activateEventFormAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event activated.",
+    });
+    await expect(moveEventToDraftFormAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event moved to draft.",
+    });
     await expect(closeEventFormAction("event-1")).resolves.toMatchObject({
       ok: true,
       message: "Event closed.",
@@ -219,6 +243,14 @@ describe("event settings actions", () => {
     getUserMock.mockResolvedValue({ data: { user: null }, error: null });
     cookiesGetMock.mockReturnValue({ value: "1" });
 
+    await expect(activateEventFormAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event activated.",
+    });
+    await expect(moveEventToDraftFormAction("event-1")).resolves.toMatchObject({
+      ok: true,
+      message: "Event moved to draft.",
+    });
     await expect(archiveEventFormAction("event-1")).resolves.toMatchObject({
       ok: true,
       message: "Event archived.",

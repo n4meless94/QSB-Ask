@@ -3,8 +3,10 @@
 import { useActionState, useState } from "react";
 
 import {
+  activateEventFormAction,
   archiveEventFormAction,
   closeEventFormAction,
+  moveEventToDraftFormAction,
   updateEventSettingsAction,
   type EventSettingsActionResult,
 } from "@/app/(app)/events/[eventId]/settings-actions";
@@ -23,9 +25,16 @@ const initialState: EventSettingsActionResult = { ok: true, message: "" };
 
 export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
   const updateAction = updateEventSettingsAction.bind(null, event.id);
+  const activateAction = activateEventFormAction.bind(null, event.id);
+  const draftAction = moveEventToDraftFormAction.bind(null, event.id);
   const closeAction = closeEventFormAction.bind(null, event.id);
   const archiveAction = archiveEventFormAction.bind(null, event.id);
   const [state, formAction, isPending] = useActionState(updateAction, initialState);
+  const [activateState, activateFormAction, isActivating] = useActionState(
+    activateAction,
+    initialState,
+  );
+  const [draftState, draftFormAction, isMovingToDraft] = useActionState(draftAction, initialState);
   const [closeState, closeFormAction, isClosing] = useActionState(closeAction, initialState);
   const [archiveState, archiveFormAction, isArchiving] = useActionState(archiveAction, initialState);
   const [moderationEnabled, setModerationEnabled] = useState(event.moderation_enabled);
@@ -33,12 +42,26 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
     event.moderation_enabled,
   );
   const [duplicateBlockEnabled, setDuplicateBlockEnabled] = useState(event.duplicate_block_enabled);
-  const [dialog, setDialog] = useState<"moderation" | "close" | "archive" | null>(null);
+  const [dialog, setDialog] = useState<"moderation" | "activate" | "draft" | "close" | "archive" | null>(
+    null,
+  );
   const canManageSettings = role === "organiser";
   const fieldErrors = state.ok ? {} : state.fieldErrors ?? {};
-  const lifecycleState = archiveState.message ? archiveState : closeState.message ? closeState : null;
+  const lifecycleState = archiveState.message
+    ? archiveState
+    : closeState.message
+      ? closeState
+      : draftState.message
+        ? draftState
+        : activateState.message
+          ? activateState
+          : null;
   const visibleDialog =
-    dialog === "close" && closeState.ok && closeState.message
+    dialog === "activate" && activateState.ok && activateState.message
+      ? null
+      : dialog === "draft" && draftState.ok && draftState.message
+        ? null
+        : dialog === "close" && closeState.ok && closeState.message
       ? null
       : dialog === "archive" && archiveState.ok && archiveState.message
         ? null
@@ -234,6 +257,16 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
+          {event.status === "draft" ? (
+            <Button onClick={() => setDialog("activate")} type="button">
+              Activate event
+            </Button>
+          ) : null}
+          {event.status === "active" ? (
+            <Button onClick={() => setDialog("draft")} type="button" variant="secondary">
+              Move to draft
+            </Button>
+          ) : null}
           <Button onClick={() => setDialog("close")} type="button" variant="secondary">
             Close event
           </Button>
@@ -279,6 +312,63 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
               >
                 I understand, turn moderation off
               </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {visibleDialog === "activate" ? (
+        <div
+          aria-labelledby="activate-dialog-title"
+          aria-modal="true"
+          className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 px-4"
+          role="dialog"
+        >
+          <div className="w-full max-w-[480px] rounded-[6px] border border-slate-300 bg-white p-5 shadow-sm">
+            <h2 className="text-xl font-semibold leading-[1.25] text-slate-900" id="activate-dialog-title">
+              Activate event?
+            </h2>
+            <p className="mt-2 text-sm leading-[1.4] text-slate-600">
+              Participants will be able to join with the event code and submit questions.
+            </p>
+            <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Button onClick={() => setDialog(null)} variant="secondary">
+                Keep as draft
+              </Button>
+              <form action={activateFormAction}>
+                <Button loading={isActivating} type="submit">
+                  Activate event
+                </Button>
+              </form>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {visibleDialog === "draft" ? (
+        <div
+          aria-labelledby="draft-dialog-title"
+          aria-modal="true"
+          className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 px-4"
+          role="dialog"
+        >
+          <div className="w-full max-w-[480px] rounded-[6px] border border-slate-300 bg-white p-5 shadow-sm">
+            <h2 className="text-xl font-semibold leading-[1.25] text-slate-900" id="draft-dialog-title">
+              Move event to draft?
+            </h2>
+            <p className="mt-2 text-sm leading-[1.4] text-slate-600">
+              Participants will no longer be able to join or submit questions until the event is
+              activated again.
+            </p>
+            <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Button onClick={() => setDialog(null)} variant="secondary">
+                Keep event active
+              </Button>
+              <form action={draftFormAction}>
+                <Button loading={isMovingToDraft} type="submit" variant="secondary">
+                  Move to draft
+                </Button>
+              </form>
             </div>
           </div>
         </div>

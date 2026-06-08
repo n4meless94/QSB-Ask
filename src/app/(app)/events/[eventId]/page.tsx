@@ -318,7 +318,7 @@ function e2eAccess(eventId: string): EventAccessContext {
       join_code: "QSB2X9ZA",
       starts_at: "2099-06-01T01:00:00.000Z",
       time_zone: "Asia/Kuala_Lumpur",
-      status: "draft",
+      status: id === "event-active" ? "active" : "draft",
       identity_mode: "name_required",
       moderation_enabled: true,
       question_character_limit: 280,

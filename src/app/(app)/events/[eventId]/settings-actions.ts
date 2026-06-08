@@ -4,9 +4,11 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import {
+  activateEvent,
   archiveEvent,
   closeEvent,
   eventSettingsSchema,
+  moveEventToDraft,
   type EventSettingsFieldErrors,
   updateEventSettings,
 } from "@/lib/events/settings";
@@ -75,6 +77,62 @@ export async function updateEventSettingsAction(
       message: error instanceof Error ? error.message : "Event settings could not be saved.",
     };
   }
+}
+
+export async function activateEventAction(eventId: string): Promise<EventSettingsActionResult> {
+  try {
+    if (await e2eFixtureUserId()) {
+      revalidatePath(`/events/${eventId}`);
+      return { ok: true, message: "Event activated." };
+    }
+
+    const userId = await signedInUserId();
+    await activateEvent(userId, eventId);
+    revalidatePath(`/events/${eventId}`);
+
+    return { ok: true, message: "Event activated." };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : "Event could not be activated.",
+    };
+  }
+}
+
+export async function activateEventFormAction(
+  eventId: string,
+  previousState?: EventSettingsActionResult,
+): Promise<EventSettingsActionResult> {
+  void previousState;
+  return activateEventAction(eventId);
+}
+
+export async function moveEventToDraftAction(eventId: string): Promise<EventSettingsActionResult> {
+  try {
+    if (await e2eFixtureUserId()) {
+      revalidatePath(`/events/${eventId}`);
+      return { ok: true, message: "Event moved to draft." };
+    }
+
+    const userId = await signedInUserId();
+    await moveEventToDraft(userId, eventId);
+    revalidatePath(`/events/${eventId}`);
+
+    return { ok: true, message: "Event moved to draft." };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : "Event could not be moved to draft.",
+    };
+  }
+}
+
+export async function moveEventToDraftFormAction(
+  eventId: string,
+  previousState?: EventSettingsActionResult,
+): Promise<EventSettingsActionResult> {
+  void previousState;
+  return moveEventToDraftAction(eventId);
 }
 
 export async function closeEventAction(eventId: string): Promise<EventSettingsActionResult> {

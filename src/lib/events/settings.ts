@@ -185,6 +185,14 @@ export async function updateEventSettings(
   return data;
 }
 
+export async function activateEvent(userId: string, eventId: string) {
+  return updateEventStatus(userId, eventId, "active");
+}
+
+export async function moveEventToDraft(userId: string, eventId: string) {
+  return updateEventStatus(userId, eventId, "draft");
+}
+
 export async function closeEvent(userId: string, eventId: string) {
   return updateEventStatus(userId, eventId, "ended");
 }

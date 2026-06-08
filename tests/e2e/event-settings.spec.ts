@@ -45,6 +45,16 @@ test("organiser lifecycle actions require close and archive confirmations", asyn
   await page.goto("/events/event-1");
   await page.getByRole("tab", { name: "Settings" }).click();
 
+  await page.getByRole("button", { name: "Activate event" }).click();
+  await expect(page.getByRole("dialog", { name: "Activate event?" })).toBeVisible();
+  await expect(page.getByText(/Participants will be able to join with the event code/)).toBeVisible();
+  await page.getByRole("button", { name: "Keep as draft" }).click();
+
+  await page.getByRole("button", { name: "Activate event" }).click();
+  await page.getByRole("dialog", { name: "Activate event?" }).getByRole("button", { name: "Activate event" }).click();
+  await expect(page.getByRole("dialog", { name: "Activate event?" })).toBeHidden();
+  await expect(page.getByRole("status").filter({ hasText: "Event activated." })).toBeVisible();
+
   await page.getByRole("button", { name: "Close event" }).click();
   await expect(page.getByRole("dialog", { name: "Close event?" })).toBeVisible();
   await expect(page.getByText("Participants will no longer be able to submit new questions.")).toBeVisible();
@@ -59,6 +69,21 @@ test("organiser lifecycle actions require close and archive confirmations", asyn
   await page.getByRole("dialog", { name: "Archive event?" }).getByRole("button", { name: "Archive event" }).click();
   await expect(page.getByRole("dialog", { name: "Archive event?" })).toBeHidden();
   await expect(page.getByRole("status").filter({ hasText: "Event archived." })).toBeVisible();
+});
+
+test("organiser can move an active event back to draft", async ({ page }) => {
+  await page.goto("/events/event-active");
+  await page.getByRole("tab", { name: "Settings" }).click();
+
+  await page.getByRole("button", { name: "Move to draft" }).click();
+  await expect(page.getByRole("dialog", { name: "Move event to draft?" })).toBeVisible();
+  await expect(page.getByText(/Participants will no longer be able to join or submit questions/)).toBeVisible();
+  await page.getByRole("button", { name: "Keep event active" }).click();
+
+  await page.getByRole("button", { name: "Move to draft" }).click();
+  await page.getByRole("dialog", { name: "Move event to draft?" }).getByRole("button", { name: "Move to draft" }).click();
+  await expect(page.getByRole("dialog", { name: "Move event to draft?" })).toBeHidden();
+  await expect(page.getByRole("status").filter({ hasText: "Event moved to draft." })).toBeVisible();
 });
 
 test("event settings has no mobile horizontal overflow at 360px", async ({ page }) => {
