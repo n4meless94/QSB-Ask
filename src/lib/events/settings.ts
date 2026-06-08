@@ -13,6 +13,7 @@ export type EventSettingsInput = {
   moderation_enabled: boolean;
   moderation_warning_acknowledged: boolean;
   name: string;
+  participant_realtime_enabled: boolean;
   question_character_limit: number;
   question_rate_limit_seconds: number;
   starts_at: string;
@@ -71,6 +72,7 @@ export const eventSettingsSchema = {
     const moderationEnabled = parseBoolean(input, "moderation_enabled");
     const moderationWarningAcknowledged = parseBoolean(input, "moderation_warning_acknowledged");
     const duplicateBlockEnabled = parseBoolean(input, "duplicate_block_enabled");
+    const participantRealtimeEnabled = parseBoolean(input, "participant_realtime_enabled");
     const characterLimit = parseNumber(input, "question_character_limit");
     const rateLimit = parseNumber(input, "question_rate_limit_seconds");
     const fieldErrors: EventSettingsFieldErrors = {};
@@ -115,6 +117,7 @@ export const eventSettingsSchema = {
         moderation_enabled: moderationEnabled,
         moderation_warning_acknowledged: moderationWarningAcknowledged,
         name,
+        participant_realtime_enabled: participantRealtimeEnabled,
         question_character_limit: characterLimit ?? 280,
         question_rate_limit_seconds: rateLimit ?? 30,
         starts_at: startsAtUtc,
@@ -167,6 +170,7 @@ export async function updateEventSettings(
       identity_mode: parsed.data.identity_mode,
       moderation_enabled: parsed.data.moderation_enabled,
       name: parsed.data.name,
+      participant_realtime_enabled: parsed.data.participant_realtime_enabled,
       question_character_limit: parsed.data.question_character_limit,
       question_rate_limit_seconds: parsed.data.question_rate_limit_seconds,
       starts_at: parsed.data.starts_at,
@@ -174,7 +178,7 @@ export async function updateEventSettings(
     })
     .eq("id", eventId)
     .select(
-      "id,name,join_code,starts_at,time_zone,status,identity_mode,moderation_enabled,question_character_limit,duplicate_block_enabled,question_rate_limit_seconds,created_by",
+      "id,name,join_code,starts_at,time_zone,status,identity_mode,moderation_enabled,participant_realtime_enabled,question_character_limit,duplicate_block_enabled,question_rate_limit_seconds,created_by",
     )
     .single();
 

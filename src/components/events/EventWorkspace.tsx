@@ -126,6 +126,10 @@ export function EventWorkspace({
                 <dt className="font-semibold text-slate-900">Duplicate block</dt>
                 <dd>{event.duplicate_block_enabled ? "On" : "Off"}</dd>
               </div>
+              <div className="rounded-[6px] border border-slate-200 bg-slate-50 px-3 py-2">
+                <dt className="font-semibold text-slate-900">Participant live</dt>
+                <dd>{event.participant_realtime_enabled ? "On" : "Manual refresh"}</dd>
+              </div>
             </dl>
           </div>
 

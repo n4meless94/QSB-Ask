@@ -26,6 +26,7 @@ function e2eEvent(joinCode: string): JoinableEvent | null {
       identity_mode: "name_required",
       join_code: "QSB2X9ZA",
       name: "Quarterly Briefing",
+      participant_realtime_enabled: true,
       status: "active",
     };
   }
@@ -36,6 +37,7 @@ function e2eEvent(joinCode: string): JoinableEvent | null {
       identity_mode: "anonymous",
       join_code: "QSB7HALL",
       name: "Town Hall",
+      participant_realtime_enabled: true,
       status: "active",
     };
   }
@@ -46,6 +48,7 @@ function e2eEvent(joinCode: string): JoinableEvent | null {
       identity_mode: "name_email_required",
       join_code: "QSBEMAIL",
       name: "Stakeholder Briefing",
+      participant_realtime_enabled: true,
       status: "active",
     };
   }
@@ -149,7 +152,7 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
                 Q&A open
               </span>
               <span aria-hidden="true">·</span>
-              <span>Live session</span>
+              <span>{event.participant_realtime_enabled ? "Live session" : "Manual refresh"}</span>
             </p>
           </div>
           <nav
@@ -186,6 +189,7 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
           fixtureMode={process.env.QSB_ASK_E2E_AUTH === "1"}
           initialVotedQuestionIds={votedQuestionIds}
           joinCode={joinCode}
+          participantRealtimeEnabled={event.participant_realtime_enabled}
           questions={questions}
         />
       </div>

@@ -16,6 +16,7 @@ export type EventSummary = Pick<
   | "status"
   | "identity_mode"
   | "moderation_enabled"
+  | "participant_realtime_enabled"
   | "question_character_limit"
   | "duplicate_block_enabled"
   | "question_rate_limit_seconds"
@@ -49,7 +50,7 @@ export async function listAccessibleEvents(userId: string): Promise<EventSummary
   const { data, error } = await supabase
     .from("event_members")
     .select(
-      "events(id,name,join_code,starts_at,time_zone,status,identity_mode,moderation_enabled,question_character_limit,duplicate_block_enabled,question_rate_limit_seconds,created_by)",
+      "events(id,name,join_code,starts_at,time_zone,status,identity_mode,moderation_enabled,participant_realtime_enabled,question_character_limit,duplicate_block_enabled,question_rate_limit_seconds,created_by)",
     )
     .eq("user_id", userId)
     .eq("status", "active")
@@ -106,12 +107,13 @@ export async function createEventForOrganiser(
       status: parsed.data.status,
       identity_mode: parsed.data.identity_mode,
       moderation_enabled: parsed.data.moderation_enabled,
+      participant_realtime_enabled: true,
       question_character_limit: parsed.data.question_character_limit,
       duplicate_block_enabled: parsed.data.duplicate_block_enabled,
       question_rate_limit_seconds: parsed.data.question_rate_limit_seconds,
     })
     .select(
-      "id,name,join_code,starts_at,time_zone,status,identity_mode,moderation_enabled,question_character_limit,duplicate_block_enabled,question_rate_limit_seconds,created_by",
+      "id,name,join_code,starts_at,time_zone,status,identity_mode,moderation_enabled,participant_realtime_enabled,question_character_limit,duplicate_block_enabled,question_rate_limit_seconds,created_by",
     )
     .single();
 

@@ -65,6 +65,7 @@ export type Database = {
           join_code: string
           moderation_enabled: boolean
           name: string
+          participant_realtime_enabled: boolean
           question_character_limit: number
           question_rate_limit_seconds: number
           starts_at: string
@@ -82,6 +83,7 @@ export type Database = {
           join_code?: string
           moderation_enabled?: boolean
           name: string
+          participant_realtime_enabled?: boolean
           question_character_limit?: number
           question_rate_limit_seconds?: number
           starts_at: string
@@ -99,6 +101,7 @@ export type Database = {
           join_code?: string
           moderation_enabled?: boolean
           name?: string
+          participant_realtime_enabled?: boolean
           question_character_limit?: number
           question_rate_limit_seconds?: number
           starts_at?: string

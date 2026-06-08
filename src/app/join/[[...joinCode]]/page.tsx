@@ -16,6 +16,7 @@ function e2eEvent(code: string): JoinableEvent | null {
       identity_mode: "name_required",
       join_code: "QSB2X9ZA",
       name: "Quarterly Briefing",
+      participant_realtime_enabled: true,
       status: "active",
     };
   }
@@ -26,6 +27,7 @@ function e2eEvent(code: string): JoinableEvent | null {
       identity_mode: "anonymous",
       join_code: "QSB7HALL",
       name: "Town Hall",
+      participant_realtime_enabled: true,
       status: "active",
     };
   }
@@ -36,6 +38,7 @@ function e2eEvent(code: string): JoinableEvent | null {
       identity_mode: "name_email_required",
       join_code: "QSBEMAIL",
       name: "Stakeholder Briefing",
+      participant_realtime_enabled: true,
       status: "active",
     };
   }

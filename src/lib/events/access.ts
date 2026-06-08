@@ -12,7 +12,7 @@ import type { Tables } from "@/lib/supabase/database.types";
 import type { EventRole, MemberStatus } from "@/types/app";
 
 const EVENT_SELECT =
-  "id,name,join_code,starts_at,time_zone,status,identity_mode,moderation_enabled,question_character_limit,duplicate_block_enabled,question_rate_limit_seconds,created_by";
+  "id,name,join_code,starts_at,time_zone,status,identity_mode,moderation_enabled,participant_realtime_enabled,question_character_limit,duplicate_block_enabled,question_rate_limit_seconds,created_by";
 
 type EventMemberRow = Tables<"event_members">;
 

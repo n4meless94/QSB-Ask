@@ -13,6 +13,7 @@ type AudienceQuestionListProps = {
   eventId: string;
   fixtureMode?: boolean;
   initialVotedQuestionIds: string[];
+  participantRealtimeEnabled?: boolean;
   joinCode: string;
   questions: PublicQuestion[];
 };
@@ -41,6 +42,7 @@ export function AudienceQuestionList({
   eventId,
   fixtureMode = false,
   initialVotedQuestionIds,
+  participantRealtimeEnabled = true,
   joinCode,
   questions,
 }: AudienceQuestionListProps) {
@@ -69,6 +71,7 @@ export function AudienceQuestionList({
     [optimisticVoteCounts, sourceQuestions],
   );
   const sortedQuestions = useMemo(() => sortQuestions(displayedQuestions, sort), [displayedQuestions, sort]);
+  const visibleConnectionState = participantRealtimeEnabled ? connectionState : "refresh-needed";
 
   useEffect(() => {
     if (fixtureMode) {
@@ -99,12 +102,16 @@ export function AudienceQuestionList({
       };
     }
 
+    if (!participantRealtimeEnabled) {
+      return undefined;
+    }
+
     return subscribeToPublicQuestions({
       eventId,
       onConnectionChange: setConnectionState,
       onRefresh: () => router.refresh(),
     });
-  }, [eventId, fixtureMode, router]);
+  }, [eventId, fixtureMode, participantRealtimeEnabled, router]);
 
   function vote(question: PublicQuestion) {
     const formData = new FormData();
@@ -167,8 +174,20 @@ export function AudienceQuestionList({
         </div>
       ) : null}
 
-      {connectionState === "live" ? null : (
-        <ConnectionStatus onRefresh={() => router.refresh()} state={connectionState} />
+      {!participantRealtimeEnabled ? (
+        <div className="grid max-w-full gap-2 rounded-[6px] border border-slate-300 bg-white px-3 py-2 text-sm leading-[1.4] text-slate-700">
+          <p className="font-semibold text-slate-900">Manual refresh mode</p>
+          <p>Newly approved questions appear after refreshing this view.</p>
+          <button
+            className="min-h-10 rounded-[6px] border border-slate-300 bg-white px-3 text-sm font-semibold leading-[1.4] text-slate-900 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2"
+            onClick={() => router.refresh()}
+            type="button"
+          >
+            Refresh questions
+          </button>
+        </div>
+      ) : visibleConnectionState === "live" ? null : (
+        <ConnectionStatus onRefresh={() => router.refresh()} state={visibleConnectionState} />
       )}
 
       {sortedQuestions.length === 0 ? (

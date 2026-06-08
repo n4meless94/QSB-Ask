@@ -14,7 +14,7 @@ import {
 
 export type JoinableEvent = Pick<
   Tables<"events">,
-  "id" | "identity_mode" | "join_code" | "name" | "status"
+  "id" | "identity_mode" | "join_code" | "name" | "participant_realtime_enabled" | "status"
 >;
 
 export type ParticipantSession = Pick<
@@ -22,7 +22,7 @@ export type ParticipantSession = Pick<
   "created_at" | "display_name" | "email" | "event_id" | "id" | "session_token_hash"
 >;
 
-const JOINABLE_EVENT_SELECT = "id,name,join_code,status,identity_mode";
+const JOINABLE_EVENT_SELECT = "id,name,join_code,status,identity_mode,participant_realtime_enabled";
 
 function hashParticipantToken(rawToken: string) {
   return createHash("sha256").update(rawToken).digest("hex");

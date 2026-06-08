@@ -42,6 +42,9 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
     event.moderation_enabled,
   );
   const [duplicateBlockEnabled, setDuplicateBlockEnabled] = useState(event.duplicate_block_enabled);
+  const [participantRealtimeEnabled, setParticipantRealtimeEnabled] = useState(
+    event.participant_realtime_enabled,
+  );
   const [dialog, setDialog] = useState<"moderation" | "activate" | "draft" | "close" | "archive" | null>(
     null,
   );
@@ -237,6 +240,24 @@ export function EventSettingsPanel({ event, role }: EventSettingsPanelProps) {
               Block repeated questions before review
               <span className="block pt-1 text-sm font-normal leading-[1.4] text-slate-600">
                 Helps reduce repeated submissions before moderator review.
+              </span>
+            </span>
+          </label>
+
+          <label className="flex items-start gap-3 rounded-[6px] border border-slate-300 bg-slate-50 p-3 text-sm font-semibold leading-[1.4] text-slate-900">
+            <input
+              checked={participantRealtimeEnabled}
+              className="mt-1 size-5 rounded border-slate-300 accent-teal-700 focus:ring-2 focus:ring-teal-700"
+              name="participant_realtime_enabled"
+              onChange={(input) => setParticipantRealtimeEnabled(input.target.checked)}
+              type="checkbox"
+              value="true"
+            />
+            <span>
+              Participant live question updates
+              <span className="block pt-1 text-sm font-normal leading-[1.4] text-slate-600">
+                Turn off for large events so audience screens use manual refresh while presenter and
+                moderator views stay live.
               </span>
             </span>
           </label>

@@ -321,6 +321,7 @@ function e2eAccess(eventId: string): EventAccessContext {
       status: id === "event-active" ? "active" : "draft",
       identity_mode: "name_required",
       moderation_enabled: true,
+      participant_realtime_enabled: true,
       question_character_limit: 280,
       duplicate_block_enabled: true,
       question_rate_limit_seconds: 30,
