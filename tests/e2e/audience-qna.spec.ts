@@ -34,6 +34,13 @@ test("audience Q&A has no mobile horizontal overflow at 360px", async ({ page })
   await page.setViewportSize({ width: 360, height: 720 });
   await page.goto("/join/QSB2X9ZA/qna");
 
+  const surveysTab = page.getByRole("link", { name: "Surveys" });
+  await expect(surveysTab).toBeVisible();
+  await expect(surveysTab).toHaveAttribute("href", "/join/QSB2X9ZA/surveys");
+
+  const surveysTabBox = await surveysTab.boundingBox();
+  expect(surveysTabBox?.y).toBeGreaterThan(620);
+
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
 });

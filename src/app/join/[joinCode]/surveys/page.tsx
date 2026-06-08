@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
-import Link from "next/link";
 import type { ReactNode } from "react";
-import { BarChart3, MessageSquare } from "lucide-react";
 
+import { ParticipantSectionNav } from "@/components/participants/ParticipantSectionNav";
 import { SurveySubmitForm } from "@/components/surveys/SurveySubmitForm";
 import {
   getJoinableEventByCode,
@@ -368,7 +367,7 @@ export default async function ParticipantSurveysPage({
       : "No surveys open";
 
   return (
-    <main className="min-h-screen bg-[#F6F8FB] px-4 py-8 text-slate-900 sm:px-6 sm:py-10">
+    <main className="min-h-screen bg-[#F6F8FB] px-4 pb-[calc(6.25rem+env(safe-area-inset-bottom))] pt-8 text-slate-900 sm:px-6 sm:py-10">
       <div className="mx-auto grid max-w-[860px] gap-7">
         <header className="grid gap-5">
           <div className="grid gap-3">
@@ -387,26 +386,11 @@ export default async function ParticipantSurveysPage({
               <span>Live session</span>
             </p>
           </div>
-          <nav
-            aria-label="Participant event sections"
-            className="inline-flex w-fit max-w-full min-w-0 rounded-[16px] border border-slate-200 bg-white p-1 shadow-sm"
-          >
-            <Link
-              className="inline-flex min-h-11 items-center gap-2 rounded-[12px] px-4 text-base font-semibold leading-6 text-slate-600 outline-none transition-colors hover:bg-slate-50 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2 sm:min-h-10"
-              href={`/join/${joinCode}/qna`}
-            >
-              <MessageSquare aria-hidden="true" className="h-4 w-4" />
-              Q&A
-            </Link>
-            <Link
-              aria-current="page"
-              className="inline-flex min-h-11 items-center gap-2 rounded-[12px] bg-[#008578] px-4 text-base font-semibold leading-6 !text-white shadow-sm outline-none hover:bg-[#00796B] focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2 sm:min-h-10"
-              href={`/join/${joinCode}/surveys`}
-            >
-              <BarChart3 aria-hidden="true" className="h-4 w-4" />
-              Surveys
-            </Link>
-          </nav>
+          <ParticipantSectionNav
+            activeSection="surveys"
+            joinCode={joinCode}
+            surveyCount={surveyCount}
+          />
         </header>
 
         {!surveyState || surveyState.surveys.length === 0 ? (

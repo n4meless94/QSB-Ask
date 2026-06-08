@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, ChevronUp, Pencil } from "lucide-react";
+import { ArrowBigUp, CheckCircle2, Pencil } from "lucide-react";
 
 import { voteQuestionAction } from "@/app/join/[joinCode]/qna/vote-actions";
 import { ConnectionStatus } from "@/components/qna/ConnectionStatus";
@@ -167,7 +167,7 @@ export function AudienceQuestionList({
 
       {message ? (
         <div
-          className="fixed bottom-4 left-4 right-4 z-30 mx-auto max-w-[420px] rounded-[14px] border border-teal-100 bg-white px-4 py-3 text-[#00796B] shadow-lg sm:left-auto sm:right-6 sm:mx-0"
+          className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] left-4 right-4 z-30 mx-auto max-w-[420px] rounded-[14px] border border-teal-100 bg-white px-4 py-3 text-[#00796B] shadow-lg sm:bottom-4 sm:left-auto sm:right-6 sm:mx-0"
           role="status"
         >
           <p className="text-sm font-semibold leading-[1.4]">{message}</p>
@@ -231,14 +231,14 @@ export function AudienceQuestionList({
                     className={[
                       "inline-flex min-h-[76px] w-16 shrink-0 flex-col items-center justify-center rounded-[12px] border px-2 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2 disabled:cursor-not-allowed sm:min-h-[84px] sm:w-[72px]",
                       isVoted
-                        ? "border-[#008578] bg-teal-50 text-[#00796B]"
+                        ? "border-[#008578] bg-[#008578] text-white"
                         : "border-slate-200 bg-white text-[#00796B] hover:border-[#008578] hover:bg-teal-50/60",
                     ].join(" ")}
                     disabled={disabled}
                     onClick={() => vote(question)}
                     type="button"
                   >
-                    <ChevronUp aria-hidden="true" className="h-5 w-5" strokeWidth={2.5} />
+                    <ArrowBigUp aria-hidden="true" className="h-5 w-5" strokeWidth={2.4} />
                     <span className="text-lg font-semibold leading-6">{question.vote_count}</span>
                     <span className="text-[11px] font-semibold uppercase leading-4 tracking-normal">
                       {question.vote_count === 1 ? "vote" : "votes"}
