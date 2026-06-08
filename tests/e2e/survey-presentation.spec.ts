@@ -48,6 +48,99 @@ test("presentation view shows aggregate charts without admin controls or private
   await expect(page.locator("main").getByText(/participant_session_id|session_token_hash|raw-token|@qsb/i)).toHaveCount(0);
 });
 
+for (const viewport of [
+  { width: 1920, height: 1080 },
+  { width: 1920, height: 1200 },
+]) {
+  test(`presentation long survey options fit at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/events/event-results/presentation/surveys/survey-1");
+    await page.waitForFunction(() => document.body.dataset.surveyPresentationReady === "true");
+
+    await page.evaluate(() => {
+      window.dispatchEvent(
+        new CustomEvent("qsb-ask:e2e-survey-results-refresh", {
+          detail: {
+            result: {
+              id: "survey-1",
+              lastUpdated: "2026-05-30T00:15:00.000Z",
+              presentationHref: "/events/event-results/presentation/surveys/survey-1",
+              responseCount: 1,
+              resultsVisibleToParticipants: true,
+              status: "published",
+              title: "BNRC",
+              questions: [
+                {
+                  chartData: [
+                    {
+                      count: 0,
+                      label: "A. BNRC takes over all staff KPI and training matters",
+                      percentage: 0,
+                    },
+                    {
+                      count: 1,
+                      label:
+                        "B. BNRC continues REMCOM'S remuneration role and expands its scope to include board-related matters",
+                      percentage: 100,
+                    },
+                    {
+                      count: 0,
+                      label: "C. BNRC replaces the authority of Management and CEOs",
+                      percentage: 0,
+                    },
+                  ],
+                  id: "question-choice",
+                  openTextKeywords: [],
+                  openTextResponses: [],
+                  options: [],
+                  position: 0,
+                  prompt: "What is the main change from REMCOM to BNRC?",
+                  ratingScale: null,
+                  responseCount: 1,
+                  type: "multiple_choice",
+                },
+              ],
+            },
+          },
+        }),
+      );
+    });
+
+    await expect(page.getByText("Early signal: 1 response")).toBeVisible();
+    await expect(page.getByTestId("survey-result-tile")).toHaveCount(3);
+
+    const tileTextFits = await page.getByTestId("survey-result-tile").evaluateAll((tiles) =>
+      tiles.every((tile) => {
+        const tileBounds = tile.getBoundingClientRect();
+        const heading = tile.querySelector("h3");
+        const headingBounds = heading?.getBoundingClientRect();
+
+        return Boolean(
+          headingBounds &&
+            headingBounds.left >= tileBounds.left - 1 &&
+            headingBounds.right <= tileBounds.right + 1 &&
+            headingBounds.top >= tileBounds.top - 1 &&
+            headingBounds.bottom <= tileBounds.bottom + 1,
+        );
+      }),
+    );
+    expect(tileTextFits).toBe(true);
+
+    await page.getByRole("button", { name: "Bar" }).click();
+    await expect(page.getByTestId("survey-result-bar-row")).toHaveCount(3);
+
+    const barRowsFit = await page.getByTestId("survey-result-bar-row").evaluateAll((rows) =>
+      rows.every((row) => {
+        const bounds = row.getBoundingClientRect();
+        return bounds.left >= -1 && bounds.right <= window.innerWidth + 1;
+      }),
+    );
+    expect(barRowsFit).toBe(true);
+  });
+}
+
 test("fixture refresh updates aggregate counts within 2 seconds without trusting raw payloads", async ({
   page,
 }) => {

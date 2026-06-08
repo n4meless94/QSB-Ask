@@ -101,6 +101,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-06: Quick task `260606-gsg` redesigned the survey presentation view into a Microsoft Forms-style presenter stage with QR rail, slide navigation, and large chart modes.
 - 2026-06-09: Quick task `260609-17x` changed participant surveys from latest-only to an all-published survey queue with per-survey completion state and focused unit/E2E coverage.
 - 2026-06-09: Quick task `260609-1jj` added mobile bottom tab navigation for participant Q&A/Surveys and replaced the Q&A vote chevron with a stronger upvote icon.
+- 2026-06-09: Quick task `260609-2bt` polished survey presenter/results UI for long labels, 1080p/1200p presenter fit, selected result state, readable chart labels, and low-response context.
 
 ## Decisions
 
@@ -173,6 +174,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 
 | Date | Quick ID | Task | Verification |
 |------|----------|------|--------------|
+| 2026-06-09 | 260609-2bt | Survey presenter/results UI polish for long labels and low-response states | Focused ESLint, `npx tsc --noEmit`, `npm test -- tests/surveys/results.test.ts`, focused survey Playwright E2E including 1920x1080 and 1920x1200 presenter checks, in-app browser public-results check, `npm run build`, and `git diff --check` passed |
 | 2026-06-09 | 260609-1jj | Mobile participant bottom tab navigation and Q&A upvote icon | Implementation commit `ee5df84`; focused ESLint, `npx tsc --noEmit`, participant Playwright E2E, in-app browser mobile viewport check, focused Vitest, `npm run build`, and `git diff --check` passed |
 | 2026-06-09 | 260609-17x | Participant all-published survey queue | `npx vitest run tests/surveys/participant.test.ts`, targeted `npx eslint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/survey-submission.spec.ts`, and `git diff --check` passed; full `npm test` has unrelated date-sensitive failures in `tests/events/events.test.ts` |
 | 2026-06-03 | 260603-wib | Participant-first QSB Ask homepage and admin setup split | `npm run lint`, `npm run build`, `npx playwright test tests/e2e/foundation.spec.ts` passed |

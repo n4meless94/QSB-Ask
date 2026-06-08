@@ -36,6 +36,13 @@ function visibilityCopy(visible: boolean) {
   return visible ? "Participants can view results" : "Visible only to organisers";
 }
 
+function lowResponseCopy(count: number) {
+  if (count === 0) return "No responses yet.";
+  if (count === 1) return "Early signal: 1 response so percentages may shift quickly.";
+  if (count < 5) return `Early signal: ${count} responses so percentages may still shift.`;
+  return null;
+}
+
 function ChartOrText({ question }: { question: SurveyQuestionResult }) {
   if (question.type === "open_text") {
     return <OpenTextResponseList responses={question.openTextResponses} title={question.prompt} />;
@@ -76,24 +83,35 @@ export function SurveyResultsPanel({ eventId, results, selectedResultId }: Surve
           <div className="grid gap-3 border-b border-slate-200 pb-4">
             <h3 className="text-base font-semibold leading-6 text-slate-900">Survey selector</h3>
             <div className="grid gap-2 md:grid-cols-2">
-              {results.map((result) => (
-                <Link
-                  aria-current={result.id === selected.id ? "true" : undefined}
-                  className={[
-                    "grid gap-1 rounded-[6px] border bg-white p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2",
-                    result.id === selected.id
-                      ? "border-teal-700 text-slate-900"
-                      : "border-slate-300 text-slate-900 hover:bg-slate-50",
-                  ].join(" ")}
-                  href={`/events/${eventId}?tab=results&resultSurveyId=${result.id}`}
-                  key={result.id}
-                >
-                  <span className="break-words text-base font-semibold leading-6">{result.title}</span>
-                  <span className="text-sm leading-[1.4] text-slate-600">
-                    {responseCopy(result.responseCount)}
-                  </span>
-                </Link>
-              ))}
+              {results.map((result) => {
+                const isSelected = result.id === selected.id;
+
+                return (
+                  <Link
+                    aria-current={isSelected ? "page" : undefined}
+                    className={[
+                      "grid gap-2 rounded-[6px] border p-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2",
+                      isSelected
+                        ? "border-teal-700 bg-teal-50 text-slate-950 shadow-[inset_4px_0_0_#0F766E]"
+                        : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
+                    ].join(" ")}
+                    href={`/events/${eventId}?tab=results&resultSurveyId=${result.id}`}
+                    key={result.id}
+                  >
+                    <span className="flex min-w-0 flex-wrap items-center gap-2">
+                      <span className="min-w-0 break-words text-base font-semibold leading-6">{result.title}</span>
+                      {isSelected ? (
+                        <span className="rounded-[6px] border border-teal-700 bg-white px-2 py-0.5 text-xs font-semibold leading-[1.4] text-teal-800">
+                          Selected
+                        </span>
+                      ) : null}
+                    </span>
+                    <span className="text-sm leading-[1.4] text-slate-600">
+                      {responseCopy(result.responseCount)}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -166,6 +184,13 @@ export function SurveyResultsPanel({ eventId, results, selectedResultId }: Surve
                 </p>
               </div>
             </div>
+
+            {lowResponseCopy(selected.responseCount) ? (
+              <div className="rounded-[6px] border border-teal-700 bg-teal-50 p-3 text-sm leading-[1.4] text-teal-900">
+                <p className="font-semibold">Response context</p>
+                <p>{lowResponseCopy(selected.responseCount)}</p>
+              </div>
+            ) : null}
 
             <form
               action={saveSurveyVisibilityFormAction.bind(null, eventId, selected.id)}

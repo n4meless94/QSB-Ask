@@ -57,6 +57,20 @@ function chartGradient(index: number) {
   return gradients[index % gradients.length];
 }
 
+function lowResponseCopy(count: number) {
+  if (count === 0) return null;
+  if (count === 1) return "Early signal: 1 response so percentages may swing quickly.";
+  if (count < 5) return `Early signal: ${count} responses so percentages may still shift.`;
+  return null;
+}
+
+function tileLabelSize(label: string) {
+  if (label.length > 120) return "text-[clamp(0.78rem,min(1.15vw,1.55vh),1.18rem)]";
+  if (label.length > 82) return "text-[clamp(0.86rem,min(1.3vw,1.75vh),1.35rem)]";
+  if (label.length > 52) return "text-[clamp(0.95rem,min(1.55vw,2vh),1.55rem)]";
+  return "text-[clamp(1.05rem,min(2vw,2.6vh),2rem)]";
+}
+
 function AccessibleResults({ data, title }: { data: SurveyChartDatum[]; title: string }) {
   return (
     <div className="sr-only">
@@ -103,25 +117,50 @@ function NoResponsesPanel() {
   );
 }
 
+function LowResponseNote({ count }: { count: number }) {
+  const copy = lowResponseCopy(count);
+
+  if (!copy) return null;
+
+  return (
+    <p className="rounded-[6px] border border-[#7AB8BD] bg-white/42 px-4 py-2 text-[clamp(0.85rem,1.4vh,1rem)] font-semibold leading-[1.35] text-[#006B66]">
+      {copy}
+    </p>
+  );
+}
+
 function TilesResults({ question }: { question: SurveyQuestionResult }) {
   const hasResponses = question.chartData.some((datum) => datum.count > 0);
 
-  if (!hasResponses) return <NoResponsesPanel />;
+  if (!hasResponses) {
+    return (
+      <>
+        <NoResponsesPanel />
+        <AccessibleResults data={question.chartData} title={question.prompt} />
+      </>
+    );
+  }
 
   return (
     <div className="grid h-full min-h-0 content-stretch gap-[clamp(0.75rem,1.6vh,1.25rem)] md:grid-cols-2">
       {question.chartData.map((datum, index) => (
         <article
-          className={`grid min-h-[clamp(7rem,16vh,13.75rem)] place-items-center rounded-[8px] bg-gradient-to-br ${chartGradient(
+          className={`grid min-h-[clamp(7rem,16vh,13.75rem)] min-w-0 overflow-hidden rounded-[8px] bg-gradient-to-br ${chartGradient(
             index,
-          )} px-6 py-[clamp(0.75rem,2.4vh,2rem)] text-center text-white shadow-[0_18px_44px_rgba(15,82,124,0.18)]`}
+          )} px-[clamp(1rem,1.8vw,1.5rem)] py-[clamp(0.75rem,2.1vh,1.65rem)] text-center text-white shadow-[0_18px_44px_rgba(15,82,124,0.18)]`}
+          data-testid="survey-result-tile"
           key={datum.label}
         >
-          <div className="grid gap-[clamp(0.5rem,1.4vh,1rem)]">
-            <p className="text-[clamp(2rem,min(5vw,7vh),4.4rem)] font-bold leading-none">
+          <div className="grid h-full min-h-0 w-full place-content-center gap-[clamp(0.45rem,1.1vh,0.85rem)]">
+            <p className="text-[clamp(1.9rem,min(4.3vw,5.8vh),3.75rem)] font-bold leading-none">
               {datum.percentage}%
             </p>
-            <h3 className="break-words text-[clamp(1.05rem,min(2vw,2.6vh),2rem)] font-bold uppercase leading-[1.18]">
+            <h3
+              className={[
+                "max-w-full break-words font-bold uppercase leading-[1.12] [overflow-wrap:anywhere] [text-wrap:balance]",
+                tileLabelSize(datum.label),
+              ].join(" ")}
+            >
               {datum.label}
             </h3>
           </div>
@@ -136,22 +175,37 @@ function BarResults({ question }: { question: SurveyQuestionResult }) {
   const maxPercentage = Math.max(...question.chartData.map((datum) => datum.percentage), 1);
   const hasResponses = question.chartData.some((datum) => datum.count > 0);
 
-  if (!hasResponses) return <NoResponsesPanel />;
+  if (!hasResponses) {
+    return (
+      <>
+        <NoResponsesPanel />
+        <AccessibleResults data={question.chartData} title={question.prompt} />
+      </>
+    );
+  }
 
   return (
-    <div aria-label={`${question.prompt} chart`} className="grid gap-[clamp(0.75rem,2.4vh,2rem)]" role="img">
+    <div
+      aria-label={`${question.prompt} chart`}
+      className="grid min-w-0 gap-[clamp(0.75rem,2.1vh,1.65rem)]"
+      role="img"
+    >
       {question.chartData.map((datum, index) => (
-        <div className="grid items-center gap-5 md:grid-cols-[minmax(140px,0.7fr)_minmax(0,1.3fr)_90px]" key={datum.label}>
-          <h3 className="break-words text-[clamp(1.05rem,min(1.9vw,2.4vh),1.8rem)] font-bold uppercase leading-[1.18] text-[#006B66]">
+        <div
+          className="grid min-w-0 items-center gap-[clamp(0.5rem,1.4vw,1.25rem)] md:grid-cols-[minmax(0,0.68fr)_minmax(0,1.32fr)_minmax(3.5rem,auto)]"
+          data-testid="survey-result-bar-row"
+          key={datum.label}
+        >
+          <h3 className="min-w-0 break-words text-[clamp(0.95rem,min(1.55vw,2.05vh),1.55rem)] font-bold uppercase leading-[1.14] text-[#006B66] [overflow-wrap:anywhere]">
             {datum.label}
           </h3>
-          <div className="h-[clamp(1.5rem,3.6vh,2.125rem)] overflow-hidden rounded-[6px] bg-white/35">
+          <div className="min-w-0 h-[clamp(1.35rem,3.2vh,1.95rem)] overflow-hidden rounded-[6px] bg-white/35">
             <div
               className={`h-full rounded-[6px] bg-gradient-to-r ${chartGradient(index)}`}
               style={{ width: `${Math.max((datum.percentage / maxPercentage) * 100, 3)}%` }}
             />
           </div>
-          <p className="text-[clamp(1.25rem,min(2.2vw,2.8vh),2.25rem)] font-bold leading-none text-[#006B66]">
+          <p className="justify-self-end font-mono text-[clamp(1.1rem,min(1.85vw,2.35vh),1.95rem)] font-bold leading-none tracking-normal text-[#006B66]">
             {datum.percentage}%
           </p>
         </div>
@@ -242,7 +296,10 @@ function ChartGroup({ mode, question }: { mode: ChartMode; question: SurveyQuest
       <h2 className="break-words text-[clamp(1.75rem,min(4.2vw,5.4vh),4.9rem)] font-bold uppercase leading-[1.08] text-[#006B66]">
         {question.prompt}
       </h2>
-      {mode === "tiles" ? <TilesResults question={question} /> : <BarResults question={question} />}
+      <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[clamp(0.65rem,1.6vh,1.25rem)]">
+        <LowResponseNote count={question.responseCount} />
+        {mode === "tiles" ? <TilesResults question={question} /> : <BarResults question={question} />}
+      </div>
     </section>
   );
 }
@@ -432,7 +489,7 @@ export function SurveyPresentationView({
               </div>
             ) : null}
 
-            <div className="grid min-h-0 content-center overflow-y-auto py-[clamp(0.75rem,2.4vh,2rem)]">
+            <div className="grid min-h-0 content-center overflow-x-hidden overflow-y-auto py-[clamp(0.75rem,2.4vh,2rem)]">
               {activeQuestion ? <ChartGroup mode={mode} question={activeQuestion} /> : <NoResponsesPanel />}
             </div>
 

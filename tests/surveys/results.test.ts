@@ -450,6 +450,29 @@ describe("SurveyBarChart", () => {
     expect(tree).toContain("table");
   });
 
+  it("renders long dashboard labels outside the chart axis and flags low response counts", () => {
+    const tree = renderToStaticMarkup(
+      createElement(SurveyBarChart, {
+        data: [
+          {
+            count: 1,
+            label:
+              "B. BNRC continues REMCOM'S remuneration role and expands its scope to include board-related matters",
+            percentage: 100,
+          },
+          { count: 0, label: "C. BNRC replaces the authority of Management and CEOs", percentage: 0 },
+        ],
+        title: "What is the main change from REMCOM to BNRC?",
+      }),
+    );
+
+    expect(tree).toContain("Early signal");
+    expect(tree).toContain("B. BNRC continues REMCOM");
+    expect(tree).toContain("1 response");
+    expect(tree).toContain("100%");
+    expect(tree).toContain("table");
+  });
+
   it("preserves chart and table structure for zero-response surveys", () => {
     const tree = renderToStaticMarkup(
       createElement(SurveyBarChart, {

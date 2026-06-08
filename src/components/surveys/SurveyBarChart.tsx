@@ -1,16 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  LabelList,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 import type { SurveyChartDatum } from "@/lib/surveys/results";
 
@@ -28,15 +18,15 @@ function labelCopy(datum: SurveyChartDatum) {
 }
 
 export function SurveyBarChart({ data, title }: SurveyBarChartProps) {
-  const { chartHeight, maxCount, summaryItems, total } = useMemo(() => {
+  const { maxPercentage, summaryItems, total } = useMemo(() => {
     return {
-      chartHeight: Math.min(260, Math.max(156, data.length * 54)),
-      maxCount: data.reduce((highest, datum) => Math.max(highest, datum.count), 1),
+      maxPercentage: data.reduce((highest, datum) => Math.max(highest, datum.percentage), 1),
       summaryItems: data.map((datum) => labelCopy(datum)),
       total: data.reduce((sum, datum) => sum + datum.count, 0),
     };
   }, [data]);
   const hasResponses = total > 0;
+  const hasLowResponses = total > 0 && total < 5;
 
   return (
     <div className="grid gap-3">
@@ -50,52 +40,38 @@ export function SurveyBarChart({ data, title }: SurveyBarChartProps) {
             <p>Charts will update when participants submit this survey.</p>
           </div>
         ) : null}
+        {hasLowResponses ? (
+          <div className="rounded-[6px] border border-teal-700 bg-teal-50 p-3 text-sm leading-[1.4] text-teal-900">
+            <p className="font-semibold">Early signal</p>
+            <p>{responseCopy(total)} so percentages may change quickly as more participants answer.</p>
+          </div>
+        ) : null}
       </div>
 
-      <div aria-label={`${title} chart`} className="w-full" role="img">
-        <ResponsiveContainer height={chartHeight} width="100%">
-          <BarChart
-            data={data}
-            layout="vertical"
-            margin={{ bottom: 8, left: 8, right: 112, top: 8 }}
-          >
-            <CartesianGrid stroke="#CBD5E1" strokeDasharray="3 3" />
-            <XAxis
-              allowDecimals={false}
-              dataKey="count"
-              domain={[0, maxCount]}
-              tick={{ fill: "#334155", fontSize: 13 }}
-              type="number"
-            />
-            <YAxis dataKey="label" tick={{ fill: "#334155", fontSize: 13 }} type="category" width={112} />
-            <Tooltip
-              formatter={(value, _name, item) => {
-                const datum = item.payload as SurveyChartDatum;
-                return [`${responseCopy(Number(value))} (${datum.percentage}%)`, datum.label];
-              }}
-            />
-            <Bar dataKey="count" fill="#0F766E" minPointSize={hasResponses ? 3 : 0}>
-              <LabelList
-                content={({ index, x, y, width, height }) => {
-                  if (typeof index !== "number") return null;
-                  const datum = data[index];
-                  if (!datum) return null;
+      <div aria-label={`${title} chart`} className="grid gap-3 rounded-[6px] border border-slate-200 bg-slate-50 p-3" role="img">
+        {data.map((datum) => {
+          const barWidth = hasResponses && datum.count > 0 ? Math.max((datum.percentage / maxPercentage) * 100, 4) : 0;
 
-                  return (
-                    <text
-                      fill="#0F172A"
-                      fontSize={14}
-                      x={Number(x) + Number(width) + 8}
-                      y={Number(y) + Number(height) / 2 + 5}
-                    >
-                      {responseCopy(datum.count)}, {datum.percentage}%
-                    </text>
-                  );
-                }}
-              />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+          return (
+            <div className="grid min-w-0 gap-2" key={datum.label}>
+              <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                <p className="min-w-0 break-words text-sm font-semibold leading-[1.35] text-slate-900">
+                  {datum.label}
+                </p>
+                <p className="font-mono text-sm font-semibold leading-[1.35] tracking-normal text-slate-700">
+                  {responseCopy(datum.count)}, {datum.percentage}%
+                </p>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-white shadow-[inset_0_0_0_1px_rgba(148,163,184,0.45)]">
+                <div
+                  aria-hidden="true"
+                  className="h-full rounded-full bg-teal-700"
+                  style={{ width: `${barWidth}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <ul className="grid gap-2 text-sm leading-[1.4] text-slate-700">

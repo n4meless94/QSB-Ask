@@ -20,15 +20,16 @@ test("organiser can inspect survey result counts, charts, tables, and open text 
   const resultsPanel = page.getByRole("tabpanel", { name: "Results" });
 
   await expect(page.getByRole("heading", { name: "Survey results" })).toBeVisible();
+  await expect(resultsPanel.getByRole("link", { name: /Pulse check/ }).filter({ hasText: "Selected" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
   await expect(page.getByRole("heading", { name: "Pulse check" })).toBeVisible();
-  await expect(
-    page
-      .getByRole("heading", { name: "Pulse check" })
-      .locator("xpath=ancestor::div[contains(@class, 'min-w-0')]")
-      .getByText("3 responses"),
-  ).toBeVisible();
-  await expect(page.locator("span").filter({ hasText: "Results visible" })).toBeVisible();
+  await expect(resultsPanel.locator('[aria-label="Survey result summary"]').getByText("3").first()).toBeVisible();
+  await expect(page.locator("span").filter({ hasText: "Participants can view results" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open presentation view" })).toBeVisible();
+  await expect(page.getByText("Response context")).toBeVisible();
+  await expect(page.getByText("Early signal: 3 responses")).toBeVisible();
 
   await expect(page.getByRole("heading", { name: "Is the pace clear?" })).toBeVisible();
   await expect(page.getByText("Yes: 2 responses, 67%")).toBeVisible();
