@@ -74,6 +74,24 @@ function spokenJoinCode(joinCode: string) {
   return joinCode.trim().toUpperCase().split("").join(" ");
 }
 
+function featuredQuestionTextClass(questionText: string) {
+  const length = questionText.trim().length;
+
+  if (length >= 240) {
+    return "text-[clamp(1.25rem,min(2.4vw,3.5vh),3rem)] leading-[1.1]";
+  }
+
+  if (length >= 180) {
+    return "text-[clamp(1.45rem,min(3.1vw,4.5vh),4rem)] leading-[1.09]";
+  }
+
+  if (length >= 120) {
+    return "text-[clamp(1.9rem,min(4.3vw,6.4vh),5.25rem)] leading-[1.07]";
+  }
+
+  return "text-[clamp(2.25rem,min(5.5vw,8.5vh),6.7rem)] leading-[1.04]";
+}
+
 export function PresenterView({
   eventId,
   eventName,
@@ -97,6 +115,9 @@ export function PresenterView({
   const featuredQuestionQueueNumber = featuredQuestion
     ? sortedQuestions.findIndex((question) => question.id === featuredQuestion.id) + 1
     : 0;
+  const featuredQuestionClassName = featuredQuestion
+    ? featuredQuestionTextClass(featuredQuestion.current_text)
+    : undefined;
   const liveQuestionsRemaining = sortedQuestions.filter(
     (question) => question.status !== "answered" && question.id !== featuredQuestion?.id,
   ).length;
@@ -197,7 +218,7 @@ export function PresenterView({
         >
           {featuredQuestion ? (
             <article
-              className="presenter-question-swap relative min-w-0 overflow-hidden rounded-[14px] border border-[#E5E1D4] bg-white/55 py-[clamp(1.25rem,3.6vh,2.75rem)] pl-[clamp(1.25rem,2.6vw,3rem)] pr-[clamp(1rem,2.4vw,2.5rem)] shadow-[0_24px_64px_rgba(31,41,51,0.07)]"
+              className="presenter-question-swap relative grid max-h-full min-w-0 overflow-hidden rounded-[14px] border border-[#E5E1D4] bg-white/55 py-[clamp(1rem,3vh,2.75rem)] pl-[clamp(1.25rem,2.6vw,3rem)] pr-[clamp(1rem,2.4vw,2.5rem)] shadow-[0_24px_64px_rgba(31,41,51,0.07)]"
               data-testid="presenter-featured-question"
               key={featuredQuestion.id}
             >
@@ -205,7 +226,7 @@ export function PresenterView({
                 aria-hidden="true"
                 className="absolute inset-y-0 left-0 w-[clamp(5px,0.55vw,8px)] bg-[#006B66]"
               />
-              <div className="grid min-w-0 gap-[clamp(1rem,3.2vh,2.25rem)]">
+              <div className="grid min-h-0 min-w-0 gap-[clamp(0.75rem,2.4vh,2.25rem)]">
                 <p className="flex items-center gap-3 text-[clamp(0.75rem,1.4vh,0.95rem)] font-black uppercase leading-none tracking-[0.32em] text-[#006B66]">
                   {featuredQuestion.status !== "answered" ? (
                     <span className="relative flex size-2.5" aria-hidden="true">
@@ -216,7 +237,7 @@ export function PresenterView({
                   {heroLabel(featuredQuestion.status)}
                 </p>
 
-                <p className="break-words text-[clamp(2.25rem,min(5.5vw,8.5vh),6.7rem)] font-bold leading-[1.04] tracking-normal text-[#1F2933]">
+                <p className={`max-h-[min(64vh,calc(100vh-13rem))] overflow-y-auto break-words font-bold tracking-normal text-[#1F2933] ${featuredQuestionClassName}`}>
                   {featuredQuestion.current_text}
                 </p>
 
