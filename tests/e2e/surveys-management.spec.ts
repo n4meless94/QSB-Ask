@@ -34,6 +34,13 @@ test("organiser can author surveys from the Event Workspace", async ({ page }) =
   await expect(page.getByRole("button", { name: "Add question" })).toBeVisible();
   await expect(page.getByText("Survey is not ready to publish")).toBeVisible();
   await expect(page.getByLabel("Show results to participants")).not.toBeChecked();
+
+  await page.getByRole("button", { name: "Add question" }).click();
+  await expect(page.getByRole("button", { name: "Remove question" })).toHaveCount(2);
+
+  await page.getByRole("button", { name: "Remove question" }).nth(1).click();
+  await expect(page.getByRole("button", { name: "Remove question" })).toHaveCount(1);
+  await expect(page.getByText("Question 2")).toHaveCount(0);
 });
 
 test("moderators and speakers do not see organiser survey authoring controls", async ({ page }) => {

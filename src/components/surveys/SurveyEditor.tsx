@@ -88,6 +88,10 @@ function updateQuestion(
   );
 }
 
+function removeQuestion(questions: EditableQuestion[], index: number) {
+  return questions.filter((_, questionIndex) => questionIndex !== index);
+}
+
 export function SurveyEditor({ eventId, survey }: SurveyEditorProps) {
   async function saveAction(_previousState: SurveyMutationResult, formData: FormData) {
     return saveSurveyDraftAction(eventId, formData);
@@ -280,6 +284,16 @@ export function SurveyEditor({ eventId, survey }: SurveyEditorProps) {
               <legend className="rounded-[6px] bg-white px-2 text-base font-semibold leading-6 text-slate-900">
                 Question {index + 1}
               </legend>
+              <div className="flex justify-end">
+                <Button
+                  className="min-h-10 px-3 text-sm"
+                  onClick={() => setQuestions(removeQuestion(questions, index))}
+                  type="button"
+                  variant="destructive"
+                >
+                  Remove question
+                </Button>
+              </div>
               <input name={`questions.${index}.id`} type="hidden" value={question.id ?? ""} />
               <div className="grid gap-4 md:grid-cols-[220px_minmax(0,1fr)]">
                 <div className="grid gap-2">
