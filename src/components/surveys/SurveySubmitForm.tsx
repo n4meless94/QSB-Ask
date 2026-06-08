@@ -57,6 +57,7 @@ export function SurveySubmitForm({
 }: SurveySubmitFormProps) {
   const submitAction = submitSurveyAction.bind(null, eventId, joinCode);
   const [isCompleted, setIsCompleted] = useState(completed);
+  const participantResultsHeadingId = `participant-results-heading-${survey.id}`;
 
   async function submitAndComplete(
     previousState: SubmitSurveyActionResult,
@@ -87,11 +88,11 @@ export function SurveySubmitForm({
         </p>
         {resultsVisible ? (
           result ? (
-            <section className="grid gap-4 border-t border-slate-200 pt-4" aria-labelledby="participant-results-heading">
+            <section className="grid gap-4 border-t border-slate-200 pt-4" aria-labelledby={participantResultsHeadingId}>
               <div className="grid gap-1">
                 <h3
                   className="text-[22px] font-semibold leading-[1.2] text-slate-950"
-                  id="participant-results-heading"
+                  id={participantResultsHeadingId}
                 >
                   Participant results
                 </h3>

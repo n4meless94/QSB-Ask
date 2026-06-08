@@ -17,7 +17,7 @@ progress:
 
 # Project State: QSB Ask
 
-**Last updated:** 2026-06-06
+**Last updated:** 2026-06-09
 **Current phase:** 5
 **Current Plan:** 1
 **Total Plans in Phase:** 2
@@ -99,6 +99,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 - 2026-06-06: Quick task `260606-4cc` changed queue presenter focus from popup links to an existing Presenter View update channel with a question-swap animation.
 - 2026-06-06: Quick task `260606-4np` removed stale `master` deployment branch notes after standardising the repo on `main`.
 - 2026-06-06: Quick task `260606-gsg` redesigned the survey presentation view into a Microsoft Forms-style presenter stage with QR rail, slide navigation, and large chart modes.
+- 2026-06-09: Quick task `260609-17x` changed participant surveys from latest-only to an all-published survey queue with per-survey completion state and focused unit/E2E coverage.
 
 ## Decisions
 
@@ -171,6 +172,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 
 | Date | Quick ID | Task | Verification |
 |------|----------|------|--------------|
+| 2026-06-09 | 260609-17x | Participant all-published survey queue | `npx vitest run tests/surveys/participant.test.ts`, targeted `npx eslint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/survey-submission.spec.ts`, and `git diff --check` passed; full `npm test` has unrelated date-sensitive failures in `tests/events/events.test.ts` |
 | 2026-06-03 | 260603-wib | Participant-first QSB Ask homepage and admin setup split | `npm run lint`, `npm run build`, `npx playwright test tests/e2e/foundation.spec.ts` passed |
 | 2026-06-04 | 260604-1jv | Hallmark presenter view and event workspace audience/operator UI redesign | `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, focused Playwright E2E passed |
 | 2026-06-04 | 260604-egr | Event dashboard UI review fixes across Q&A, surveys, results, exports, access, and settings | `npm run lint`, `npm test`, `npm run build`, desktop/mobile Playwright fixture sweep passed |
@@ -216,4 +218,4 @@ Execute `.planning/phases/05-pdf-deck-upload-and-storage/05-01-PLAN.md`.
 Phase: 5 - PDF Deck Upload And Storage
 Plan: 01 - Event-scoped PDF deck upload, validation, storage, and organiser management
 Status: Plan ready
-Last activity: 2026-06-05 - Quick task 260605-vyf code optimizer findings fixed and verified
+Last activity: 2026-06-09 - Quick task 260609-17x participant all-published survey queue implemented and verified

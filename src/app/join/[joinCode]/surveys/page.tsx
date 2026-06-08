@@ -10,9 +10,10 @@ import {
   type JoinableEvent,
 } from "@/lib/participants/session";
 import {
-  loadParticipantSurvey,
+  loadParticipantSurveys,
   type ParticipantSurvey,
-  type ParticipantSurveyPageState,
+  type ParticipantSurveyListItem,
+  type ParticipantSurveyListPageState,
 } from "@/lib/surveys/participant";
 import { getParticipantVisibleSurveyResults, type SurveyResult } from "@/lib/surveys/results";
 
@@ -61,11 +62,13 @@ function e2eEvent(joinCode: string): JoinableEvent | null {
 }
 
 function e2eSurvey(
+  id = "survey-1",
+  title = "Pulse check",
   status: "published" | "draft" | "closed" = "published",
   resultsVisibleToParticipants = false,
 ): ParticipantSurvey {
   return {
-    id: "survey-1",
+    id,
     questions: [
       {
         id: "question-choice",
@@ -108,47 +111,70 @@ function e2eSurvey(
     ],
     resultsVisibleToParticipants,
     status,
-    title: "Pulse check",
+    title,
   };
 }
 
-function e2eSurveyState(fixture?: string): ParticipantSurveyPageState {
+function e2eSurveyState(fixture?: string): ParticipantSurveyListPageState {
   if (fixture === "draft") {
     return {
-      completed: false,
       message: "No surveys are open",
-      results: { visible: false },
       state: "unavailable",
-      survey: null,
+      surveys: [],
     };
   }
 
   if (fixture === "closed") {
     return {
-      completed: false,
       message: "This survey is closed. New responses are no longer being accepted.",
-      results: { visible: false },
-      state: "closed",
-      survey: e2eSurvey("closed"),
+      state: "unavailable",
+      surveys: [],
     };
   }
 
   if (fixture === "visible") {
     return {
-      completed: true,
-      message: "You have already submitted this survey.",
-      results: { visible: true },
+      message: "",
       state: "available",
-      survey: e2eSurvey("published", true),
+      surveys: [
+        {
+          completed: true,
+          results: { visible: true },
+          survey: e2eSurvey("survey-1", "Pulse check", "published", true),
+        },
+      ],
+    };
+  }
+
+  if (fixture === "multi") {
+    return {
+      message: "",
+      state: "available",
+      surveys: [
+        {
+          completed: false,
+          results: { visible: false },
+          survey: e2eSurvey("survey-1", "Pulse check"),
+        },
+        {
+          completed: false,
+          results: { visible: false },
+          survey: e2eSurvey("survey-2", "Townhall follow-up"),
+        },
+      ],
     };
   }
 
   return {
-    completed: false,
     message: "",
-    results: { visible: false },
     state: "available",
-    survey: e2eSurvey(),
+    surveys: [
+      {
+        completed: false,
+        results: { visible: false },
+        survey: e2eSurvey(),
+      },
+    ],
   };
 }
 
@@ -195,6 +221,92 @@ function AlertPanel({ children, title }: { children: ReactNode; title: string })
   );
 }
 
+function surveyStatusLabel(survey: ParticipantSurveyListItem) {
+  if (survey.completed) return "Submitted";
+  return survey.results.visible ? "Results visible" : "Results hidden";
+}
+
+function SurveyQueue({
+  eventId,
+  joinCode,
+  surveys,
+  visibleResults,
+}: {
+  eventId: string;
+  joinCode: string;
+  surveys: ParticipantSurveyListItem[];
+  visibleResults: SurveyResult[];
+}) {
+  const completedCount = surveys.filter((survey) => survey.completed).length;
+  const firstUnansweredIndex = surveys.findIndex((survey) => !survey.completed);
+  const openCountCopy = `${surveys.length} ${surveys.length === 1 ? "survey" : "surveys"} open`;
+
+  return (
+    <section className="grid gap-4" aria-labelledby="survey-queue-heading">
+      <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <div className="grid gap-1">
+          <h2 className="text-[26px] font-semibold leading-[1.15] text-slate-950" id="survey-queue-heading">
+            {surveys.length === 1 ? surveys[0].survey.title : "Event surveys"}
+          </h2>
+          {surveys.length > 1 ? (
+            <p className="text-base leading-6 text-slate-600">
+              {openCountCopy} · {completedCount} completed
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {surveys.map((entry, index) => {
+          const shouldOpen = surveys.length === 1 || index === firstUnansweredIndex || entry.completed;
+          const result = visibleResults.find((visibleResult) => visibleResult.id === entry.survey.id) ?? null;
+
+          return (
+            <details
+              className="group grid gap-3"
+              key={entry.survey.id}
+              open={shouldOpen}
+            >
+              <summary className="grid cursor-pointer gap-2 rounded-[16px] border border-slate-200 bg-white px-5 py-4 shadow-sm outline-none marker:text-slate-500 focus-visible:ring-2 focus-visible:ring-[#008578] focus-visible:ring-offset-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-7">
+                <span className="grid gap-1">
+                  <span className="text-[22px] font-semibold leading-[1.2] text-slate-950">
+                    {entry.survey.title}
+                  </span>
+                  <span className="text-sm font-semibold leading-[1.4] text-slate-600">
+                    {entry.survey.questions.length}{" "}
+                    {entry.survey.questions.length === 1 ? "question" : "questions"}
+                  </span>
+                </span>
+                <span
+                  className={
+                    entry.completed
+                      ? "w-fit rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold leading-[1.4] text-[#00796B]"
+                      : entry.results.visible
+                        ? "w-fit rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold leading-[1.4] text-[#00796B]"
+                        : "w-fit rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold leading-[1.4] text-amber-700"
+                  }
+                >
+                  {surveyStatusLabel(entry)}
+                </span>
+              </summary>
+              <div>
+                <SurveySubmitForm
+                  completed={entry.completed}
+                  eventId={eventId}
+                  joinCode={joinCode}
+                  result={result}
+                  resultsVisible={entry.results.visible}
+                  survey={entry.survey}
+                />
+              </div>
+            </details>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export default async function ParticipantSurveysPage({
   params,
   searchParams,
@@ -206,7 +318,7 @@ export default async function ParticipantSurveysPage({
       ? e2eEvent(joinCode)
       : await getJoinableEventByCode(joinCode);
 
-  let surveyState: ParticipantSurveyPageState | null = null;
+  let surveyState: ParticipantSurveyListPageState | null = null;
   let visibleResults: SurveyResult[] = [];
 
   if (event && process.env.QSB_ASK_E2E_AUTH === "1") {
@@ -217,17 +329,19 @@ export default async function ParticipantSurveysPage({
     const rawToken = cookieStore.get(getParticipantCookieName(event.id))?.value;
 
     if (rawToken) {
-      surveyState = await loadParticipantSurvey(event.id, rawToken);
-      if (surveyState.completed && surveyState.results.visible && surveyState.survey) {
-        visibleResults = await getParticipantVisibleSurveyResults(event.id, rawToken, surveyState.survey.id);
-      }
+      surveyState = await loadParticipantSurveys(event.id, rawToken);
+      visibleResults = (
+        await Promise.all(
+          surveyState.surveys
+            .filter((survey) => survey.completed && survey.results.visible)
+            .map((survey) => getParticipantVisibleSurveyResults(event.id, rawToken, survey.survey.id)),
+        )
+      ).flat();
     } else {
       surveyState = {
-        completed: false,
         message: "Join this event again before opening surveys.",
-        results: { visible: false },
         state: "unavailable",
-        survey: null,
+        surveys: [],
       };
     }
   }
@@ -247,6 +361,12 @@ export default async function ParticipantSurveysPage({
     );
   }
 
+  const surveyCount = surveyState?.surveys.length ?? 0;
+  const surveyStatusCopy =
+    surveyCount > 0
+      ? `${surveyCount} ${surveyCount === 1 ? "survey" : "surveys"} open`
+      : "No surveys open";
+
   return (
     <main className="min-h-screen bg-[#F6F8FB] px-4 py-8 text-slate-900 sm:px-6 sm:py-10">
       <div className="mx-auto grid max-w-[860px] gap-7">
@@ -261,7 +381,7 @@ export default async function ParticipantSurveysPage({
             <p className="flex min-w-0 flex-wrap items-center gap-2 text-sm font-semibold leading-[1.4] text-slate-500">
               <span className="inline-flex items-center gap-2 text-[#00796B]">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#008578]" aria-hidden="true" />
-                Survey open
+                {surveyStatusCopy}
               </span>
               <span aria-hidden="true">·</span>
               <span>Live session</span>
@@ -289,42 +409,17 @@ export default async function ParticipantSurveysPage({
           </nav>
         </header>
 
-        {!surveyState?.survey ? (
+        {!surveyState || surveyState.surveys.length === 0 ? (
           <AlertPanel title={surveyState?.message ?? "No surveys are open"}>
             <p>Open surveys will appear here when the organiser publishes them.</p>
           </AlertPanel>
         ) : (
-          <section className="grid gap-4" aria-labelledby="survey-title">
-            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-              <h2 className="text-[26px] font-semibold leading-[1.15] text-slate-950" id="survey-title">
-                {surveyState.survey.title}
-              </h2>
-              {surveyState.results.visible ? (
-                <p className="rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold leading-[1.4] text-[#00796B]">
-                  Results visible
-                </p>
-              ) : (
-                <p className="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold leading-[1.4] text-amber-700">
-                  Results hidden
-                </p>
-              )}
-            </div>
-
-            {surveyState.state === "available" ? (
-              <SurveySubmitForm
-                completed={surveyState.completed}
-                eventId={event.id}
-                joinCode={joinCode}
-                result={visibleResults.find((result) => result.id === surveyState.survey?.id) ?? null}
-                resultsVisible={surveyState.results.visible}
-                survey={surveyState.survey}
-              />
-            ) : (
-              <AlertPanel title={surveyState.message}>
-                <p>{surveyState.message}</p>
-              </AlertPanel>
-            )}
-          </section>
+          <SurveyQueue
+            eventId={event.id}
+            joinCode={joinCode}
+            surveys={surveyState.surveys}
+            visibleResults={visibleResults}
+          />
         )}
       </div>
     </main>

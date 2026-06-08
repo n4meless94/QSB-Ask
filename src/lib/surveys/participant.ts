@@ -42,6 +42,18 @@ export type ParticipantSurveyPageState = {
   survey: ParticipantSurvey | null;
 };
 
+export type ParticipantSurveyListItem = {
+  completed: boolean;
+  results: { visible: boolean };
+  survey: ParticipantSurvey;
+};
+
+export type ParticipantSurveyListPageState = {
+  message: string;
+  state: "available" | "unavailable";
+  surveys: ParticipantSurveyListItem[];
+};
+
 export type ParticipantSurveyAnswerInput = {
   questionId: string;
   selectedOptionIds?: string[];
@@ -91,6 +103,14 @@ function unavailableState(message = "No surveys are open"): ParticipantSurveyPag
     results: { visible: false },
     state: "unavailable",
     survey: null,
+  };
+}
+
+function unavailableListState(message = "No surveys are open"): ParticipantSurveyListPageState {
+  return {
+    message,
+    state: "unavailable",
+    surveys: [],
   };
 }
 
@@ -191,6 +211,22 @@ async function loadSurveyForParticipant(eventId: string, surveyId?: string) {
   return mapSurvey(data as SurveyWithQuestions);
 }
 
+async function loadPublishedSurveysForParticipant(eventId: string) {
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("surveys")
+    .select(PARTICIPANT_SURVEY_SELECT)
+    .eq("event_id", eventId)
+    .eq("status", "published")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw new Error("Surveys could not be loaded. Refresh the page and try again.");
+  }
+
+  return ((data ?? []) as SurveyWithQuestions[]).map(mapSurvey);
+}
+
 async function hasSubmittedSurvey(surveyId: string, participantSessionId: string) {
   const admin = createSupabaseAdminClient();
   const { data, error } = await admin
@@ -205,6 +241,23 @@ async function hasSubmittedSurvey(surveyId: string, participantSessionId: string
   }
 
   return (data ?? []).length > 0;
+}
+
+async function submittedSurveyIds(surveyIds: string[], participantSessionId: string) {
+  if (surveyIds.length === 0) return new Set<string>();
+
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("survey_responses")
+    .select("survey_id")
+    .eq("participant_session_id", participantSessionId)
+    .in("survey_id", surveyIds);
+
+  if (error) {
+    throw new Error("Survey response status could not be checked.");
+  }
+
+  return new Set((data ?? []).map((response) => response.survey_id as string));
 }
 
 export async function loadParticipantSurvey(
@@ -241,6 +294,33 @@ export async function loadParticipantSurvey(
     results: { visible: survey.resultsVisibleToParticipants },
     state: "available",
     survey,
+  };
+}
+
+export async function loadParticipantSurveys(
+  eventId: string,
+  rawToken: string,
+): Promise<ParticipantSurveyListPageState> {
+  const participantSession = await validateParticipantSession(eventId, rawToken);
+  const surveys = await loadPublishedSurveysForParticipant(eventId);
+
+  if (surveys.length === 0) {
+    return unavailableListState();
+  }
+
+  const completedSurveyIds = await submittedSurveyIds(
+    surveys.map((survey) => survey.id),
+    participantSession.id,
+  );
+
+  return {
+    message: "",
+    state: "available",
+    surveys: surveys.map((survey) => ({
+      completed: completedSurveyIds.has(survey.id),
+      results: { visible: survey.resultsVisibleToParticipants },
+      survey,
+    })),
   };
 }
 

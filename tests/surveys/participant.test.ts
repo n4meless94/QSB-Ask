@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { submitSurveyAction } from "@/app/join/[joinCode]/surveys/submit-actions";
 import {
   loadParticipantSurvey,
+  loadParticipantSurveys,
   submitParticipantSurvey,
 } from "@/lib/surveys/participant";
 
@@ -127,15 +128,48 @@ function form(values: Record<string, string | string[]>) {
   return formData;
 }
 
-function surveyQuery(row: typeof surveyFixture | null = surveyFixture, responseRows: unknown[] = []) {
+function surveyQuery(
+  rowOrRows: typeof surveyFixture | Array<typeof surveyFixture> | null = surveyFixture,
+  responseRows: Array<Record<string, unknown>> = [],
+) {
+  const surveyRows = Array.isArray(rowOrRows) ? rowOrRows : rowOrRows ? [rowOrRows] : [];
+
   function surveysQuery() {
+    const filters: Array<{ column: string; value: unknown }> = [];
     const query = {
-      eq: vi.fn(() => query),
-      order: vi.fn(() => query),
+      eq: vi.fn((column: string, value: unknown) => {
+        filters.push({ column, value });
+        return query;
+      }),
+      order: vi.fn((column: string, options?: { ascending?: boolean }) => {
+        surveyRows.sort((left, right) => {
+          const leftValue = String(left[column as keyof typeof surveyFixture] ?? "");
+          const rightValue = String(right[column as keyof typeof surveyFixture] ?? "");
+          return options?.ascending === false
+            ? rightValue.localeCompare(leftValue)
+            : leftValue.localeCompare(rightValue);
+        });
+        return query;
+      }),
       limit: vi.fn(() => query),
-      maybeSingle: vi.fn(async () => ({ data: row, error: null })),
-      single: vi.fn(async () => ({ data: row, error: row ? null : { message: "No rows" } })),
+      maybeSingle: vi.fn(async () => {
+        const [row] = filteredSurveyRows();
+        return { data: row ?? null, error: null };
+      }),
+      single: vi.fn(async () => {
+        const [row] = filteredSurveyRows();
+        return { data: row ?? null, error: row ? null : { message: "No rows" } };
+      }),
+      then: vi.fn((resolve: (value: { data: typeof surveyRows; error: null }) => void) =>
+        resolve({ data: filteredSurveyRows(), error: null }),
+      ),
     };
+
+    function filteredSurveyRows() {
+      return surveyRows.filter((survey) =>
+        filters.every((filter) => survey[filter.column as keyof typeof surveyFixture] === filter.value),
+      );
+    }
 
     return {
       select: vi.fn(() => query),
@@ -143,10 +177,30 @@ function surveyQuery(row: typeof surveyFixture | null = surveyFixture, responseR
   }
 
   function surveyResponsesQuery() {
+    const filters: Array<{ column: string; value: unknown }> = [];
+    const inFilters: Array<{ column: string; values: unknown[] }> = [];
     const query = {
-      eq: vi.fn(() => query),
-      limit: vi.fn(async () => ({ data: responseRows, error: null })),
+      eq: vi.fn((column: string, value: unknown) => {
+        filters.push({ column, value });
+        return query;
+      }),
+      in: vi.fn((column: string, values: unknown[]) => {
+        inFilters.push({ column, values });
+        return query;
+      }),
+      limit: vi.fn(() => query),
+      then: vi.fn((resolve: (value: { data: typeof responseRows; error: null }) => void) =>
+        resolve({ data: filteredResponseRows(), error: null }),
+      ),
     };
+
+    function filteredResponseRows() {
+      return responseRows.filter((response) => {
+        const matchesEq = filters.every((filter) => response[filter.column] === filter.value);
+        const matchesIn = inFilters.every((filter) => filter.values.includes(response[filter.column]));
+        return matchesEq && matchesIn;
+      });
+    }
 
     return {
       select: vi.fn(() => query),
@@ -216,6 +270,58 @@ describe("participant survey helpers", () => {
     await expect(loadParticipantSurvey("event-1", "raw-token")).resolves.toMatchObject({
       state: "closed",
       message: "This survey is closed. New responses are no longer being accepted.",
+    });
+  });
+
+  it("loads every published participant survey and ignores draft or closed surveys", async () => {
+    const olderPublishedSurvey = {
+      ...surveyFixture,
+      created_at: "2026-05-30T00:00:00.000Z",
+      id: "survey-older",
+      title: "Older published survey",
+      updated_at: "2026-05-30T00:00:00.000Z",
+    };
+    const latestDraftSurvey = {
+      ...surveyFixture,
+      created_at: "2026-06-01T00:00:00.000Z",
+      id: "survey-draft",
+      status: "draft",
+      title: "Latest draft survey",
+      updated_at: "2026-06-01T00:00:00.000Z",
+    };
+    const secondPublishedSurvey = {
+      ...surveyFixture,
+      created_at: "2026-05-31T00:00:00.000Z",
+      id: "survey-second",
+      title: "Second published survey",
+      updated_at: "2026-05-31T00:00:00.000Z",
+    };
+    const closedSurvey = {
+      ...surveyFixture,
+      created_at: "2026-05-29T00:00:00.000Z",
+      id: "survey-closed",
+      status: "closed",
+      title: "Closed survey",
+      updated_at: "2026-05-29T00:00:00.000Z",
+    };
+
+    surveyQuery(
+      [latestDraftSurvey, secondPublishedSurvey, closedSurvey, olderPublishedSurvey],
+      [{ id: "response-1", participant_session_id: "participant-session-1", survey_id: "survey-second" }],
+    );
+
+    await expect(loadParticipantSurveys("event-1", "raw-token")).resolves.toMatchObject({
+      state: "available",
+      surveys: [
+        {
+          completed: false,
+          survey: { id: "survey-older", title: "Older published survey" },
+        },
+        {
+          completed: true,
+          survey: { id: "survey-second", title: "Second published survey" },
+        },
+      ],
     });
   });
 

@@ -33,6 +33,19 @@ test("participant submits a published survey, sees hidden-results and duplicate 
   expect(overflow).toBe(false);
 });
 
+test("participant surveys page lists every published survey", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 720 });
+  await page.goto("/join/QSB2X9ZA/surveys?fixture=multi");
+
+  await expect(page.getByText("2 surveys open · 0 completed")).toBeVisible();
+  await expect(page.getByText("Pulse check")).toBeVisible();
+  await expect(page.getByText("Townhall follow-up")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Submit survey" }).first()).toBeVisible();
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  expect(overflow).toBe(false);
+});
+
 test("draft and closed surveys never render enabled participant response controls", async ({ page }) => {
   await page.goto("/join/QSB2X9ZA/surveys?fixture=closed");
   await expect(
