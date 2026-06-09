@@ -20,6 +20,10 @@ test("presenter view shows approved questions only without management controls",
   await expect(page.getByRole("heading", { level: 2, name: "Ask a question" })).toBeVisible();
   await expect(page.getByText("Scan the QR code or enter this code")).toBeVisible();
   await expect(page.getByText("QSB2-X9ZA", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("presenter-qna-join-qr")).toHaveAttribute(
+    "data-join-link",
+    "http://127.0.0.1:3000/join/QSB2X9ZA",
+  );
   await expect(page.getByText("Live Q&A active")).toBeVisible();
   await expect(page.getByText("Now answering")).toBeVisible();
   await expect(page.getByText("How will follow-up actions be shared?")).toBeVisible();

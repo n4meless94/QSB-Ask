@@ -281,4 +281,27 @@ describe("submit question action", () => {
     });
     expect(revalidatePathMock).toHaveBeenCalledWith("/join/QSB2X9ZA/qna");
   });
+
+  it("requires the participant cookie before using the E2E submission shortcut", async () => {
+    const previousE2eAuth = process.env.QSB_ASK_E2E_AUTH;
+
+    try {
+      process.env.QSB_ASK_E2E_AUTH = "1";
+      cookiesGetMock.mockReturnValueOnce(undefined);
+
+      const result = await submitQuestionAction("event-1", "QSB2X9ZA", form({ question: "Hello?" }));
+
+      expect(result).toMatchObject({
+        ok: false,
+        message: "Join this event again before submitting a question.",
+      });
+      expect(validateParticipantSessionMock).not.toHaveBeenCalled();
+    } finally {
+      if (previousE2eAuth === undefined) {
+        delete process.env.QSB_ASK_E2E_AUTH;
+      } else {
+        process.env.QSB_ASK_E2E_AUTH = previousE2eAuth;
+      }
+    }
+  });
 });

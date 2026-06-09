@@ -291,6 +291,8 @@ export function PresenterView({
                 <QRCodeCanvas
                   bgColor="#F8F7F2"
                   className="h-auto w-full max-w-full"
+                  data-join-link={joinLink}
+                  data-testid="presenter-qna-join-qr"
                   fgColor="#020617"
                   level="M"
                   marginSize={2}

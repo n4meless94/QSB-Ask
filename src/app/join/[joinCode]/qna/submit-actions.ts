@@ -34,13 +34,6 @@ export async function submitQuestionAction(
     };
   }
 
-  if (process.env.QSB_ASK_E2E_AUTH === "1" && eventId === "event-1") {
-    return {
-      ok: true,
-      message: "Question submitted. It is waiting for moderator review.",
-    };
-  }
-
   try {
     const cookieStore = await cookies();
     const rawToken = cookieStore.get(getParticipantCookieName(eventId))?.value;
@@ -49,6 +42,13 @@ export async function submitQuestionAction(
       return {
         ok: false,
         message: "Join this event again before submitting a question.",
+      };
+    }
+
+    if (process.env.QSB_ASK_E2E_AUTH === "1" && eventId === "event-1") {
+      return {
+        ok: true,
+        message: "Question submitted. It is waiting for moderator review.",
       };
     }
 

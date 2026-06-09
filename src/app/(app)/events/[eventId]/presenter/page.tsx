@@ -31,7 +31,7 @@ export default async function PresenterPage({ params, searchParams }: PresenterP
         eventName="Quarterly Briefing"
         fixtureMode
         joinCode="QSB2X9ZA"
-        joinLink="http://127.0.0.1:3000/join/QSB2X9ZA/qna"
+        joinLink="http://127.0.0.1:3000/join/QSB2X9ZA"
         questions={questions}
         selectedQuestionId={questionId}
       />
@@ -61,7 +61,7 @@ export default async function PresenterPage({ params, searchParams }: PresenterP
       eventId={eventId}
       eventName={result.access.event.name}
       joinCode={result.access.event.join_code}
-      joinLink={`${result.access.event.joinLink.replace(/\/+$/, "")}/qna`}
+      joinLink={result.access.event.joinLink}
       questions={result.questions}
       selectedQuestionId={questionId}
     />

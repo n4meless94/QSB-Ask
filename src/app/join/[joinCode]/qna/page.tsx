@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { ParticipantSectionNav } from "@/components/participants/ParticipantSectionNav";
 import { AudienceQuestionList } from "@/components/qna/AudienceQuestionList";
@@ -130,7 +131,7 @@ export default async function ParticipantQnaPage({ params, searchParams }: Parti
         listParticipantVoteQuestionIds(event.id, rawToken),
       ]);
     } else {
-      questions = await listPublicQuestions(event.id, { participantToken: rawToken });
+      redirect(`/join/${encodeURIComponent(joinCode)}`);
     }
   }
 
