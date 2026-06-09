@@ -279,7 +279,7 @@ export function PresenterView({
           <aside className="relative mx-auto grid w-full max-w-[360px] gap-[clamp(0.75rem,2.2vh,1.5rem)] rounded-[12px] border border-[#DCE7E3] bg-white/85 px-7 py-[clamp(1.25rem,3vh,2rem)] text-center shadow-[0_20px_50px_rgba(31,41,51,0.10)] sm:px-8">
             <div className="grid gap-1">
               <h2 className="text-[clamp(1.25rem,min(2vw,2.8vh),1.625rem)] font-black leading-[1.1] text-[#006B66]">
-                Ask a question
+                Ask a question anonymously
               </h2>
               <p className="text-[clamp(0.875rem,1.6vh,1rem)] font-semibold leading-[1.35] text-[#667085]">
                 Scan the QR code or enter this code

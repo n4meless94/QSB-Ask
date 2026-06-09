@@ -17,7 +17,7 @@ test("presenter view shows approved questions only without management controls",
 
   await expect(page.getByRole("heading", { level: 1, name: "Quarterly Briefing Presenter View" })).toBeVisible();
   await expect(page.getByText("Townhall Briefing")).toHaveCount(0);
-  await expect(page.getByRole("heading", { level: 2, name: "Ask a question" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Ask a question anonymously" })).toBeVisible();
   await expect(page.getByText("Scan the QR code or enter this code")).toBeVisible();
   await expect(page.getByText("QSB2-X9ZA", { exact: true })).toBeVisible();
   await expect(page.getByTestId("presenter-qna-join-qr")).toHaveAttribute(

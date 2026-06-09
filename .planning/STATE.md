@@ -174,6 +174,7 @@ Phase 5 Plan 01 is ready: event-scoped PDF deck upload, storage, validation, and
 
 | Date | Quick ID | Task | Verification |
 |------|----------|------|--------------|
+| 2026-06-09 | 260609-aqa | Presenter QR card anonymous question wording | Focused ESLint, focused presenter Playwright E2E, and `git diff --check` passed |
 | 2026-06-09 | 260609-2bt | Survey presenter/results UI polish for long labels and low-response states | Focused ESLint, `npx tsc --noEmit`, `npm test -- tests/surveys/results.test.ts`, focused survey Playwright E2E including 1920x1080 and 1920x1200 presenter checks, in-app browser public-results check, `npm run build`, and `git diff --check` passed |
 | 2026-06-09 | 260609-1jj | Mobile participant bottom tab navigation and Q&A upvote icon | Implementation commit `ee5df84`; focused ESLint, `npx tsc --noEmit`, participant Playwright E2E, in-app browser mobile viewport check, focused Vitest, `npm run build`, and `git diff --check` passed |
 | 2026-06-09 | 260609-17x | Participant all-published survey queue | `npx vitest run tests/surveys/participant.test.ts`, targeted `npx eslint`, `npx tsc --noEmit`, `npx playwright test tests/e2e/survey-submission.spec.ts`, and `git diff --check` passed; full `npm test` has unrelated date-sensitive failures in `tests/events/events.test.ts` |
