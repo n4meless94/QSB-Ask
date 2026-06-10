@@ -1,5 +1,7 @@
 "use client";
 
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+
 export type PresenterFocusMessage = {
   eventId: string;
   questionId: string;
@@ -34,14 +36,16 @@ function parseMessage(value: string | null) {
   }
 }
 
-export function publishPresenterFocus(eventId: string, questionId: string) {
-  const message: PresenterFocusMessage = {
-    eventId,
-    questionId,
-    sentAt: Date.now(),
-  };
+function createClientOrNull() {
+  try {
+    return createSupabaseBrowserClient();
+  } catch {
+    return null;
+  }
+}
 
-  globalThis.localStorage?.setItem(storageKey(eventId), JSON.stringify(message));
+function publishLocalFocus(message: PresenterFocusMessage) {
+  globalThis.localStorage?.setItem(storageKey(message.eventId), JSON.stringify(message));
   globalThis.dispatchEvent(new CustomEvent(CHANNEL_NAME, { detail: message }));
 
   if ("BroadcastChannel" in globalThis) {
@@ -51,10 +55,39 @@ export function publishPresenterFocus(eventId: string, questionId: string) {
   }
 }
 
+export function publishPresenterFocus(eventId: string, questionId: string) {
+  const message: PresenterFocusMessage = {
+    eventId,
+    questionId,
+    sentAt: Date.now(),
+  };
+
+  publishLocalFocus(message);
+
+  const supabase = createClientOrNull();
+  if (!supabase) return;
+
+  void supabase.auth.getUser().then(({ data }) => {
+    if (!data.user) return;
+
+    void supabase.from("event_presenter_state").upsert(
+      {
+        event_id: eventId,
+        focused_question_id: questionId,
+        updated_at: new Date(message.sentAt).toISOString(),
+        updated_by: data.user.id,
+      },
+      { onConflict: "event_id" },
+    );
+  });
+}
+
 export function subscribeToPresenterFocus(
   eventId: string,
   onFocus: (questionId: string) => void,
 ) {
+  const supabase = createClientOrNull();
+
   function applyMessage(message: PresenterFocusMessage | null) {
     if (message?.eventId === eventId) {
       onFocus(message.questionId);
@@ -66,6 +99,38 @@ export function subscribeToPresenterFocus(
 
   const channel =
     "BroadcastChannel" in globalThis ? new BroadcastChannel(CHANNEL_NAME) : null;
+
+  void supabase
+    ?.from("event_presenter_state")
+    .select("focused_question_id")
+    .eq("event_id", eventId)
+    .maybeSingle()
+    .then(({ data }) => {
+      if (data?.focused_question_id) {
+        onFocus(data.focused_question_id);
+      }
+    });
+
+  const presenterStateChannel = supabase
+    ?.channel(`qsb-ask-presenter-state-${eventId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        filter: `event_id=eq.${eventId}`,
+        schema: "public",
+        table: "event_presenter_state",
+      },
+      (payload) => {
+        const next = payload.new as { focused_question_id?: unknown };
+
+        if (typeof next.focused_question_id === "string") {
+          onFocus(next.focused_question_id);
+        }
+      },
+    );
+
+  presenterStateChannel?.subscribe();
 
   function handleBroadcast(event: MessageEvent) {
     applyMessage(isPresenterFocusMessage(event.data) ? event.data : null);
@@ -89,6 +154,9 @@ export function subscribeToPresenterFocus(
   return () => {
     channel?.removeEventListener("message", handleBroadcast);
     channel?.close();
+    if (presenterStateChannel) {
+      void supabase?.removeChannel(presenterStateChannel);
+    }
     globalThis.removeEventListener("storage", handleStorage);
     globalThis.removeEventListener(CHANNEL_NAME, handleLocalEvent);
   };

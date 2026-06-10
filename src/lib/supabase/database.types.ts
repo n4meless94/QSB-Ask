@@ -119,6 +119,49 @@ export type Database = {
           },
         ]
       }
+      event_presenter_state: {
+        Row: {
+          event_id: string
+          focused_question_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          event_id: string
+          focused_question_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          event_id?: string
+          focused_question_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_presenter_state_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_presenter_state_focused_question_id_fkey"
+            columns: ["focused_question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_presenter_state_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       login_attempts: {
         Row: {
           attempted_at: string
